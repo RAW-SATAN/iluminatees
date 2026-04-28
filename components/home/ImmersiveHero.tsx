@@ -65,12 +65,12 @@ export function ImmersiveHero() {
             <feComposite in="SourceGraphic" in2="mask" operator="in" result="worn"/>
             <feDisplacementMap in="worn" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
           </filter>
-          {/* Brutal brush stroke for red text */}
-          <filter id="brutal-brush" x="-8%" y="-45%" width="120%" height="195%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency="0.018 0.11" numOctaves="4" seed="9" result="noise"/>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G" result="distorted"/>
-            <feComponentTransfer in="distorted">
-              <feFuncA type="gamma" amplitude="1" exponent="0.7" offset="0"/>
+          {/* Brutal brush stroke — turbulence type for paint-like strokes */}
+          <filter id="brutal-brush" x="-12%" y="-60%" width="130%" height="220%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="turbulence" baseFrequency="0.008 0.065" numOctaves="3" seed="5" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="22" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+            <feComponentTransfer in="displaced">
+              <feFuncA type="gamma" amplitude="1.2" exponent="0.55" offset="-0.04"/>
             </feComponentTransfer>
           </filter>
         </defs>
