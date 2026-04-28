@@ -34,7 +34,7 @@ export default function CartPage() {
           {/* Items */}
           <div style={{ paddingRight: 48, paddingTop: 32 }}>
             {items.map((item, idx) => (
-              <div key={`${item.id}-${item.size}`} style={{ display: 'flex', gap: 20, padding: '24px 0', borderBottom: '1px solid rgba(240,236,232,.06)' }}>
+              <div key={`${item.productId}-${item.size}`} style={{ display: 'flex', gap: 20, padding: '24px 0', borderBottom: '1px solid rgba(240,236,232,.06)' }}>
                 <div style={{ width: 80, height: 80, flexShrink: 0, overflow: 'hidden' }}>
                   <img src={IMAGES[idx % IMAGES.length]} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
@@ -46,11 +46,11 @@ export default function CartPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                     <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 9, letterSpacing: '.18em', color: 'var(--r)', border: '1px solid rgba(204,0,0,.3)', padding: '2px 8px' }}>{item.size}</span>
                     <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(240,236,232,.12)', marginLeft: 'auto' }}>
-                      <button onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)} style={{ width: 30, height: 30, background: 'none', border: 'none', color: 'rgba(240,236,232,.5)', cursor: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                      <button onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)} style={{ width: 30, height: 30, background: 'none', border: 'none', color: 'rgba(240,236,232,.5)', cursor: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
                       <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, color: 'var(--w)', padding: '0 12px', borderLeft: '1px solid rgba(240,236,232,.12)', borderRight: '1px solid rgba(240,236,232,.12)' }}>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)} style={{ width: 30, height: 30, background: 'none', border: 'none', color: 'rgba(240,236,232,.5)', cursor: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                      <button onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)} style={{ width: 30, height: 30, background: 'none', border: 'none', color: 'rgba(240,236,232,.5)', cursor: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
                     </div>
-                    <button onClick={() => removeItem(item.id, item.size)} style={{ background: 'none', border: 'none', color: 'rgba(240,236,232,.25)', cursor: 'none', fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', marginLeft: 8 }}>✕ REMOVE</button>
+                    <button onClick={() => removeItem(item.productId, item.size)} style={{ background: 'none', border: 'none', color: 'rgba(240,236,232,.25)', cursor: 'none', fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', marginLeft: 8 }}>✕ REMOVE</button>
                   </div>
                 </div>
               </div>
