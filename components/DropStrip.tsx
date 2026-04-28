@@ -3,57 +3,34 @@ import { ArrowRight } from "lucide-react";
 import { CountdownTimer } from "./CountdownTimer";
 
 const DROP_ITEMS = [
-  { slug: "eye-of-providence",   name: "LIQUID METAL TEE",  price: "₹ 1,899", color: "#0d0005", accent: "#cc0010" },
-  { slug: "the-architect",       name: "VOID HOODIE",       price: "₹ 2,999", color: "#050010", accent: "#4400cc" },
-  { slug: "cipher-33",           name: "SHADOW CARGO",      price: "₹ 2,499", color: "#050505", accent: "#333" },
-  { slug: "sacred-geometry",     name: "ABSTRACT TEE",      price: "₹ 1,799", color: "#0a0a14", accent: "#888" },
-  { slug: "quantum-eye",         name: "DISTORT CAP",       price: "₹ 999",   color: "#00100f", accent: "#00aa88" },
+  { slug: "eye-of-providence", name: "LIQUID METAL TEE",  price: "₹ 1,899", img: "/hero-model.jpg",        imgPos: "center top" },
+  { slug: "the-architect",     name: "VOID HOODIE",       price: "₹ 2,999", img: "/tee-floating.jpg",      imgPos: "center center" },
+  { slug: "cipher-33",         name: "SHADOW CARGO",      price: "₹ 2,499", img: "/editorial-back.jpg",    imgPos: "center top" },
+  { slug: "sacred-geometry",   name: "ABSTRACT TEE",      price: "₹ 1,799", img: "/editorial-portrait.jpg",imgPos: "center top" },
+  { slug: "quantum-eye",       name: "DISTORT CAP",       price: "₹ 999",   img: "/editorial-swirl.jpg",   imgPos: "center center" },
 ];
-
-function MiniMockup({ color, accent }: { color: string; accent: string }) {
-  return (
-    <svg viewBox="0 0 200 240" width={110} height={132} aria-hidden>
-      <defs>
-        <radialGradient id={`g-${accent.replace("#","")}`} cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor={color} />
-          <stop offset="100%" stopColor="#000" />
-        </radialGradient>
-      </defs>
-      <path
-        d="M 68,28 C 80,10 120,10 132,28 L 158,16 L 198,52 L 176,80 L 158,64 L 158,232 L 42,232 L 42,64 L 24,80 L 2,52 L 42,16 Z"
-        fill={`url(#g-${accent.replace("#","")})`}
-        stroke={accent}
-        strokeWidth="0.8"
-        strokeOpacity="0.4"
-      />
-      <circle cx="100" cy="128" r="28" fill="none" stroke={accent} strokeWidth="1" opacity="0.5" />
-      <circle cx="100" cy="128" r="10" fill={accent} opacity="0.3" />
-    </svg>
-  );
-}
 
 export function DropStrip() {
   return (
     <section style={{ background: "#000", borderTop: "1px solid #111", borderBottom: "1px solid #111" }}>
       <div className="max-w-[1400px] mx-auto">
         <div className="flex">
+
           {/* ── Left label ─────────────────────────── */}
           <div
             className="flex-shrink-0 flex flex-col justify-center gap-3 px-6 py-8"
-            style={{ width: "160px", borderRight: "1px solid #111" }}
+            style={{ width: "150px", borderRight: "1px solid #111" }}
           >
-            <span className="tag-red text-[0.5rem]">FEATURED</span>
+            <span className="tag-red text-[0.48rem]">FEATURED</span>
             <h2
-              className="text-white text-lg leading-tight"
-              style={{ fontFamily: "Bebas Neue, sans-serif", letterSpacing: "0.05em" }}
+              className="text-white leading-tight"
+              style={{ fontFamily: "Bebas Neue, sans-serif", fontSize: "1.4rem", letterSpacing: "0.05em" }}
             >
               DROP
               <br />
               PIECES
             </h2>
-            <button
-              className="flex items-center justify-center w-8 h-8 rounded-full border border-white/20 hover:border-red-600 hover:bg-red-600/10 transition-all"
-            >
+            <button className="flex items-center justify-center w-8 h-8 rounded-full border border-white/20 hover:border-red-600 hover:bg-red-600/10 transition-all">
               <ArrowRight size={14} className="text-white" />
             </button>
           </div>
@@ -67,31 +44,43 @@ export function DropStrip() {
                   href={`/product/${item.slug}`}
                   className="strip-card flex-shrink-0 flex flex-col group"
                   style={{
-                    width: "180px",
+                    width: "190px",
                     borderRight: "1px solid #111",
                     borderLeft: "none",
                     borderTop: "none",
                     borderBottom: "none",
-                    background: "#0a0a0a",
+                    background: "#070707",
                   }}
                 >
                   {/* NEW badge */}
-                  <div className="relative pt-3 px-3">
+                  <div className="pt-3 px-3">
                     <span className="tag-red text-[0.45rem] px-1.5 py-0.5">NEW</span>
                   </div>
 
-                  {/* Image */}
+                  {/* Real product photo */}
                   <div
-                    className="flex items-center justify-center py-4"
-                    style={{ background: `radial-gradient(circle at 50% 40%, ${item.color}dd, #000)` }}
+                    className="overflow-hidden mx-0 mt-2"
+                    style={{ height: "170px" }}
                   >
-                    <MiniMockup color={item.color} accent={item.accent} />
+                    <img
+                      src={item.img}
+                      alt={item.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: item.imgPos,
+                        filter: "brightness(0.85) contrast(1.05)",
+                        transition: "transform 0.5s ease",
+                      }}
+                      className="group-hover:scale-105"
+                    />
                   </div>
 
                   {/* Info */}
-                  <div className="px-4 pb-5 space-y-1 mt-auto">
-                    <p className="text-xs font-bold text-white tracking-wide group-hover:text-red-500 transition-colors">{item.name}</p>
-                    <p className="text-xs text-gray-500">{item.price}</p>
+                  <div className="px-4 py-4 space-y-1 mt-auto">
+                    <p className="text-[0.72rem] font-bold text-white tracking-wide group-hover:text-red-500 transition-colors">{item.name}</p>
+                    <p className="text-[0.7rem] text-gray-500">{item.price}</p>
                   </div>
                 </Link>
               ))}
@@ -100,8 +89,8 @@ export function DropStrip() {
 
           {/* ── Countdown ──────────────────────────── */}
           <div
-            className="flex-shrink-0 flex items-center px-8 py-8"
-            style={{ width: "220px", borderLeft: "1px solid #111" }}
+            className="flex-shrink-0 flex items-center px-7 py-8"
+            style={{ width: "210px", borderLeft: "1px solid #111" }}
           >
             <CountdownTimer />
           </div>
