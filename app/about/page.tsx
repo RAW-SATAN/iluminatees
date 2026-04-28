@@ -1,31 +1,71 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function AboutPage() {
   const heroRef = useRef<HTMLDivElement>(null);
+  const [storyVisible, setStoryVisible] = useState(false);
+  const [valuesVisible, setValuesVisible] = useState(false);
+  const [manifestoVisible, setManifestoVisible] = useState(false);
 
+  /* Hero entrance animation */
   useEffect(() => {
-    // Animate hero elements on mount
     const el = heroRef.current;
     if (!el) return;
-    const children = el.querySelectorAll<HTMLElement>("[data-animate]");
+    const children = el.querySelectorAll<HTMLElement>("[data-hero]");
     children.forEach((child, i) => {
       child.style.opacity = "0";
-      child.style.transform = "translateY(32px)";
-      child.style.transition = `opacity 0.8s ease ${i * 0.15}s, transform 0.8s ease ${i * 0.15}s`;
-      requestAnimationFrame(() => {
+      child.style.transform = "translateY(36px)";
+      child.style.transition = `opacity 0.9s ease ${i * 0.18}s, transform 0.9s ease ${i * 0.18}s`;
+      requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           child.style.opacity = "1";
           child.style.transform = "translateY(0)";
-        });
-      });
+        })
+      );
     });
   }, []);
 
+  /* Scroll-reveal for other sections */
+  useEffect(() => {
+    const map: [string, () => void][] = [
+      ["[data-story]", () => setStoryVisible(true)],
+      ["[data-values]", () => setValuesVisible(true)],
+      ["[data-manifesto]", () => setManifestoVisible(true)],
+    ];
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const found = map.find(([sel]) => e.target.matches(sel));
+          if (found) {
+            found[1]();
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    map.forEach(([sel]) => {
+      const el = document.querySelector(sel);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, []);
+
+  const scrollDown = () =>
+    window.scrollTo({ top: window.innerHeight, behavior: "smooth" });
+
+  const reveal = (visible: boolean): React.CSSProperties => ({
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(44px)",
+    transition: "opacity 0.85s ease, transform 0.85s ease",
+  });
+
   return (
     <main style={{ background: "var(--blk)", color: "var(--w)", overflowX: "hidden" }}>
-      {/* ── 1. MANIFESTO HERO ───────────────────────────────── */}
+
+      {/* ── 1. MANIFESTO HERO ──────────────────────────────────── */}
       <section
         style={{
           minHeight: "100vh",
@@ -39,29 +79,32 @@ export default function AboutPage() {
           padding: "0 24px",
         }}
       >
-        <div ref={heroRef} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px" }}>
+        <div
+          ref={heroRef}
+          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}
+        >
           {/* Eyebrow */}
           <span
-            data-animate
+            data-hero
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontSize: "9px",
-              letterSpacing: "0.45em",
-              color: "var(--r)",
+              letterSpacing: "0.5em",
               textTransform: "uppercase",
+              color: "var(--r)",
             }}
           >
-            About the Brand
+            ABOUT THE BRAND
           </span>
 
-          {/* Big headline */}
-          <div data-animate style={{ lineHeight: 1 }}>
+          {/* Headline */}
+          <div data-hero style={{ lineHeight: 0.92 }}>
             <div
               style={{
                 fontFamily: "'Bebas Neue', sans-serif",
                 fontSize: "clamp(60px, 9vw, 140px)",
                 color: "var(--w)",
-                lineHeight: 0.95,
+                letterSpacing: "0.02em",
                 display: "block",
               }}
             >
@@ -72,7 +115,7 @@ export default function AboutPage() {
                 fontFamily: "'Bebas Neue', sans-serif",
                 fontSize: "clamp(60px, 9vw, 140px)",
                 color: "var(--w)",
-                lineHeight: 0.95,
+                letterSpacing: "0.02em",
                 display: "block",
               }}
             >
@@ -80,9 +123,9 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Accent line */}
+          {/* Accent */}
           <div
-            data-animate
+            data-hero
             style={{
               fontFamily: "'Rubik Dirt', cursive",
               fontSize: "clamp(36px, 4.5vw, 72px)",
@@ -96,45 +139,54 @@ export default function AboutPage() {
         </div>
 
         {/* Down arrow */}
-        <div
+        <button
+          onClick={scrollDown}
+          aria-label="Scroll down"
           style={{
             position: "absolute",
             bottom: "40px",
             left: "50%",
             transform: "translateX(-50%)",
+            background: "none",
+            border: "none",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "6px",
-            animation: "bounce 2s ease infinite",
+            gap: "8px",
+            cursor: "none",
           }}
         >
           <span
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontSize: "9px",
-              letterSpacing: "0.35em",
+              letterSpacing: "0.4em",
               color: "rgba(240,236,232,0.3)",
             }}
           >
             SCROLL
           </span>
-          <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
-            <line x1="8" y1="0" x2="8" y2="18" stroke="rgba(240,236,232,0.3)" strokeWidth="1" />
-            <polyline points="3,13 8,19 13,13" stroke="rgba(240,236,232,0.3)" strokeWidth="1" fill="none" />
+          <svg
+            width="16"
+            height="24"
+            viewBox="0 0 16 24"
+            fill="none"
+            style={{ animation: "float 2.2s ease-in-out infinite" }}
+          >
+            <line x1="8" y1="0" x2="8" y2="18" stroke="rgba(240,236,232,0.35)" strokeWidth="1" />
+            <polyline
+              points="3,13 8,19 13,13"
+              stroke="rgba(240,236,232,0.35)"
+              strokeWidth="1"
+              fill="none"
+            />
           </svg>
-        </div>
-
-        <style>{`
-          @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(8px); }
-          }
-        `}</style>
+        </button>
       </section>
 
-      {/* ── 2. BRAND STORY ──────────────────────────────────── */}
+      {/* ── 2. BRAND STORY ─────────────────────────────────────── */}
       <section
+        data-story
         style={{
           padding: "120px 52px",
           maxWidth: "1200px",
@@ -143,12 +195,14 @@ export default function AboutPage() {
           gridTemplateColumns: "60fr 40fr",
           gap: "64px",
           alignItems: "start",
+          ...reveal(storyVisible),
         }}
       >
         {/* Left */}
         <div style={{ position: "relative" }}>
           {/* Ghost number */}
           <span
+            aria-hidden
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
               fontSize: "120px",
@@ -176,7 +230,6 @@ export default function AboutPage() {
             >
               THE STORY
             </h2>
-
             <p
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
@@ -186,8 +239,8 @@ export default function AboutPage() {
                 marginBottom: "20px",
               }}
             >
-              ILUMINATEES was born from a simple idea: clothing should be a statement, not a uniform. We build for the
-              ones who refuse to disappear into the crowd.
+              ILUMINATEES was born from a simple idea: clothing should be a statement, not a uniform. We
+              build for the ones who refuse to disappear into the crowd.
             </p>
             <p
               style={{
@@ -197,13 +250,13 @@ export default function AboutPage() {
                 color: "rgba(240,236,232,0.65)",
               }}
             >
-              Every piece is designed to last — 220–280 GSM heavyweight cotton, pre-washed, oversized architecture. No
-              fast fashion. No compromises.
+              Every piece is designed to last — 220–280 GSM heavyweight cotton, pre-washed, oversized
+              architecture. No fast fashion. No compromises.
             </p>
           </div>
         </div>
 
-        {/* Right: stats card */}
+        {/* Right: Stats card */}
         <div
           style={{
             background: "#0d0d0d",
@@ -227,6 +280,7 @@ export default function AboutPage() {
                   color: "var(--r)",
                   lineHeight: 1,
                   marginBottom: "6px",
+                  letterSpacing: "0.01em",
                 }}
               >
                 {value}
@@ -247,11 +301,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 3. VALUES ───────────────────────────────────────── */}
+      {/* ── 3. VALUES ──────────────────────────────────────────── */}
       <section
+        data-values
         style={{
           background: "#0d0d0d",
           padding: "100px 52px",
+          ...reveal(valuesVisible),
         }}
       >
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -283,12 +339,12 @@ export default function AboutPage() {
               {
                 num: "02",
                 title: "REBELLION OVER CONFORMITY",
-                desc: "We don't follow trends. We ignore them.",
+                desc: "We don't follow trends. We ignore them entirely.",
               },
               {
                 num: "03",
                 title: "IDENTITY OVER TREND",
-                desc: "Wear who you are, not what you're told.",
+                desc: "Wear who you are, not what you're told to wear.",
               },
             ].map(({ num, title, desc }) => (
               <div
@@ -321,30 +377,32 @@ export default function AboutPage() {
                 >
                   {title}
                 </div>
-                <div
+                <p
                   style={{
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "12px",
                     color: "rgba(240,236,232,0.45)",
-                    lineHeight: 1.6,
+                    lineHeight: 1.7,
                   }}
                 >
                   {desc}
-                </div>
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── 4. MANIFESTO QUOTE ──────────────────────────────── */}
+      {/* ── 4. MANIFESTO QUOTE ─────────────────────────────────── */}
       <section
+        data-manifesto
         style={{
           padding: "120px 24px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
+          ...reveal(manifestoVisible),
         }}
       >
         <div style={{ maxWidth: "680px" }}>
@@ -358,16 +416,16 @@ export default function AboutPage() {
               marginBottom: "24px",
             }}
           >
-            "We are not for everyone. We are for the ones who know exactly who they are — and refuse to apologize for
-            it."
+            "We are not for everyone. We are for the ones who know exactly who they are — and refuse to
+            apologize for it."
           </p>
           <span
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontSize: "10px",
               letterSpacing: "0.4em",
-              color: "var(--r)",
               textTransform: "uppercase",
+              color: "var(--r)",
             }}
           >
             — ILUMINATEES, SS26

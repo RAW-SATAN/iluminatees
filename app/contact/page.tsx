@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [hoveredBtn, setHoveredBtn] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -16,31 +17,33 @@ export default function ContactPage() {
     setSubmitted(true);
   }
 
-  const inputStyle: React.CSSProperties = {
+  const fieldStyle = (name: string): React.CSSProperties => ({
     width: "100%",
     background: "#060606",
-    border: "1px solid rgba(240,236,232,0.1)",
+    border: `1px solid ${focusedField === name ? "var(--r)" : "rgba(240,236,232,0.1)"}`,
     color: "var(--w)",
     fontFamily: "'Space Grotesk', sans-serif",
     fontSize: "13px",
     padding: "14px 16px",
     outline: "none",
     transition: "border-color 0.2s",
-  };
+    display: "block",
+  });
 
   const labelStyle: React.CSSProperties = {
     fontFamily: "'Space Grotesk', sans-serif",
     fontSize: "10px",
     letterSpacing: "0.3em",
+    textTransform: "uppercase",
     color: "rgba(240,236,232,0.45)",
-    textTransform: "uppercase" as const,
     display: "block",
     marginBottom: "8px",
   };
 
   return (
     <main style={{ background: "var(--blk)", color: "var(--w)", overflowX: "hidden" }}>
-      {/* ── 1. HEADER ───────────────────────────────────────── */}
+
+      {/* ── 1. HEADER ──────────────────────────────────────────── */}
       <section
         style={{
           padding: "100px 52px 60px",
@@ -51,14 +54,14 @@ export default function ContactPage() {
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontSize: "9px",
-            letterSpacing: "0.45em",
-            color: "var(--r)",
+            letterSpacing: "0.5em",
             textTransform: "uppercase",
+            color: "var(--r)",
             display: "block",
             marginBottom: "16px",
           }}
         >
-          Get in Touch
+          GET IN TOUCH
         </span>
         <h1
           style={{
@@ -70,7 +73,7 @@ export default function ContactPage() {
             marginBottom: "20px",
           }}
         >
-          LET'S TALK.
+          LET&apos;S TALK.
         </h1>
         <p
           style={{
@@ -84,18 +87,17 @@ export default function ContactPage() {
         </p>
       </section>
 
-      {/* ── 2. CONTACT SPLIT ────────────────────────────────── */}
+      {/* ── 2. CONTACT SPLIT ───────────────────────────────────── */}
       <section
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "0",
           maxWidth: "1200px",
           margin: "0 auto",
           padding: "80px 52px",
-          alignItems: "start",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
           gap: "48px",
-        } as React.CSSProperties}
+          alignItems: "start",
+        }}
       >
         {/* LEFT: Form */}
         <div
@@ -112,7 +114,7 @@ export default function ContactPage() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                minHeight: "300px",
+                minHeight: "320px",
                 gap: "16px",
                 textAlign: "center",
               }}
@@ -123,26 +125,29 @@ export default function ContactPage() {
                   fontSize: "32px",
                   color: "var(--r)",
                   letterSpacing: "0.04em",
-                  lineHeight: 1.3,
+                  lineHeight: 1.35,
                 }}
               >
                 MESSAGE RECEIVED.
                 <br />
-                WE'LL BE IN TOUCH.
+                WE&apos;LL BE IN TOUCH.
               </div>
-              <div
+              <p
                 style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "11px",
+                  letterSpacing: "0.25em",
                   color: "rgba(240,236,232,0.4)",
-                  letterSpacing: "0.2em",
                 }}
               >
                 WITHIN 48 HOURS.
-              </div>
+              </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <form
+              onSubmit={handleSubmit}
+              style={{ display: "flex", flexDirection: "column", gap: "24px" }}
+            >
               {/* Name */}
               <div>
                 <label htmlFor="name" style={labelStyle}>Name</label>
@@ -153,9 +158,9 @@ export default function ContactPage() {
                   required
                   value={form.name}
                   onChange={handleChange}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "var(--r)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(240,236,232,0.1)")}
+                  onFocus={() => setFocusedField("name")}
+                  onBlur={() => setFocusedField(null)}
+                  style={fieldStyle("name")}
                   placeholder="Your name"
                 />
               </div>
@@ -170,9 +175,9 @@ export default function ContactPage() {
                   required
                   value={form.email}
                   onChange={handleChange}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "var(--r)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(240,236,232,0.1)")}
+                  onFocus={() => setFocusedField("email")}
+                  onBlur={() => setFocusedField(null)}
+                  style={fieldStyle("email")}
                   placeholder="your@email.com"
                 />
               </div>
@@ -187,9 +192,9 @@ export default function ContactPage() {
                   required
                   value={form.subject}
                   onChange={handleChange}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "var(--r)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(240,236,232,0.1)")}
+                  onFocus={() => setFocusedField("subject")}
+                  onBlur={() => setFocusedField(null)}
+                  style={fieldStyle("subject")}
                   placeholder="What's this about?"
                 />
               </div>
@@ -204,9 +209,9 @@ export default function ContactPage() {
                   required
                   value={form.message}
                   onChange={handleChange}
-                  style={{ ...inputStyle, resize: "vertical" }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "var(--r)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(240,236,232,0.1)")}
+                  onFocus={() => setFocusedField("message")}
+                  onBlur={() => setFocusedField(null)}
+                  style={{ ...fieldStyle("message"), resize: "vertical" }}
                   placeholder="Tell us everything."
                 />
               </div>
@@ -226,8 +231,8 @@ export default function ContactPage() {
                   letterSpacing: "0.12em",
                   padding: "16px",
                   cursor: "none",
-                  transition: "box-shadow 0.2s, background 0.2s",
-                  boxShadow: hoveredBtn ? "0 0 32px rgba(204,0,0,0.45)" : "none",
+                  transition: "box-shadow 0.25s",
+                  boxShadow: hoveredBtn ? "0 0 40px rgba(204,0,0,0.5)" : "none",
                 }}
               >
                 SEND MESSAGE
@@ -273,8 +278,8 @@ export default function ContactPage() {
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "9px",
                     letterSpacing: "0.35em",
-                    color: "var(--r)",
                     textTransform: "uppercase",
+                    color: "var(--r)",
                     marginBottom: "6px",
                   }}
                 >
@@ -295,7 +300,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* ── 3. BOTTOM STRIP ─────────────────────────────────── */}
+      {/* ── 3. BOTTOM STRIP ────────────────────────────────────── */}
       <section
         style={{
           background: "var(--r)",
@@ -303,6 +308,8 @@ export default function ContactPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "16px",
         }}
       >
         <span
@@ -316,13 +323,7 @@ export default function ContactPage() {
           FOLLOW THE MOVEMENT
         </span>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            alignItems: "center",
-          }}
-        >
+        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
           {["IG", "TK", "YT", "X"].map((handle) => (
             <span
               key={handle}

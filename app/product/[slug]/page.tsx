@@ -47,6 +47,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   };
 
   const gsm = getGSM(product.description);
+  const specs = [gsm, "OVERSIZED FIT", "FREE SHIPPING >₹999"];
 
   return (
     <div style={{ background: "var(--blk)", minHeight: "100vh" }}>
@@ -88,7 +89,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             flexDirection: "column",
             gap: "24px",
             overflowY: "auto",
-            paddingTop: "calc(48px + 72px)", // account for nav
+            paddingTop: "calc(48px + 72px)",
           }}
         >
           {/* Eyebrow */}
@@ -277,34 +278,42 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               borderTop: "1px solid rgba(240,236,232,0.06)",
             }}
           >
-            {[gsm, "OVERSIZED FIT", "FREE SHIPPING >₹999"].map((spec, i) => (
-              <>
-                <span
-                  key={spec}
-                  style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "9px",
-                    letterSpacing: "0.25em",
-                    textTransform: "uppercase",
-                    color: "rgba(240,236,232,0.4)",
-                    textAlign: i === 1 ? "center" : i === 2 ? "right" : "left",
-                  }}
-                >
-                  {spec}
-                </span>
-                {i < 2 && (
-                  <div
-                    key={`div-${i}`}
-                    style={{
-                      width: "1px",
-                      height: "20px",
-                      background: "rgba(240,236,232,0.12)",
-                      margin: "0 16px",
-                    }}
-                  />
-                )}
-              </>
+            {specs.map((spec, i) => (
+              <span
+                key={spec}
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: "9px",
+                  letterSpacing: "0.25em",
+                  textTransform: "uppercase",
+                  color: "rgba(240,236,232,0.4)",
+                  textAlign: i === 1 ? "center" : i === 2 ? "right" : "left",
+                  gridColumn: i === 0 ? 1 : i === 1 ? 3 : 5,
+                }}
+              >
+                {spec}
+              </span>
             ))}
+            <div
+              style={{
+                gridColumn: 2,
+                width: "1px",
+                height: "20px",
+                background: "rgba(240,236,232,0.12)",
+                margin: "0 16px",
+                justifySelf: "center",
+              }}
+            />
+            <div
+              style={{
+                gridColumn: 4,
+                width: "1px",
+                height: "20px",
+                background: "rgba(240,236,232,0.12)",
+                margin: "0 16px",
+                justifySelf: "center",
+              }}
+            />
           </div>
         </div>
       </div>
@@ -415,6 +424,7 @@ function RelatedCard({ product, image }: { product: Product; image: string }) {
             textTransform: "uppercase",
             padding: "3px 8px",
             fontWeight: 700,
+            zIndex: 1,
           }}
         >
           {product.category}
@@ -449,7 +459,7 @@ function RelatedCard({ product, image }: { product: Product; image: string }) {
               color: "var(--r)",
             }}
           >
-            {formatPrice(product.price)}
+            ₹ {product.price.toLocaleString("en-IN")}
           </span>
           <span
             style={{

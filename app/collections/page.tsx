@@ -36,7 +36,7 @@ function ProductCard({ product, imageIndex }: { product: Product; imageIndex: nu
         }}
         className="collection-card"
       >
-        {/* Image */}
+        {/* Image area */}
         <div
           style={{
             position: "relative",
@@ -55,7 +55,7 @@ function ProductCard({ product, imageIndex }: { product: Product; imageIndex: nu
             }}
             className="collection-card-img"
           />
-          {/* Category badge */}
+          {/* Category badge top-right */}
           <span
             style={{
               position: "absolute",
@@ -108,7 +108,7 @@ function ProductCard({ product, imageIndex }: { product: Product; imageIndex: nu
             {product.name}
           </p>
 
-          {/* Price + Limited row */}
+          {/* Price + Limited badge row */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <span
               style={{
@@ -156,7 +156,7 @@ function CollectionSection({
 
   return (
     <section style={{ marginBottom: "72px" }}>
-      {/* Section header row */}
+      {/* Section header row: name | red line | count */}
       <div
         style={{
           display: "flex",
@@ -177,7 +177,7 @@ function CollectionSection({
         >
           {category}
         </h2>
-        {/* Red line that fills remaining width */}
+        {/* Red horizontal line filling remaining width */}
         <div
           style={{
             flex: 1,
@@ -199,7 +199,7 @@ function CollectionSection({
         </span>
       </div>
 
-      {/* Description one-liner */}
+      {/* Collection description one-liner */}
       <p
         style={{
           fontFamily: "'Space Grotesk', sans-serif",
@@ -212,7 +212,7 @@ function CollectionSection({
         {description}
       </p>
 
-      {/* Product grid: 4 columns, 1px gap */}
+      {/* Product grid: 4 columns, 1px gap — tight grid with gap-as-border effect */}
       <div
         style={{
           display: "grid",
@@ -234,7 +234,6 @@ function CollectionSection({
 }
 
 export default function CollectionsPage() {
-  // Pre-calculate per-category offsets so images cycle globally
   const apexProducts = getProductsByCategory("APEX");
   const cipherProducts = getProductsByCategory("CIPHER");
 
@@ -245,14 +244,14 @@ export default function CollectionsPage() {
   return (
     <>
       <style>{`
-        .collection-card:hover .collection-card-img {
-          transform: scale(1.05);
-        }
         .collection-card {
           transition: border-color 0.2s;
         }
         .collection-card:hover {
           border-color: rgba(204,0,0,0.25);
+        }
+        .collection-card:hover .collection-card-img {
+          transform: scale(1.05);
         }
       `}</style>
 
@@ -309,7 +308,7 @@ export default function CollectionsPage() {
           </p>
         </div>
 
-        {/* COLLECTIONS */}
+        {/* COLLECTIONS: APEX, CIPHER, SACRED */}
         <div style={{ padding: "64px 52px" }}>
           <CollectionSection category="APEX" globalOffset={apexOffset} />
           <CollectionSection category="CIPHER" globalOffset={cipherOffset} />
