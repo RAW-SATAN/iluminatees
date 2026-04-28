@@ -28,8 +28,14 @@ export function ImmersiveNavbar() {
       </Link>
 
       <div style={{ display: 'flex', gap: 36 }}>
-        {['SHOP', 'COLLECTIONS', 'DROPS', 'ABOUT', 'COMMUNITY'].map(label => (
-          <Link key={label} href={label === 'SHOP' ? '/shop' : '#'} className="nav-link">{label}</Link>
+        {[
+          { label: 'SHOP',        href: '/shop' },
+          { label: 'COLLECTIONS', href: '/collections' },
+          { label: 'DROPS',       href: '/collections' },
+          { label: 'ABOUT',       href: '/about' },
+          { label: 'COMMUNITY',   href: '/contact' },
+        ].map(({ label, href }) => (
+          <Link key={label} href={href} className="nav-link">{label}</Link>
         ))}
       </div>
 

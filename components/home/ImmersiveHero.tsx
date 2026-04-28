@@ -86,7 +86,7 @@ export function ImmersiveHero() {
             <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(62px,8.4vw,134px)', lineHeight: .88, letterSpacing: '.01em', color: 'var(--w)', display: 'block', opacity: 0, transform: 'translateY(105%)', animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.46s forwards', filter: 'url(#grunge-text)' }}>TO FIT IN.</span>
           </div>
           <div style={{ overflow: 'visible' }}>
-            <span style={{ fontFamily: "'Permanent Marker',cursive", fontSize: 'clamp(44px,5.6vw,90px)', lineHeight: 1, color: 'var(--r)', display: 'inline-block', transform: 'skewX(-4deg)', transformOrigin: 'left bottom', letterSpacing: '.01em', opacity: 0, animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.62s forwards', filter: 'url(#brush-edge)', textShadow: '0 0 60px rgba(204,0,0,.5),0 0 120px rgba(180,0,0,.25)' }}>MADE TO STAND OUT.</span>
+            <span style={{ fontFamily: "'Rubik Dirt',cursive", fontSize: 'clamp(44px,5.6vw,90px)', lineHeight: 1, color: 'var(--r)', display: 'inline-block', transform: 'skewX(-4deg)', transformOrigin: 'left bottom', letterSpacing: '.01em', opacity: 0, animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.62s forwards', filter: 'url(#brush-edge)', textShadow: '0 0 60px rgba(204,0,0,.5),0 0 120px rgba(180,0,0,.25)' }}>MADE TO STAND OUT.</span>
           </div>
         </div>
         <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, lineHeight: 1.85, color: 'var(--m)', marginTop: 26, maxWidth: 295, opacity: 0, animation: 'fu .7s ease 3s forwards' }}>
