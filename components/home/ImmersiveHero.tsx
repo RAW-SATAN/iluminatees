@@ -55,6 +55,27 @@ export function ImmersiveHero() {
         ))}
       </div>
 
+      {/* SVG filters */}
+      <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }} aria-hidden>
+        <defs>
+          {/* Grunge/worn texture for white headline */}
+          <filter id="grunge-text" x="-4%" y="-4%" width="108%" height="108%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.62 0.62" numOctaves="4" seed="3" result="noise"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 9 -3.5" in="noise" result="mask"/>
+            <feComposite in="SourceGraphic" in2="mask" operator="in" result="worn"/>
+            <feDisplacementMap in="worn" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+          {/* Brutal brush stroke for red text */}
+          <filter id="brutal-brush" x="-8%" y="-45%" width="120%" height="195%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.018 0.11" numOctaves="4" seed="9" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G" result="distorted"/>
+            <feComponentTransfer in="distorted">
+              <feFuncA type="gamma" amplitude="1" exponent="0.7" offset="0"/>
+            </feComponentTransfer>
+          </filter>
+        </defs>
+      </svg>
+
       {/* left content */}
       <div style={{ position: 'relative', zIndex: 10, width: '46%', padding: 'clamp(108px,13vh,155px) 0 60px 52px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--r)', display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, opacity: 0, animation: 'fu .6s ease 2.6s forwards' }}>
@@ -62,13 +83,13 @@ export function ImmersiveHero() {
         </div>
         <div>
           <div style={{ overflow: 'hidden' }}>
-            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(62px,8.4vw,134px)', lineHeight: .88, letterSpacing: '.01em', color: 'var(--w)', display: 'block', opacity: 0, transform: 'translateY(105%)', animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.3s forwards' }}>NOT MADE</span>
+            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(62px,8.4vw,134px)', lineHeight: .88, letterSpacing: '.01em', color: 'var(--w)', display: 'block', opacity: 0, transform: 'translateY(105%)', animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.3s forwards', filter: 'url(#grunge-text)' }}>NOT MADE</span>
           </div>
           <div style={{ overflow: 'hidden' }}>
-            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(62px,8.4vw,134px)', lineHeight: .88, letterSpacing: '.01em', color: 'var(--w)', display: 'block', opacity: 0, transform: 'translateY(105%)', animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.46s forwards' }}>TO FIT IN.</span>
+            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(62px,8.4vw,134px)', lineHeight: .88, letterSpacing: '.01em', color: 'var(--w)', display: 'block', opacity: 0, transform: 'translateY(105%)', animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.46s forwards', filter: 'url(#grunge-text)' }}>TO FIT IN.</span>
           </div>
           <div style={{ overflow: 'visible' }}>
-            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(48px,6.2vw,100px)', lineHeight: .9, color: 'var(--r)', display: 'inline-block', transform: 'skewX(-10deg)', transformOrigin: 'left bottom', letterSpacing: '.02em', opacity: 0, animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.62s forwards', textShadow: '0 0 40px rgba(255,0,0,.45),0 0 80px rgba(200,0,0,.2)' }}>MADE TO STAND OUT.</span>
+            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(48px,6.2vw,100px)', lineHeight: .9, color: 'var(--r)', display: 'inline-block', transform: 'skewX(-10deg)', transformOrigin: 'left bottom', letterSpacing: '.02em', opacity: 0, animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.62s forwards', filter: 'url(#brutal-brush)', textShadow: '0 0 40px rgba(255,0,0,.45),0 0 80px rgba(200,0,0,.2)' }}>MADE TO STAND OUT.</span>
           </div>
         </div>
         <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, lineHeight: 1.85, color: 'var(--m)', marginTop: 26, maxWidth: 295, opacity: 0, animation: 'fu .7s ease 3s forwards' }}>
