@@ -235,6 +235,36 @@ export function ImmersiveHero() {
       className="relative min-h-screen flex items-end overflow-hidden pb-16"
       style={{ background: "#000" }}
     >
+      {/* SVG brush-stroke filter — applied to red headline */}
+      <svg width="0" height="0" style={{ position: "absolute", pointerEvents: "none" }} aria-hidden>
+        <defs>
+          <filter id="brutal-brush" x="-8%" y="-45%" width="120%" height="195%"
+            colorInterpolationFilters="sRGB">
+            {/* Horizontal brush turbulence — low X freq, higher Y for stroke direction */}
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.018 0.11"
+              numOctaves="4"
+              seed="9"
+              result="noise"
+            />
+            {/* Displace edges to look hand-brushed */}
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale="11"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="distorted"
+            />
+            {/* Boost contrast so edges stay crisp-ish but rough */}
+            <feComponentTransfer in="distorted">
+              <feFuncA type="gamma" amplitude="1" exponent="0.7" offset="0" />
+            </feComponentTransfer>
+          </filter>
+        </defs>
+      </svg>
+
       {/* Grid overlay */}
       <div className="grid-overlay" aria-hidden>
         {Array.from({ length: 12 }).map((_, i) => <span key={i} />)}
@@ -318,7 +348,11 @@ export function ImmersiveHero() {
               <h1 ref={h1Ref} className="hero-headline" aria-label="NOT MADE TO FIT IN.">
                 NOT MADE<br />TO FIT IN.
               </h1>
-              <span ref={redRef} className="hero-redline mt-1.5">
+              <span
+                ref={redRef}
+                className="hero-redline mt-1.5"
+                style={{ filter: "url(#brutal-brush)" }}
+              >
                 MADE TO STAND OUT.
               </span>
             </div>

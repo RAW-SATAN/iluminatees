@@ -72,6 +72,11 @@ a, button { cursor: none; }
   line-height: 1; color: #e8000d;
   transform: skewX(-10deg); transform-origin: left center;
   display: block; white-space: nowrap; letter-spacing: 0.02em;
+  text-shadow:
+    3px 2px 0 rgba(180,0,5,0.6),
+    6px 4px 0 rgba(120,0,3,0.3),
+    0 0 40px rgba(232,0,13,0.25);
+  will-change: filter;
 }
 .section-label {
   font-family: "Space Mono", monospace;
