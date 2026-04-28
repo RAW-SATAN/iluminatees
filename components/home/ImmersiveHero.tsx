@@ -65,13 +65,10 @@ export function ImmersiveHero() {
             <feComposite in="SourceGraphic" in2="mask" operator="in" result="worn"/>
             <feDisplacementMap in="worn" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
           </filter>
-          {/* Brutal brush stroke — turbulence type for paint-like strokes */}
-          <filter id="brutal-brush" x="-12%" y="-60%" width="130%" height="220%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="turbulence" baseFrequency="0.008 0.065" numOctaves="3" seed="5" result="noise"/>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="22" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
-            <feComponentTransfer in="displaced">
-              <feFuncA type="gamma" amplitude="1.2" exponent="0.55" offset="-0.04"/>
-            </feComponentTransfer>
+          {/* subtle edge roughen for red text — very light, just breaks clean edges */}
+          <filter id="brush-edge" x="-4%" y="-20%" width="108%" height="140%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04 0.02" numOctaves="3" seed="4" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
           </filter>
         </defs>
       </svg>
@@ -89,7 +86,7 @@ export function ImmersiveHero() {
             <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(62px,8.4vw,134px)', lineHeight: .88, letterSpacing: '.01em', color: 'var(--w)', display: 'block', opacity: 0, transform: 'translateY(105%)', animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.46s forwards', filter: 'url(#grunge-text)' }}>TO FIT IN.</span>
           </div>
           <div style={{ overflow: 'visible' }}>
-            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(48px,6.2vw,100px)', lineHeight: .9, color: 'var(--r)', display: 'inline-block', transform: 'skewX(-10deg)', transformOrigin: 'left bottom', letterSpacing: '.02em', opacity: 0, animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.62s forwards', filter: 'url(#brutal-brush)', textShadow: '0 0 40px rgba(255,0,0,.45),0 0 80px rgba(200,0,0,.2)' }}>MADE TO STAND OUT.</span>
+            <span style={{ fontFamily: "'Permanent Marker',cursive", fontSize: 'clamp(44px,5.6vw,90px)', lineHeight: 1, color: 'var(--r)', display: 'inline-block', transform: 'skewX(-4deg)', transformOrigin: 'left bottom', letterSpacing: '.01em', opacity: 0, animation: 'su .9s cubic-bezier(.22,1,.36,1) 2.62s forwards', filter: 'url(#brush-edge)', textShadow: '0 0 60px rgba(204,0,0,.5),0 0 120px rgba(180,0,0,.25)' }}>MADE TO STAND OUT.</span>
           </div>
         </div>
         <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, lineHeight: 1.85, color: 'var(--m)', marginTop: 26, maxWidth: 295, opacity: 0, animation: 'fu .7s ease 3s forwards' }}>
