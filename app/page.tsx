@@ -1,14 +1,14 @@
-import { HeroSection } from "@/components/HeroSection";
-import { DropStrip } from "@/components/DropStrip";
-import { EditorialGrid } from "@/components/EditorialGrid";
+import { ImmersiveHero } from "@/components/home/ImmersiveHero";
+import { FeaturedDrop } from "@/components/home/FeaturedDrop";
+import { EditorialSection } from "@/components/home/EditorialSection";
 import { InfoBar } from "@/components/InfoBar";
 
 export default function HomePage() {
   return (
     <>
-      <HeroSection />
-      <DropStrip />
-      <EditorialGrid />
+      <ImmersiveHero />
+      <FeaturedDrop />
+      <EditorialSection />
       <InfoBar />
     </>
   );
