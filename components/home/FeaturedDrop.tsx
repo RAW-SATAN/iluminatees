@@ -1,218 +1,99 @@
-"use client";
+'use client';
+import { useEffect, useRef, useState } from 'react';
 
-import { useEffect, useRef } from "react";
-import Link from "next/link";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Plus, ArrowRight } from "lucide-react";
-
-const PRODUCTS = [
-  { slug: "eye-of-providence", name: "LIQUID METAL TEE",  price: "₹ 1,899", img: "/hero-model.jpg",        pos: "center top",    label: "APEX", num: "001" },
-  { slug: "the-architect",     name: "VOID HOODIE",       price: "₹ 2,999", img: "/tee-floating.jpg",      pos: "center center", label: "CIPHER", num: "002" },
-  { slug: "cipher-33",         name: "SHADOW CARGO",      price: "₹ 2,499", img: "/editorial-back.jpg",    pos: "center top",    label: "SACRED", num: "003" },
-  { slug: "sacred-geometry",   name: "ABSTRACT TEE",      price: "₹ 1,799", img: "/editorial-portrait.jpg",pos: "center 20%",   label: "APEX", num: "004" },
-  { slug: "quantum-eye",       name: "DISTORT CAP",       price: "₹ 999",   img: "/editorial-swirl.jpg",   pos: "center center", label: "CIPHER", num: "005" },
+const DROPS = [
+  { name: 'LIQUID METAL TEE',  price: '₹ 1,899', img: '/hero-model.jpg' },
+  { name: 'VOID HOODIE',        price: '₹ 2,999', img: '/tee-floating.jpg' },
+  { name: 'SHADOW CARGO',       price: '₹ 2,499', img: '/editorial-portrait.jpg' },
+  { name: 'ABSTRACT TEE',       price: '₹ 1,799', img: '/editorial-back.jpg' },
+  { name: 'DISTORT CAP',        price: '₹ 999',   img: '/editorial-swirl.jpg' },
 ];
 
-/* Tilt effect on card */
-function useTilt(ref: React.RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width  - 0.5) * 18;
-      const y = ((e.clientY - r.top)  / r.height - 0.5) * 14;
-      gsap.to(el, { rotateY: x, rotateX: -y, transformPerspective: 800, duration: 0.4, ease: "power2.out" });
-    };
-    const onLeave = () => gsap.to(el, { rotateY: 0, rotateX: 0, duration: 0.6, ease: "power3.out" });
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => { el.removeEventListener("mousemove", onMove); el.removeEventListener("mouseleave", onLeave); };
-  }, []);
-}
-
-function ProductCard({ p }: { p: typeof PRODUCTS[0] }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  useTilt(cardRef as React.RefObject<HTMLElement>);
-
-  return (
-    <Link
-      href={`/product/${p.slug}`}
-      data-cursor
-      className="product-card flex-shrink-0"
-      style={{ width: "280px", height: "400px", background: "#0a0a0a", border: "1px solid #161616" }}
-    >
-      <div ref={cardRef} style={{ width: "100%", height: "100%", position: "relative", transformStyle: "preserve-3d" }}>
-        <img src={p.img} alt={p.name} className="card-img" style={{ objectPosition: p.pos }} />
-        <div className="card-overlay" />
-
-        {/* Header row */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3 z-10">
-          <span className="tag">{p.label}</span>
-          <span className="section-label">{p.num}</span>
-        </div>
-
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 z-10 flex items-end justify-between">
-          <div>
-            <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#fff", letterSpacing: "0.06em", lineHeight: 1.2 }}>
-              {p.name}
-            </p>
-            <p style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.45)", marginTop: "0.3rem" }}>{p.price}</p>
-          </div>
-
-          {/* ADD hover morph */}
-          <button
-            className="add-btn"
-            style={{
-              width: 36, height: 36, borderRadius: "50%",
-              background: "#e8000d", border: "none",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "transform 0.3s ease",
-            }}
-            onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3 })}
-            onMouseLeave={(e) => gsap.to(e.currentTarget, { scale: 1, duration: 0.3 })}
-          >
-            <Plus size={15} color="white" />
-          </button>
-        </div>
-      </div>
-    </Link>
-  );
-}
+function pad(n: number) { return String(Math.floor(n)).padStart(2, '0'); }
 
 export function FeaturedDrop() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const trackRef   = useRef<HTMLDivElement>(null);
-  const headerRef  = useRef<HTMLDivElement>(null);
+  const [time, setTime] = useState({ d: '09', h: '23', m: '56', s: '48' });
+  const stripRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const ctx = gsap.context(() => {
-      const track   = trackRef.current!;
-      const section = sectionRef.current!;
-
-      /* Horizontal scroll pin */
-      const trackW = track.scrollWidth - section.offsetWidth;
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          pin: true,
-          scrub: 1.2,
-          start: "top top",
-          end: () => `+=${trackW + 200}`,
-          anticipatePin: 1,
-        },
+    const target = new Date('2026-05-15T00:00:00').getTime();
+    const tick = () => {
+      const diff = target - Date.now();
+      if (diff < 0) return;
+      setTime({
+        d: pad(diff / 86400000),
+        h: pad((diff % 86400000) / 3600000),
+        m: pad((diff % 3600000) / 60000),
+        s: pad((diff % 60000) / 1000),
       });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
 
-      tl.to(track, { x: -trackW, ease: "none" });
-
-      /* Header reveal */
-      gsap.from(headerRef.current, {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        ease: "power3.out",
-        scrollTrigger: { trigger: section, start: "top 85%" },
+  useEffect(() => {
+    import('gsap').then(async ({ gsap }) => {
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(ScrollTrigger);
+      if (!stripRef.current) return;
+      ScrollTrigger.create({
+        trigger: stripRef.current,
+        start: 'top 85%',
+        onEnter: () => gsap.from(stripRef.current!.querySelectorAll('.ds-prod'), { opacity: 0, y: 28, stagger: .08, duration: .6, ease: 'power2.out' }),
       });
-
-      /* Card stagger reveal */
-      gsap.from(".featured-card", {
-        opacity: 0,
-        y: 40,
-        stagger: 0.1,
-        duration: 0.9,
-        ease: "power3.out",
-        scrollTrigger: { trigger: section, start: "top 80%" },
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
+    });
   }, []);
 
   return (
-    <div
-      ref={sectionRef}
-      className="h-scroll-outer"
-      style={{ background: "#000", borderTop: "1px solid #161616" }}
-    >
-      {/* Section header */}
-      <div
-        ref={headerRef}
-        className="flex items-center justify-between px-6 py-5"
-        style={{ borderBottom: "1px solid #161616", maxWidth: 1400, margin: "0 auto" }}
-      >
-        <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2.5">
-            <div style={{ width: 6, height: 6, background: "#e8000d", borderRadius: "50%" }} />
-            <span className="section-label">FEATURED DROP</span>
-          </div>
-          <div style={{ width: 1, height: 14, background: "#222" }} />
-          <h2 className="section-title" style={{ fontSize: "1.1rem" }}>SS&apos;24 COLLECTION</h2>
+    <div style={{ display: 'grid', gridTemplateColumns: '162px 1fr 216px', background: 'var(--s1)', borderTop: '1px solid rgba(240,236,232,.04)' }}>
+      {/* featured label */}
+      <div style={{ padding: '26px 22px', borderRight: '1px solid rgba(240,236,232,.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 8, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--r)', marginBottom: 5 }}>FEATURED</div>
+          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: 'var(--w)', letterSpacing: '.04em', lineHeight: 1 }}>DROP<br/>PIECES</div>
         </div>
-        <Link
-          href="/shop"
-          className="flex items-center gap-2 section-label"
-          style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none", letterSpacing: "0.25em", transition: "color 0.2s" }}
-        >
-          VIEW ALL <ArrowRight size={10} />
-        </Link>
+        <button style={{ width: 34, height: 34, borderRadius: '50%', border: '1px solid rgba(204,0,0,.38)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--r)', fontSize: 16, cursor: 'none', marginTop: 18, background: 'none', transition: 'background .2s, color .2s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background='var(--r)'; (e.currentTarget as HTMLButtonElement).style.color='var(--w)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background='none'; (e.currentTarget as HTMLButtonElement).style.color='var(--r)'; }}
+        >›</button>
       </div>
 
-      {/* Scroll track */}
-      <div
-        ref={trackRef}
-        className="h-scroll-track"
-        style={{ padding: "40px 40px 40px 40px", gap: "20px", alignItems: "center" }}
-      >
-        {/* Left label */}
-        <div
-          className="flex-shrink-0 flex flex-col gap-3 pr-10"
-          style={{ width: 140, borderRight: "1px solid #161616", paddingRight: "2.5rem" }}
-        >
-          <div>
-            <p className="section-label mb-1">TOTAL PIECES</p>
-            <p style={{ fontFamily: "Anton, sans-serif", fontSize: "3rem", color: "#fff", lineHeight: 1 }}>05</p>
-          </div>
-          <p style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.25)", lineHeight: 1.6, fontFamily: "Inter, sans-serif" }}>
-            Each piece is a limited<br />statement. No restock.
-          </p>
-          <button
-            className="flex items-center justify-center"
-            style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #222", background: "transparent" }}
+      {/* product rail */}
+      <div ref={stripRef} className="no-scrollbar" style={{ display: 'flex', overflowX: 'auto' }}>
+        {DROPS.map((d) => (
+          <div key={d.name} className="ds-prod" style={{ flexShrink: 0, width: 148, padding: '18px 14px 20px', cursor: 'none', position: 'relative', borderRight: '1px solid rgba(240,236,232,.04)', transition: 'background .25s' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.background='rgba(240,236,232,.025)'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background=''}
           >
-            <ArrowRight size={14} color="rgba(255,255,255,0.5)" />
-          </button>
-        </div>
-
-        {/* Cards */}
-        {PRODUCTS.map((p) => (
-          <div key={p.slug} className="featured-card flex-shrink-0">
-            <ProductCard p={p} />
+            <span style={{ position: 'absolute', top: 10, right: 8, background: 'var(--r)', color: 'var(--w)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 7, letterSpacing: '.1em', padding: '2px 7px', textTransform: 'uppercase', zIndex: 2 }}>NEW</span>
+            <div style={{ height: 96, overflow: 'hidden', marginBottom: 12 }}>
+              <img src={d.img} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+            </div>
+            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, fontWeight: 500, color: 'var(--w)', letterSpacing: '.04em', marginBottom: 3, textTransform: 'uppercase' }}>{d.name}</div>
+            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, color: 'rgba(240,236,232,.45)' }}>{d.price}</div>
           </div>
         ))}
-
-        {/* End CTA */}
-        <Link
-          href="/shop"
-          className="flex-shrink-0 flex flex-col items-center justify-center gap-4"
-          style={{ width: 160, height: 400, border: "1px solid #161616", background: "#080808", textDecoration: "none" }}
-          data-cursor
-        >
-          <ArrowRight size={20} color="#e8000d" />
-          <span style={{ fontFamily: "Anton, sans-serif", fontSize: "1.3rem", color: "#fff", letterSpacing: "0.08em", textAlign: "center", lineHeight: 1.1 }}>
-            VIEW<br />ALL
-          </span>
-          <span className="section-label">12 PRODUCTS</span>
-        </Link>
       </div>
 
-      {/* Progress bar */}
-      <div style={{ height: 1, background: "#0d0d0d", position: "relative" }}>
-        <div id="hscroll-bar" style={{ height: "100%", background: "#e8000d", width: "0%", transition: "width 0.1s" }} />
+      {/* countdown */}
+      <div style={{ padding: '22px 18px', borderLeft: '1px solid rgba(240,236,232,.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
+        <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 8, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--r)' }}>NEXT DROP IN</div>
+        <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+          {[{ v: time.d, l: 'DAYS' }, { v: time.h, l: 'HRS' }, { v: time.m, l: 'MINS' }, { v: time.s, l: 'SECS' }].map((u, i) => (
+            <div key={u.l} style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <div style={{ textAlign: 'center', minWidth: 42 }}>
+                <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 36, color: 'var(--w)', display: 'block', lineHeight: 1 }}>{u.v}</span>
+                <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 7, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', display: 'block', marginTop: 2 }}>{u.l}</span>
+              </div>
+              {i < 3 && <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 30, color: 'var(--r)', padding: '0 1px', marginBottom: 12 }}>:</span>}
+            </div>
+          ))}
+        </div>
+        <button style={{ background: 'none', border: 'none', fontFamily: "'Space Grotesk',sans-serif", fontSize: 9, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(240,236,232,.5)', display: 'flex', alignItems: 'center', gap: 8, cursor: 'none', transition: 'color .2s, gap .2s', padding: 0 }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color='var(--r)'; (e.currentTarget as HTMLButtonElement).style.gap='14px'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color='rgba(240,236,232,.5)'; (e.currentTarget as HTMLButtonElement).style.gap='8px'; }}
+        >JOIN THE WAITLIST →</button>
       </div>
     </div>
   );
