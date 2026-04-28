@@ -58,12 +58,12 @@ export function ImmersiveHero() {
       {/* SVG filters */}
       <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }} aria-hidden>
         <defs>
-          {/* Grunge/worn texture for white headline */}
-          <filter id="grunge-text" x="-4%" y="-4%" width="108%" height="108%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency="0.62 0.62" numOctaves="4" seed="3" result="noise"/>
-            <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 9 -3.5" in="noise" result="mask"/>
+          {/* Worn/distressed texture — large grain, punches holes in white text */}
+          <filter id="grunge-text" x="-4%" y="-8%" width="108%" height="116%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.038 0.042" numOctaves="5" seed="7" result="noise"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 4.5 -1.2" in="noise" result="mask"/>
             <feComposite in="SourceGraphic" in2="mask" operator="in" result="worn"/>
-            <feDisplacementMap in="worn" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+            <feDisplacementMap in="worn" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
           </filter>
           {/* Brutal brush stroke for red text */}
           <filter id="brutal-brush" x="-8%" y="-45%" width="120%" height="195%" colorInterpolationFilters="sRGB">
