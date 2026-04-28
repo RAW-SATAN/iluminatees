@@ -1,118 +1,101 @@
 import Link from "next/link";
 
+const SHOP_LINKS = [
+  { href: "/shop", label: "All Products" },
+  { href: "/shop?cat=APEX", label: "Apex Collection" },
+  { href: "/shop?cat=CIPHER", label: "Cipher Series" },
+  { href: "/shop?cat=SACRED", label: "Sacred Geometry" },
+];
+
+const HELP_LINKS = [
+  { href: "#", label: "Size Guide" },
+  { href: "#", label: "Shipping Info" },
+  { href: "#", label: "Returns & Exchanges" },
+  { href: "#", label: "Contact Us" },
+];
+
 export function Footer() {
   return (
-    <footer
-      className="relative mt-24 border-t"
-      style={{ borderColor: "rgba(201,168,76,0.1)", background: "var(--color-onyx)" }}
-    >
-      {/* Top gold line */}
-      <div
-        className="h-px w-full"
-        style={{
-          background: "linear-gradient(90deg, transparent, var(--color-gold-deep), var(--color-gold), var(--color-gold-deep), transparent)",
-        }}
-      />
+    <footer style={{ background: "#000", borderTop: "1px solid #111" }}>
+      <div className="max-w-[1400px] mx-auto px-6 pt-16 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-12" style={{ borderBottom: "1px solid #111" }}>
 
-      <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
-        {/* Brand */}
-        <div className="md:col-span-2 space-y-4">
-          <div className="flex items-center gap-3">
-            <svg width="24" height="24" viewBox="0 0 100 100" aria-hidden>
-              <polygon points="50,8 92,80 8,80" fill="none" stroke="#c9a84c" strokeWidth="2.5" />
-              <ellipse cx="50" cy="52" rx="11" ry="7" fill="none" stroke="#c9a84c" strokeWidth="1.5" />
-              <circle cx="50" cy="52" r="4" fill="#c9a84c" />
-            </svg>
-            <span
-              className="font-black tracking-[0.25em] text-sm"
-              style={{ fontFamily: "var(--font-cinzel)", color: "var(--color-gold)" }}
-            >
-              ILUMINATEES
-            </span>
-          </div>
-          <p className="text-xs leading-relaxed max-w-sm" style={{ color: "var(--color-muted)", fontFamily: "var(--font-body)" }}>
-            Secret society streetwear for those who already know. Limited drops.
-            Heavyweight cotton. Symbols that predate your civilization.
-          </p>
-          <p className="text-[0.5rem] tracking-[0.3em]" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>
-            EST. MMXXVI · INDIA
-          </p>
-        </div>
-
-        {/* Links */}
-        <div className="space-y-4">
-          <h4
-            className="text-[0.6rem] tracking-[0.4em]"
-            style={{ color: "var(--color-gold)", fontFamily: "var(--font-mono)" }}
-          >
-            THE VAULT
-          </h4>
-          {[
-            { href: "/shop", label: "All Threads" },
-            { href: "/shop?cat=APEX", label: "Apex Collection" },
-            { href: "/shop?cat=CIPHER", label: "Cipher Collection" },
-            { href: "/shop?cat=SACRED", label: "Sacred Collection" },
-          ].map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="block text-xs transition-colors duration-300 hover:text-[var(--color-gold)]"
-              style={{ color: "var(--color-muted)", fontFamily: "var(--font-body)" }}
-            >
-              {label}
+          {/* Brand */}
+          <div className="md:col-span-5 space-y-5">
+            <Link href="/">
+              <span
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif", fontSize: "1.8rem", letterSpacing: "0.12em" }}
+              >
+                ILUMINATEES<sup style={{ fontSize: "0.45em", marginLeft: "2px" }}>®</sup>
+              </span>
             </Link>
-          ))}
+            <p className="text-gray-500 text-xs leading-relaxed max-w-xs">
+              Not made to fit in. Worn by those who already stand out. Limited drops, heavyweight cotton, zero compromises.
+            </p>
+            <p className="text-[0.5rem] tracking-[0.35em] text-gray-700">EST. MMXXVI · INDIA</p>
+
+            {/* Social */}
+            <div className="flex items-center gap-3 pt-1">
+              {["IG", "TW", "YT"].map((s) => (
+                <a
+                  key={s}
+                  href="#"
+                  className="w-8 h-8 flex items-center justify-center border border-white/10 text-[0.55rem] font-bold tracking-widest text-gray-500 hover:border-red-600 hover:text-white transition-all"
+                >
+                  {s}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Shop */}
+          <div className="md:col-span-3 space-y-4">
+            <h4
+              className="text-[0.6rem] font-bold tracking-[0.35em] text-white"
+            >
+              SHOP
+            </h4>
+            {SHOP_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="block text-xs text-gray-500 hover:text-white transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Help */}
+          <div className="md:col-span-4 space-y-4">
+            <h4 className="text-[0.6rem] font-bold tracking-[0.35em] text-white">
+              HELP
+            </h4>
+            {HELP_LINKS.map(({ href, label }) => (
+              <a
+                key={label}
+                href={href}
+                className="block text-xs text-gray-500 hover:text-white transition-colors"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
         </div>
 
-        {/* The Order */}
-        <div className="space-y-4">
-          <h4
-            className="text-[0.6rem] tracking-[0.4em]"
-            style={{ color: "var(--color-gold)", fontFamily: "var(--font-mono)" }}
-          >
-            THE ORDER
-          </h4>
-          {[
-            { href: "#", label: "Size Guide" },
-            { href: "#", label: "Shipping Info" },
-            { href: "#", label: "Returns" },
-            { href: "#", label: "Contact" },
-          ].map(({ href, label }) => (
-            <a
-              key={label}
-              href={href}
-              className="block text-xs transition-colors duration-300 hover:text-[var(--color-gold)]"
-              style={{ color: "var(--color-muted)", fontFamily: "var(--font-body)" }}
-            >
-              {label}
-            </a>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom bar */}
-      <div
-        className="border-t px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3"
-        style={{ borderColor: "rgba(201,168,76,0.08)" }}
-      >
-        <span className="text-[0.5rem] tracking-[0.3em]" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>
-          © MMXXVI ILUMINATEES. ALL RIGHTS RESERVED. ALL TRUTHS ENCRYPTED.
-        </span>
-        <div className="flex items-center gap-2">
-          {["INSTAGRAM", "TWITTER"].map((s) => (
-            <a
-              key={s}
-              href="#"
-              className="text-[0.5rem] tracking-[0.25em] px-3 py-1.5 transition-all duration-300 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
-              style={{
-                fontFamily: "var(--font-mono)",
-                color: "var(--color-dim)",
-                border: "1px solid rgba(201,168,76,0.15)",
-              }}
-            >
-              {s}
-            </a>
-          ))}
+        {/* Bottom bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6">
+          <span className="text-[0.55rem] tracking-[0.25em] text-gray-700">
+            © 2026 ILUMINATEES. ALL RIGHTS RESERVED.
+          </span>
+          <div className="flex items-center gap-4 text-[0.55rem] tracking-[0.2em] text-gray-700">
+            <a href="#" className="hover:text-white transition-colors">PRIVACY</a>
+            <span style={{ color: "#222" }}>·</span>
+            <a href="#" className="hover:text-white transition-colors">TERMS</a>
+            <span style={{ color: "#222" }}>·</span>
+            <a href="#" className="hover:text-white transition-colors">COOKIES</a>
+          </div>
         </div>
       </div>
     </footer>

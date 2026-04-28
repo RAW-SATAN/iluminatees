@@ -2,8 +2,16 @@
 
 import Link from "next/link";
 import { useCart } from "./CartProvider";
-import { ShoppingBag, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+
+const NAV_LINKS = [
+  { href: "/shop", label: "SHOP" },
+  { href: "/shop?cat=APEX", label: "COLLECTIONS" },
+  { href: "/shop", label: "DROPS" },
+  { href: "/#about", label: "ABOUT" },
+  { href: "/#community", label: "COMMUNITY" },
+];
 
 export function Navbar() {
   const { itemCount } = useCart();
@@ -11,109 +19,67 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
+    const fn = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-40 transition-all duration-500"
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled
-          ? "rgba(3,3,3,0.96)"
-          : "transparent",
-        borderBottom: scrolled
-          ? "1px solid rgba(201,168,76,0.15)"
-          : "1px solid transparent",
-        backdropFilter: scrolled ? "blur(12px)" : "none",
+        background: scrolled ? "rgba(0,0,0,0.97)" : "rgba(0,0,0,0.6)",
+        borderBottom: scrolled ? "1px solid #1f1f1f" : "1px solid transparent",
+        backdropFilter: "blur(12px)",
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-[1400px] mx-auto px-6 h-[60px] flex items-center justify-between gap-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <svg width="28" height="28" viewBox="0 0 100 100" className="flex-shrink-0">
-            <polygon
-              points="50,8 92,80 8,80"
-              fill="none"
-              stroke="#c9a84c"
-              strokeWidth="2.5"
-              className="transition-all duration-500 group-hover:stroke-[#ffd700]"
-              style={{ filter: "drop-shadow(0 0 4px rgba(201,168,76,0.5))" }}
-            />
-            <ellipse cx="50" cy="52" rx="11" ry="7" fill="none" stroke="#c9a84c" strokeWidth="1.5" />
-            <circle cx="50" cy="52" r="4" fill="#c9a84c" style={{ filter: "drop-shadow(0 0 6px #c9a84c)" }} />
-            <line x1="18" y1="80" x2="82" y2="80" stroke="#c9a84c" strokeWidth="1.5" opacity="0.5" />
-          </svg>
+        <Link href="/" className="flex-shrink-0">
           <span
-            className="font-cinzel font-black tracking-[0.25em] text-sm hidden sm:block"
-            style={{
-              fontFamily: "var(--font-cinzel)",
-              background: "linear-gradient(90deg, #8b6914, #c9a84c, #ffd700, #c9a84c, #8b6914)",
-              backgroundSize: "200% auto",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              animation: "shimmer 4s linear infinite",
-            }}
+            className="font-display text-xl tracking-widest text-white"
+            style={{ fontFamily: "Bebas Neue, sans-serif", letterSpacing: "0.15em" }}
           >
-            ILUMINATEES
+            ILUMINATEES<sup className="text-[0.5em] ml-0.5">®</sup>
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-10">
-          {[
-            { href: "/shop", label: "VAULT" },
-            { href: "/shop?cat=APEX", label: "APEX" },
-            { href: "/shop?cat=CIPHER", label: "CIPHER" },
-          ].map(({ href, label }) => (
+        <nav className="hidden lg:flex items-center gap-8">
+          {NAV_LINKS.map(({ href, label }) => (
             <Link
-              key={href}
+              key={label}
               href={href}
-              className="text-[0.65rem] tracking-[0.3em] transition-colors duration-300"
-              style={{
-                fontFamily: "var(--font-mono)",
-                color: "var(--color-muted)",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-gold)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-muted)")}
+              className="text-[0.7rem] font-semibold tracking-[0.18em] text-gray-400 hover:text-white transition-colors duration-200"
             >
               {label}
             </Link>
           ))}
         </nav>
 
-        {/* Right side */}
-        <div className="flex items-center gap-4">
+        {/* Right */}
+        <div className="flex items-center gap-5">
+          <button className="hidden md:flex items-center gap-1.5 text-[0.65rem] font-semibold tracking-[0.2em] text-gray-400 hover:text-white transition-colors">
+            <Search size={14} />
+            <span>SEARCH</span>
+          </button>
+
+          <div
+            className="hidden md:block w-px h-4"
+            style={{ background: "#2a2a2a" }}
+          />
+
           <Link
             href="/cart"
-            className="relative flex items-center justify-center w-10 h-10 transition-colors duration-300 group"
+            className="flex items-center gap-1.5 text-[0.65rem] font-semibold tracking-[0.2em] text-gray-400 hover:text-white transition-colors"
           >
-            <ShoppingBag
-              size={20}
-              className="transition-colors duration-300"
-              style={{ color: itemCount > 0 ? "var(--color-gold)" : "var(--color-muted)" }}
-            />
-            {itemCount > 0 && (
-              <span
-                className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center"
-                style={{
-                  background: "var(--color-gold)",
-                  color: "var(--color-void)",
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                {itemCount > 9 ? "9+" : itemCount}
-              </span>
-            )}
+            <ShoppingCart size={14} />
+            <span>CART ({itemCount})</span>
           </Link>
 
-          {/* Mobile menu */}
           <button
-            className="md:hidden"
+            className="lg:hidden text-gray-400 hover:text-white transition-colors"
             onClick={() => setMenuOpen((v) => !v)}
-            style={{ color: "var(--color-muted)" }}
           >
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -122,29 +88,14 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div
-          className="md:hidden border-t"
-          style={{
-            background: "rgba(3,3,3,0.98)",
-            borderColor: "rgba(201,168,76,0.15)",
-          }}
-        >
-          {[
-            { href: "/shop", label: "VAULT" },
-            { href: "/shop?cat=APEX", label: "APEX" },
-            { href: "/shop?cat=CIPHER", label: "CIPHER" },
-            { href: "/cart", label: "ORDER BAG" },
-          ].map(({ href, label }) => (
+        <div className="lg:hidden border-t" style={{ background: "#000", borderColor: "#1f1f1f" }}>
+          {NAV_LINKS.map(({ href, label }) => (
             <Link
-              key={href}
+              key={label}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="block px-6 py-4 text-[0.65rem] tracking-[0.3em] border-b"
-              style={{
-                fontFamily: "var(--font-mono)",
-                color: "var(--color-muted)",
-                borderColor: "rgba(201,168,76,0.08)",
-              }}
+              className="block px-6 py-4 text-[0.7rem] font-semibold tracking-[0.2em] text-gray-400 hover:text-white border-b transition-colors"
+              style={{ borderColor: "#111" }}
             >
               {label}
             </Link>
