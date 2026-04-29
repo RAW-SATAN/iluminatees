@@ -9,99 +9,150 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortKey>('name');
   const [cat, setCat] = useState('ALL');
+  const [view, setView] = useState<'table' | 'grid'>('table');
 
   const filtered = products
     .filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
-      const matchCat = cat === 'ALL' || p.category === cat;
-      return matchSearch && matchCat;
+      const q = search.toLowerCase();
+      return (cat === 'ALL' || p.category === cat) && (!q || p.name.toLowerCase().includes(q) || p.tags.some(t => t.includes(q)));
     })
-    .sort((a, b) => {
-      if (sort === 'price') return a.price - b.price;
-      if (sort === 'category') return a.category.localeCompare(b.category);
-      return a.name.localeCompare(b.name);
-    });
+    .sort((a, b) => sort === 'price' ? a.price - b.price : sort === 'category' ? a.category.localeCompare(b.category) : a.name.localeCompare(b.name));
 
-  const th: React.CSSProperties = { fontFamily: "'Space Grotesk',sans-serif", fontSize: 8, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', padding: '10px 16px', textAlign: 'left', fontWeight: 600, background: '#080808', borderBottom: '1px solid rgba(240,236,232,.06)', whiteSpace: 'nowrap' };
-  const td: React.CSSProperties = { fontFamily: "'Space Grotesk',sans-serif", fontSize: 12, color: '#f0ece8', padding: '14px 16px', borderBottom: '1px solid rgba(240,236,232,.04)', verticalAlign: 'middle' };
+  const totalValue = products.reduce((s, p) => s + p.price, 0);
 
   return (
-    <div style={{ padding: '32px 36px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24, flexWrap: 'wrap', gap: 14 }}>
+    <div className="adm-page">
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <div style={{ fontSize: 9, letterSpacing: '.24em', textTransform: 'uppercase', color: '#cc0000', marginBottom: 6 }}>MANAGE</div>
-          <h1 style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 36, color: '#f0ece8', letterSpacing: '.04em', margin: 0 }}>PRODUCTS</h1>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#f0ece8', marginBottom: 4 }}>Products</div>
+          <div style={{ fontSize: 12, color: 'rgba(240,236,232,.35)' }}>{products.length} products · Catalogue value ₹{totalValue.toLocaleString('en-IN')}</div>
         </div>
-        <div style={{ fontSize: 10, letterSpacing: '.1em', color: 'rgba(240,236,232,.3)' }}>{filtered.length} / {products.length} shown</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link href="/shop" className="adm-btn-ghost" style={{ textDecoration: 'none', fontSize: 12, padding: '9px 16px', borderRadius: 4, border: '1px solid rgba(240,236,232,.12)', color: 'rgba(240,236,232,.6)', display: 'flex', alignItems: 'center', gap: 6 }}>View in store ↗</Link>
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 20 }}>
+        {[
+          { label: 'Total',   count: products.length,                                  color: '#f0ece8' },
+          { label: 'APEX',    count: products.filter(p => p.category === 'APEX').length,   color: '#cc0000' },
+          { label: 'CIPHER',  count: products.filter(p => p.category === 'CIPHER').length, color: '#f59e0b' },
+          { label: 'SACRED',  count: products.filter(p => p.category === 'SACRED').length, color: '#22c55e' },
+        ].map(s => (
+          <div key={s.label} className="adm-card" style={{ padding: '14px 16px' }}>
+            <div style={{ fontSize: 9, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', marginBottom: 4 }}>{s.label}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.count}</div>
+          </div>
+        ))}
       </div>
 
       {/* Toolbar */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-        <input
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search products…"
-          style={{ background: '#0d0d0d', border: '1px solid rgba(240,236,232,.1)', color: '#f0ece8', fontFamily: "'Space Grotesk',sans-serif", fontSize: 12, padding: '10px 14px', outline: 'none', flex: 1, minWidth: 180 }}
-        />
-        {['ALL','APEX','CIPHER','SACRED'].map(c => (
-          <button key={c} onClick={() => setCat(c)} style={{ background: cat === c ? 'rgba(204,0,0,.12)' : '#0d0d0d', border: cat === c ? '1px solid rgba(204,0,0,.4)' : '1px solid rgba(240,236,232,.1)', color: cat === c ? '#cc0000' : 'rgba(240,236,232,.5)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.14em', padding: '10px 16px', cursor: 'pointer', transition: 'all .2s' }}>{c}</button>
-        ))}
-        <select value={sort} onChange={e => setSort(e.target.value as SortKey)} style={{ background: '#0d0d0d', border: '1px solid rgba(240,236,232,.1)', color: 'rgba(240,236,232,.5)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.1em', padding: '10px 14px', cursor: 'pointer' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input className="adm-input" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products, tags…" style={{ maxWidth: 240 }} />
+        <div style={{ display: 'flex', gap: 0, border: '1px solid rgba(240,236,232,.08)', borderRadius: 4, overflow: 'hidden' }}>
+          {['ALL','APEX','CIPHER','SACRED'].map(c => (
+            <button key={c} onClick={() => setCat(c)} style={{ background: cat === c ? 'rgba(204,0,0,.1)' : 'transparent', border: 'none', borderRight: '1px solid rgba(240,236,232,.08)', color: cat === c ? '#cc0000' : 'rgba(240,236,232,.4)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.1em', padding: '8px 14px', cursor: 'pointer', textTransform: 'uppercase', transition: 'all .15s' }}>{c}</button>
+          ))}
+        </div>
+        <select value={sort} onChange={e => setSort(e.target.value as SortKey)} className="adm-input" style={{ width: 'auto', cursor: 'pointer' }}>
           <option value="name">Sort: Name</option>
           <option value="price">Sort: Price</option>
           <option value="category">Sort: Category</option>
         </select>
+        {/* View toggle */}
+        <div style={{ marginLeft: 'auto', display: 'flex', border: '1px solid rgba(240,236,232,.08)', borderRadius: 4, overflow: 'hidden' }}>
+          {(['table','grid'] as const).map(v => (
+            <button key={v} onClick={() => setView(v)} style={{ background: view === v ? 'rgba(240,236,232,.08)' : 'transparent', border: 'none', color: view === v ? '#f0ece8' : 'rgba(240,236,232,.35)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, padding: '8px 12px', cursor: 'pointer' }}>
+              {v === 'table' ? '☰' : '⊞'}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div style={{ border: '1px solid rgba(240,236,232,.06)', overflow: 'hidden', overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
-          <thead>
-            <tr>
-              <th style={th}>Product</th><th style={th}>Category</th><th style={th}>Price</th>
-              <th style={th}>Sizes</th><th style={th}>Tags</th><th style={th}>Stock</th><th style={th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((p, i) => (
-              <tr key={p.id} style={{ background: i % 2 === 0 ? '#0d0d0d' : 'transparent', transition: 'background .2s' }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background='rgba(240,236,232,.02)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background=i % 2 === 0 ? '#0d0d0d' : 'transparent'}
+      {/* Grid view */}
+      {view === 'grid' ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 10 }}>
+          {filtered.map(p => (
+            <Link key={p.id} href={`/product/${p.slug}`} style={{ textDecoration: 'none' }}>
+              <div className="adm-card" style={{ overflow: 'hidden', transition: 'border-color .2s', cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(204,0,0,.3)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,232,.06)'}
               >
-                <td style={td}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, background: p.shirtColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: p.accentColor, opacity: .8, flexShrink: 0 }}>◈</div>
-                    <div>
-                      <div style={{ fontWeight: 600, marginBottom: 1 }}>{p.name}</div>
-                      <div style={{ fontSize: 9, color: 'rgba(240,236,232,.3)', letterSpacing: '.1em' }}>{p.codename}</div>
-                    </div>
+                <div style={{ background: p.shirtColor, aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, color: p.accentColor, opacity: .7 }}>◈</div>
+                <div style={{ padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#f0ece8', marginBottom: 2 }}>{p.name}</div>
+                  <div style={{ fontSize: 9, letterSpacing: '.12em', color: 'rgba(240,236,232,.3)', marginBottom: 6, textTransform: 'uppercase' }}>{p.category}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#cc0000' }}>₹{p.price.toLocaleString('en-IN')}</span>
+                    {p.limited && <span className="adm-badge adm-badge-yellow" style={{ fontSize: 8 }}>LIMITED</span>}
+                    {p.inStock ? <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} /> : <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#6b7280', display: 'inline-block' }} />}
                   </div>
-                </td>
-                <td style={td}><span style={{ fontSize: 9, letterSpacing: '.14em', color: '#cc0000', border: '1px solid rgba(204,0,0,.25)', padding: '3px 8px', textTransform: 'uppercase' }}>{p.category}</span></td>
-                <td style={{ ...td, fontWeight: 700, color: '#cc0000' }}>
-                  ₹{p.price.toLocaleString('en-IN')}
-                  {p.originalPrice && <div style={{ fontSize: 10, color: 'rgba(240,236,232,.3)', textDecoration: 'line-through', fontWeight: 400 }}>₹{p.originalPrice.toLocaleString('en-IN')}</div>}
-                </td>
-                <td style={{ ...td, fontSize: 10 }}>{p.sizes.join(', ')}</td>
-                <td style={td}>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                    {p.tags.map(t => <span key={t} style={{ fontSize: 8, letterSpacing: '.1em', color: 'rgba(240,236,232,.35)', border: '1px solid rgba(240,236,232,.08)', padding: '2px 6px', textTransform: 'uppercase' }}>{t}</span>)}
-                    {p.limited && <span style={{ fontSize: 8, letterSpacing: '.1em', color: '#f59e0b', border: '1px solid rgba(245,158,11,.3)', padding: '2px 6px', textTransform: 'uppercase' }}>LIMITED</span>}
-                  </div>
-                </td>
-                <td style={td}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.inStock ? '#22c55e' : '#cc0000', display: 'inline-block' }} />
-                  <span style={{ fontSize: 10, color: 'rgba(240,236,232,.4)', marginLeft: 6 }}>{p.inStock ? 'In Stock' : 'Out'}</span>
-                </td>
-                <td style={td}>
-                  <Link href={`/product/${p.slug}`} style={{ fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', color: '#cc0000', textDecoration: 'none', border: '1px solid rgba(204,0,0,.25)', padding: '4px 10px', transition: 'background .2s' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.background='rgba(204,0,0,.1)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.background='transparent'}
-                  >VIEW →</Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        /* Table view */
+        <div className="adm-card" style={{ overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="adm-table" style={{ minWidth: 700 }}>
+              <thead>
+                <tr>
+                  <th className="adm-th">Product</th>
+                  <th className="adm-th">Category</th>
+                  <th className="adm-th">Price</th>
+                  <th className="adm-th">Sizes</th>
+                  <th className="adm-th">Tags</th>
+                  <th className="adm-th">Stock</th>
+                  <th className="adm-th">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((p, i) => (
+                  <tr key={p.id}
+                    style={{ cursor: 'pointer', transition: 'background .15s' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,232,.02)'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                  >
+                    <td className="adm-td">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 36, height: 36, background: p.shirtColor, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: p.accentColor, borderRadius: 4 }}>◈</div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#f0ece8' }}>{p.name}</div>
+                          <div style={{ fontSize: 10, color: 'rgba(240,236,232,.3)' }}>{p.codename}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="adm-td"><span className="adm-badge adm-badge-red" style={{ fontSize: 9 }}>{p.category}</span></td>
+                    <td className="adm-td">
+                      <div style={{ fontWeight: 700, color: '#cc0000' }}>₹{p.price.toLocaleString('en-IN')}</div>
+                      {p.originalPrice && <div style={{ fontSize: 10, color: 'rgba(240,236,232,.3)', textDecoration: 'line-through' }}>₹{p.originalPrice.toLocaleString('en-IN')}</div>}
+                    </td>
+                    <td className="adm-td" style={{ fontSize: 11, color: 'rgba(240,236,232,.5)' }}>{p.sizes.join(' · ')}</td>
+                    <td className="adm-td">
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {p.tags.map(t => <span key={t} className="adm-badge adm-badge-gray" style={{ fontSize: 8 }}>{t}</span>)}
+                        {p.limited && <span className="adm-badge adm-badge-yellow" style={{ fontSize: 8 }}>LIMITED</span>}
+                      </div>
+                    </td>
+                    <td className="adm-td">
+                      <span className={`adm-badge ${p.inStock ? 'adm-badge-green' : 'adm-badge-gray'}`} style={{ fontSize: 10 }}>
+                        {p.inStock ? '● In Stock' : '● Out of Stock'}
+                      </span>
+                    </td>
+                    <td className="adm-td">
+                      <Link href={`/product/${p.slug}`} className="adm-btn-ghost" style={{ textDecoration: 'none', fontSize: 11, padding: '5px 12px', display: 'inline-block', borderRadius: 4 }}>View</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
