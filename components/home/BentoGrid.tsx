@@ -34,8 +34,24 @@ export function BentoGrid() {
 
   return (
     <>
-      {/* Bento Top — 4 equal photo cells */}
-      <div ref={topRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
+      <style>{`
+        .bento-top-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+        .bento-bot-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 56px; }
+        .bi-red-strip { display: flex; }
+        @media (max-width: 900px) {
+          .bento-top-grid { grid-template-columns: repeat(2,1fr); }
+          .bento-bot-grid { grid-template-columns: 1fr 1fr; }
+          .bi-red-strip { display: none; }
+        }
+        @media (max-width: 520px) {
+          .bento-top-grid { grid-template-columns: 1fr 1fr; }
+          .bento-bot-grid { grid-template-columns: 1fr; }
+          .bi { min-height: 220px !important; }
+        }
+      `}</style>
+
+      {/* Bento Top */}
+      <div ref={topRef} className="bento-top-grid">
         {BENTO_TOP.map((b) => (
           <div key={b.eye} className="bi" style={{ position: 'relative', overflow: 'hidden', cursor: 'none', minHeight: 290, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '26px 24px' }}>
             <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
@@ -56,7 +72,7 @@ export function BentoGrid() {
       </div>
 
       {/* Bento Bottom */}
-      <div ref={botRef} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 56px' }}>
+      <div ref={botRef} className="bento-bot-grid">
         {/* newsletter */}
         <div className="bi-bot" style={{ background: 'var(--s2)', padding: '30px 26px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: 230, position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 80% at 50% 130%,rgba(204,0,0,.08),transparent)', pointerEvents: 'none' }} />
@@ -65,8 +81,8 @@ export function BentoGrid() {
             <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--r)', padding: '14px 0' }}>You&apos;re in. Watch for the light. ✦</div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', border: '1px solid rgba(240,236,232,.09)', overflow: 'hidden' }}>
-              <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="ENTER YOUR EMAIL" style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--w)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.08em', padding: '13px 14px', outline: 'none' }} />
-              <button type="submit" style={{ width: 44, background: 'var(--r)', border: 'none', color: 'var(--w)', cursor: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background .2s' }}>→</button>
+              <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="ENTER YOUR EMAIL" style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--w)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.08em', padding: '13px 14px', outline: 'none', minWidth: 0 }} />
+              <button type="submit" style={{ width: 44, background: 'var(--r)', border: 'none', color: 'var(--w)', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background .2s' }}>→</button>
             </form>
           )}
         </div>
@@ -99,8 +115,8 @@ export function BentoGrid() {
           </div>
         </div>
 
-        {/* red strip */}
-        <div className="bi-bot" style={{ background: 'var(--r)', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 230 }}>
+        {/* red strip — hidden on mobile via CSS */}
+        <div className="bi-bot bi-red-strip" style={{ background: 'var(--r)', alignItems: 'center', justifyContent: 'center', minHeight: 230 }}>
           <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, letterSpacing: '.28em', color: 'rgba(0,0,0,.32)', writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>ILUMINATEES®</div>
         </div>
       </div>

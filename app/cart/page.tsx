@@ -29,7 +29,7 @@ export default function CartPage() {
           </Link>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 0, padding: '0 52px 80px', maxWidth: 1400, margin: '0 auto' }}>
+        <div className="cart-split" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 0, padding: '0 52px 80px', maxWidth: 1400, margin: '0 auto' }}>
 
           {/* Items */}
           <div style={{ paddingRight: 48, paddingTop: 32 }}>
@@ -76,9 +76,12 @@ export default function CartPage() {
                 <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: 'var(--w)', letterSpacing: '.04em' }}>TOTAL</span>
                 <span style={{ fontFamily: "'Rubik Dirt',cursive", fontSize: 28, color: 'var(--r)' }}>₹ {(total + shipping).toLocaleString('en-IN')}</span>
               </div>
-              <button style={{ width: '100%', background: 'var(--r)', border: 'none', color: 'var(--w)', fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, letterSpacing: '.1em', padding: '18px 0', cursor: 'none', transition: 'box-shadow .25s' }}>
-                PROCEED TO CHECKOUT
-              </button>
+              <Link href="/checkout" style={{ display: 'block', width: '100%', background: 'var(--r)', border: 'none', color: 'var(--w)', fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, letterSpacing: '.1em', padding: '18px 0', cursor: 'pointer', transition: 'box-shadow .25s', textDecoration: 'none', textAlign: 'center' }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.boxShadow='0 8px 32px rgba(204,0,0,.4)'}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.boxShadow='none'}
+              >
+                PROCEED TO CHECKOUT →
+              </Link>
               <Link href="/shop" style={{ display: 'block', textAlign: 'center', fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', textDecoration: 'none', marginTop: 16 }}>
                 CONTINUE SHOPPING
               </Link>

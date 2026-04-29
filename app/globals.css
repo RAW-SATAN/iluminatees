@@ -20,7 +20,8 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: auto; }
+html { scroll-behavior: auto; overflow-x: hidden; }
+img { max-width: 100%; }
 body {
   background: var(--blk);
   color: var(--w);
@@ -210,18 +211,11 @@ body.cx .cur-label { opacity: 1; }
 }
 
 /* Cart layout */
-.cart-split {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 0;
-  padding: 0 52px 80px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
 @media (max-width: 900px) {
   .cart-split {
-    grid-template-columns: 1fr;
-    padding: 0 20px 60px;
+    grid-template-columns: 1fr !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 }
 
@@ -330,4 +324,19 @@ body.cx .cur-label { opacity: 1; }
   .sticky-mobile-bar {
     display: flex !important;
   }
+}
+
+/* Admin layout override — prevent site-wide cursor:none */
+.admin-cursor-reset, .admin-cursor-reset * {
+  cursor: auto !important;
+}
+.admin-cursor-reset button, .admin-cursor-reset a, .admin-cursor-reset select, .admin-cursor-reset input {
+  cursor: pointer !important;
+}
+.admin-cursor-reset input[type="text"],
+.admin-cursor-reset input[type="email"],
+.admin-cursor-reset input[type="tel"],
+.admin-cursor-reset input[type="password"],
+.admin-cursor-reset input[type="number"] {
+  cursor: text !important;
 }
