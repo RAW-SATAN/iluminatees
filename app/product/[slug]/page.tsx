@@ -1,11 +1,12 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { useState, use } from "react";
+import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getProductBySlug, getProductsByCategory, type Product, type ProductSize } from "@/lib/products";
-import { AddToCartButton } from "@/components/AddToCartButton";
+import { useCart } from "@/components/CartProvider";
 
 const SIZES: ProductSize[] = ["XS", "S", "M", "L", "XL", "XXL"];
 const IMAGES = [
@@ -31,8 +32,13 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   if (!product) notFound();
 
+  const router = useRouter();
+  const { addItem } = useCart();
+
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [sizeError, setSizeError] = useState(false);
+  const [viewerCount, setViewerCount] = useState(Math.floor(Math.random() * 17) + 8);
+  const [addedState, setAddedState] = useState<"idle" | "added">("idle");
 
   const related = getProductsByCategory(product.category)
     .filter((p) => p.id !== product.id)
@@ -41,9 +47,52 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const productImageIdx = parseInt(product.id, 10) % IMAGES.length;
   const productImage = IMAGES[productImageIdx];
 
+  // Stock scarcity: deterministic 2–5
+  const stockCount = (parseInt(product.id) % 4) + 2;
+
+  // Low-stock size indices: pick 1-2 based on product.id
+  const lowIdx1 = parseInt(product.id) % 6;
+  const lowIdx2 = (parseInt(product.id) + 2) % 6;
+  const lowSizes = new Set([SIZES[lowIdx1], SIZES[lowIdx2]]);
+
+  // Live viewers: update every 8–12s
+  useEffect(() => {
+    const tick = () => {
+      setViewerCount(Math.floor(Math.random() * 17) + 8);
+      const next = 8000 + Math.random() * 4000;
+      timer = setTimeout(tick, next);
+    };
+    let timer = setTimeout(tick, 8000 + Math.random() * 4000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleNeedSize = () => {
     setSizeError(true);
     setTimeout(() => setSizeError(false), 2500);
+  };
+
+  const buildCartItem = () => ({
+    productId: product.id,
+    slug: product.slug,
+    name: product.name,
+    price: product.price,
+    size: selectedSize!,
+    quantity: 1,
+    shirtColor: product.shirtColor,
+    symbol: product.symbol,
+  });
+
+  const handleAddToCart = () => {
+    if (!selectedSize) { handleNeedSize(); return; }
+    addItem(buildCartItem());
+    setAddedState("added");
+    setTimeout(() => setAddedState("idle"), 2200);
+  };
+
+  const handleBuyNow = () => {
+    if (!selectedSize) { handleNeedSize(); return; }
+    addItem(buildCartItem());
+    router.push("/cart");
   };
 
   const gsm = getGSM(product.description);
@@ -51,16 +100,35 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   return (
     <div style={{ background: "var(--blk)", minHeight: "100vh" }}>
+      {/* Responsive styles */}
+      <style>{`
+        @keyframes pulse-amber {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.55; }
+        }
+        .product-split {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          min-height: 100vh;
+        }
+        @media (max-width: 768px) {
+          .product-split {
+            grid-template-columns: 1fr;
+          }
+          .product-img {
+            height: 55vw;
+            min-height: 280px;
+          }
+          .sticky-buy-bar {
+            display: flex !important;
+          }
+        }
+      `}</style>
+
       {/* ── HERO SPLIT ──────────────────────────────────────────── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          minHeight: "100vh",
-        }}
-      >
+      <div className="product-split">
         {/* LEFT: Product image */}
-        <div style={{ position: "relative", overflow: "hidden" }}>
+        <div className="product-img" style={{ position: "relative", overflow: "hidden" }}>
           <Image
             src={productImage}
             alt={product.name}
@@ -117,6 +185,30 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           >
             {product.name}
           </h1>
+
+          {/* Star rating */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ color: "#f59e0b", fontSize: "13px", letterSpacing: "1px" }}>★★★★★</span>
+            <span
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "11px",
+                color: "var(--w)",
+                fontWeight: 600,
+              }}
+            >
+              4.8
+            </span>
+            <span
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "11px",
+                color: "rgba(240,236,232,0.4)",
+              }}
+            >
+              (127 reviews)
+            </span>
+          </div>
 
           {/* Price + Limited badge row */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
@@ -177,60 +269,185 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               {SIZES.map((size) => {
                 const available = product.sizes.includes(size);
                 const active = selectedSize === size;
+                const isLow = available && lowSizes.has(size);
                 return (
-                  <button
-                    key={size}
-                    disabled={!available}
-                    onClick={() => {
-                      if (available) {
-                        setSelectedSize(size);
-                        setSizeError(false);
-                      }
-                    }}
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontSize: "10px",
-                      letterSpacing: "0.12em",
-                      fontWeight: 600,
-                      background: active ? "var(--r)" : "transparent",
-                      color: active ? "var(--w)" : available ? "var(--w)" : "rgba(240,236,232,0.2)",
-                      border: active
-                        ? "1px solid var(--r)"
-                        : available
-                        ? "1px solid rgba(240,236,232,0.15)"
-                        : "1px solid rgba(240,236,232,0.06)",
-                      opacity: available ? 1 : 0.35,
-                      cursor: available ? "pointer" : "not-allowed",
-                      textDecoration: !available ? "line-through" : "none",
-                      transition: "background 0.2s, border-color 0.2s, color 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (available && !active) {
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--r)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (available && !active) {
-                        (e.currentTarget as HTMLButtonElement).style.borderColor =
-                          "rgba(240,236,232,0.15)";
-                      }
-                    }}
-                  >
-                    {size}
-                  </button>
+                  <div key={size} style={{ position: "relative" }}>
+                    <button
+                      disabled={!available}
+                      onClick={() => {
+                        if (available) {
+                          setSelectedSize(size);
+                          setSizeError(false);
+                        }
+                      }}
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        fontSize: "10px",
+                        letterSpacing: "0.12em",
+                        fontWeight: 600,
+                        background: active ? "var(--r)" : "transparent",
+                        color: active ? "var(--w)" : available ? "var(--w)" : "rgba(240,236,232,0.2)",
+                        border: active
+                          ? "1px solid var(--r)"
+                          : available
+                          ? "1px solid rgba(240,236,232,0.15)"
+                          : "1px solid rgba(240,236,232,0.06)",
+                        opacity: available ? 1 : 0.35,
+                        cursor: available ? "pointer" : "not-allowed",
+                        textDecoration: !available ? "line-through" : "none",
+                        transition: "background 0.2s, border-color 0.2s, color 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (available && !active) {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--r)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (available && !active) {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            "rgba(240,236,232,0.15)";
+                        }
+                      }}
+                    >
+                      {size}
+                    </button>
+                    {isLow && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: "-6px",
+                          right: "-6px",
+                          background: "#f59e0b",
+                          color: "#000",
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontSize: "7px",
+                          fontWeight: 700,
+                          letterSpacing: "0.05em",
+                          padding: "1px 4px",
+                          lineHeight: 1.3,
+                          pointerEvents: "none",
+                        }}
+                      >
+                        LOW
+                      </span>
+                    )}
+                  </div>
                 );
               })}
             </div>
           </div>
 
-          {/* ADD TO CART */}
-          <AddToCartButton
-            product={product}
-            selectedSize={selectedSize}
-            onNeedSize={handleNeedSize}
-          />
+          {/* Stock scarcity */}
+          <div
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "11px",
+              color: "#f59e0b",
+              animation: "pulse-amber 2s ease-in-out infinite",
+            }}
+          >
+            ⚡ Only {stockCount} left in stock — order soon
+          </div>
+
+          {/* Live viewers */}
+          <div
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "11px",
+              color: "rgba(240,236,232,0.45)",
+            }}
+          >
+            👁 {viewerCount} people viewing this right now
+          </div>
+
+          {/* ADD TO CART + BUY NOW */}
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <button
+              onClick={handleAddToCart}
+              style={{
+                flex: 1,
+                minWidth: "140px",
+                padding: "16px 24px",
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "16px",
+                letterSpacing: "0.1em",
+                background: addedState === "added" ? "rgba(204,0,0,0.12)" : "var(--r)",
+                color: addedState === "added" ? "var(--r)" : "var(--w)",
+                border: addedState === "added" ? "1px solid var(--r)" : "1px solid var(--r)",
+                cursor: "pointer",
+                transition: "background 0.2s, color 0.2s",
+              }}
+            >
+              {addedState === "added" ? "✓ ADDED TO CART" : "ADD TO CART"}
+            </button>
+            <button
+              onClick={handleBuyNow}
+              style={{
+                flex: 1,
+                minWidth: "140px",
+                padding: "16px 24px",
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "16px",
+                letterSpacing: "0.1em",
+                background: "#ffffff",
+                color: "#000000",
+                border: "1px solid #ffffff",
+                cursor: "pointer",
+                transition: "background 0.2s, color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#e0e0e0";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#ffffff";
+              }}
+            >
+              BUY NOW
+            </button>
+          </div>
+
+          {/* Trust badges */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "8px",
+              borderTop: "1px solid rgba(240,236,232,0.06)",
+              paddingTop: "16px",
+            }}
+          >
+            {[
+              { icon: "🔒", label: "Secure Checkout" },
+              { icon: "📦", label: "Free Shipping >₹999" },
+              { icon: "↩", label: "Easy Returns" },
+              { icon: "✓", label: "Authentic Quality" },
+            ].map(({ icon, label }) => (
+              <div
+                key={label}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "4px",
+                  textAlign: "center",
+                }}
+              >
+                <span style={{ fontSize: "14px" }}>{icon}</span>
+                <span
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: "9px",
+                    color: "rgba(240,236,232,0.35)",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
 
           {/* LORE SECTION */}
           <div
@@ -316,6 +533,67 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             />
           </div>
         </div>
+      </div>
+
+      {/* ── STICKY MOBILE BOTTOM BAR ─────────────────────────────── */}
+      <div
+        className="sticky-buy-bar"
+        style={{
+          display: "none",
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: "#0d0d0d",
+          borderTop: "1px solid rgba(204,0,0,0.3)",
+          padding: "12px 20px",
+          zIndex: 200,
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "12px",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px", overflow: "hidden", flex: 1 }}>
+          <span
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "11px",
+              color: "var(--w)",
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {product.name}
+          </span>
+          <span
+            style={{
+              fontFamily: "'Rubik Dirt', cursive",
+              fontSize: "16px",
+              color: "var(--r)",
+              lineHeight: 1,
+            }}
+          >
+            {formatPrice(product.price)}
+          </span>
+        </div>
+        <button
+          onClick={handleAddToCart}
+          style={{
+            flexShrink: 0,
+            padding: "12px 20px",
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: "14px",
+            letterSpacing: "0.1em",
+            background: "var(--r)",
+            color: "var(--w)",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          ADD TO CART
+        </button>
       </div>
 
       {/* ── RELATED DROPS ─────────────────────────────────────────── */}
