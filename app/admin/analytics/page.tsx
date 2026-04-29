@@ -11,11 +11,11 @@ function BarChart({ data, maxH = 120 }: { data: { label: string; value: number }
       {data.map(d => (
         <div key={d.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ width: '100%', background: 'linear-gradient(to top,#cc0000,rgba(204,0,0,.4))', borderRadius: '3px 3px 0 0', height: `${(d.value / max) * maxH}px`, minHeight: d.value > 0 ? 2 : 0, transition: 'height .6s cubic-bezier(.22,1,.36,1)', position: 'relative' }}>
-            {d.value > 0 && <div style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', fontSize: 8, color: 'rgba(240,236,232,.5)', whiteSpace: 'nowrap' }}>
+            {d.value > 0 && <div style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', fontSize: 8, color: '#6b7280', whiteSpace: 'nowrap' }}>
               {d.value > 999 ? `₹${Math.round(d.value/1000)}k` : d.value > 0 ? `₹${d.value}` : ''}
             </div>}
           </div>
-          <div style={{ fontSize: 8, color: 'rgba(240,236,232,.35)', letterSpacing: '.06em', textAlign: 'center' }}>{d.label}</div>
+          <div style={{ fontSize: 8, color: '#9ca3af', letterSpacing: '.06em', textAlign: 'center' }}>{d.label}</div>
         </div>
       ))}
     </div>
@@ -63,8 +63,8 @@ export default function AnalyticsPage() {
   return (
     <div className="adm-page">
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 22, fontWeight: 700, color: '#f0ece8', marginBottom: 4 }}>Analytics</div>
-        <div style={{ fontSize: 12, color: 'rgba(240,236,232,.35)' }}>Store performance overview</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 }}>Analytics</div>
+        <div style={{ fontSize: 12, color: '#9ca3af' }}>Store performance overview</div>
       </div>
 
       {/* KPI strip */}
@@ -76,15 +76,15 @@ export default function AnalyticsPage() {
           { label: 'Avg Order',      value: `₹${orders.length ? Math.round(revenue / orders.length).toLocaleString('en-IN') : 0}` },
         ].map(k => (
           <div key={k.label} className="adm-card" style={{ padding: '18px 20px' }}>
-            <div style={{ fontSize: 9, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', marginBottom: 6 }}>{k.label}</div>
-            <div style={{ fontSize: 26, fontWeight: 700, color: '#f0ece8' }}>{k.value}</div>
+            <div style={{ fontSize: 9, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 6 }}>{k.label}</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a' }}>{k.value}</div>
           </div>
         ))}
       </div>
 
       {/* Revenue chart — 30 days */}
       <div className="adm-card" style={{ padding: '20px 20px 16px', marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#f0ece8', marginBottom: 20 }}>Revenue — Last 30 Days</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', marginBottom: 20 }}>Revenue — Last 30 Days</div>
         {orders.length === 0 ? (
           <div style={{ height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(240,236,232,.15)', fontSize: 13 }}>No data yet</div>
         ) : <BarChart data={last30} maxH={140} />}
@@ -93,27 +93,27 @@ export default function AnalyticsPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
         {/* Top cities */}
         <div className="adm-card" style={{ padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#f0ece8', marginBottom: 16 }}>Top Cities</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', marginBottom: 16 }}>Top Cities</div>
           {topCities.length === 0 ? (
-            <div style={{ color: 'rgba(240,236,232,.2)', fontSize: 12 }}>No data</div>
+            <div style={{ color: '#d1d5db', fontSize: 12 }}>No data</div>
           ) : topCities.map(([city, rev], i) => (
             <div key={city} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(204,0,0,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: '#cc0000', fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, color: '#f0ece8', marginBottom: 2 }}>{city}</div>
+                <div style={{ fontSize: 12, color: '#1a1a1a', marginBottom: 2 }}>{city}</div>
                 <div style={{ height: 3, background: 'rgba(240,236,232,.06)', borderRadius: 2 }}>
                   <div style={{ height: '100%', width: `${(rev / (topCities[0]?.[1] || 1)) * 100}%`, background: '#cc0000', borderRadius: 2 }} />
                 </div>
               </div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(240,236,232,.5)', flexShrink: 0 }}>₹{rev.toLocaleString('en-IN')}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', flexShrink: 0 }}>₹{rev.toLocaleString('en-IN')}</div>
             </div>
           ))}
         </div>
 
         {/* Payment methods */}
         <div className="adm-card" style={{ padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#f0ece8', marginBottom: 16 }}>Payment Methods</div>
-          {payMap.size === 0 ? <div style={{ color: 'rgba(240,236,232,.2)', fontSize: 12 }}>No data</div> : (
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', marginBottom: 16 }}>Payment Methods</div>
+          {payMap.size === 0 ? <div style={{ color: '#d1d5db', fontSize: 12 }}>No data</div> : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {Array.from(payMap.entries()).map(([method, count]) => {
                 const pct = Math.round((count / orders.length) * 100);
@@ -121,8 +121,8 @@ export default function AnalyticsPage() {
                 return (
                   <div key={method}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: 12, color: '#f0ece8', textTransform: 'uppercase', letterSpacing: '.08em' }}>{method}</span>
-                      <span style={{ fontSize: 12, color: 'rgba(240,236,232,.5)' }}>{pct}% · {count}</span>
+                      <span style={{ fontSize: 12, color: '#1a1a1a', textTransform: 'uppercase', letterSpacing: '.08em' }}>{method}</span>
+                      <span style={{ fontSize: 12, color: '#6b7280' }}>{pct}% · {count}</span>
                     </div>
                     <div style={{ height: 4, background: 'rgba(240,236,232,.06)', borderRadius: 2 }}>
                       <div style={{ height: '100%', width: `${pct}%`, background: colors[method] || '#cc0000', borderRadius: 2 }} />
@@ -136,13 +136,13 @@ export default function AnalyticsPage() {
 
         {/* Top products */}
         <div className="adm-card" style={{ padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#f0ece8', marginBottom: 16 }}>Best Sellers</div>
-          {topProducts.length === 0 ? <div style={{ color: 'rgba(240,236,232,.2)', fontSize: 12 }}>No data</div> : topProducts.map(([name, data], i) => (
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', marginBottom: 16 }}>Best Sellers</div>
+          {topProducts.length === 0 ? <div style={{ color: '#d1d5db', fontSize: 12 }}>No data</div> : topProducts.map(([name, data], i) => (
             <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(240,236,232,.2)', width: 16, flexShrink: 0 }}>#{i + 1}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#d1d5db', width: 16, flexShrink: 0 }}>#{i + 1}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 11, color: '#f0ece8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
-                <div style={{ fontSize: 10, color: 'rgba(240,236,232,.35)' }}>{data.count} units · ₹{data.revenue.toLocaleString('en-IN')}</div>
+                <div style={{ fontSize: 11, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+                <div style={{ fontSize: 10, color: '#9ca3af' }}>{data.count} units · ₹{data.revenue.toLocaleString('en-IN')}</div>
               </div>
             </div>
           ))}

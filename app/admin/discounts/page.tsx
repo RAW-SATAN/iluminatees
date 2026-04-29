@@ -50,15 +50,15 @@ export default function DiscountsPage() {
   const setF = (k: keyof Discount) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(p => ({ ...p, [k]: e.target.value }));
 
-  const inputStyle = { width: '100%', background: 'rgba(240,236,232,.04)', border: '1px solid rgba(240,236,232,.1)', color: '#f0ece8', fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, padding: '10px 12px', outline: 'none', borderRadius: 4, transition: 'border-color .2s' };
-  const labelStyle: React.CSSProperties = { display: 'block', fontSize: 9, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(240,236,232,.4)', marginBottom: 6 };
+  const inputStyle = { width: '100%', background: '#fafafa', border: '1px solid rgba(240,236,232,.1)', color: '#1a1a1a', fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, padding: '10px 12px', outline: 'none', borderRadius: 4, transition: 'border-color .2s' };
+  const labelStyle: React.CSSProperties = { display: 'block', fontSize: 9, letterSpacing: '.18em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 6 };
 
   return (
     <div className="adm-page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#f0ece8', marginBottom: 4 }}>Discounts</div>
-          <div style={{ fontSize: 12, color: 'rgba(240,236,232,.35)' }}>{discounts.filter(d => d.active).length} active codes</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 }}>Discounts</div>
+          <div style={{ fontSize: 12, color: '#9ca3af' }}>{discounts.filter(d => d.active).length} active codes</div>
         </div>
         <button className="adm-btn-red" onClick={() => setShowForm(o => !o)}>
           {showForm ? '✕ Cancel' : '+ Create Discount'}
@@ -68,7 +68,7 @@ export default function DiscountsPage() {
       {/* Create form */}
       {showForm && (
         <div className="adm-card" style={{ padding: 24, marginBottom: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#f0ece8', marginBottom: 20 }}>New Discount Code</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', marginBottom: 20 }}>New Discount Code</div>
           <form onSubmit={handleCreate}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 14, marginBottom: 16 }}>
               <div>
@@ -130,22 +130,22 @@ export default function DiscountsPage() {
                     </div>
                   </td>
                   <td className="adm-td"><span className={`adm-badge ${d.type === 'percent' ? 'adm-badge-yellow' : 'adm-badge-green'}`} style={{ fontSize: 9 }}>{d.type}</span></td>
-                  <td className="adm-td" style={{ fontWeight: 700, color: '#f0ece8' }}>{d.type === 'percent' ? `${d.value}%` : `₹${d.value}`}</td>
-                  <td className="adm-td" style={{ fontSize: 12, color: 'rgba(240,236,232,.4)' }}>{d.minOrder > 0 ? `₹${d.minOrder}` : '—'}</td>
+                  <td className="adm-td" style={{ fontWeight: 700, color: '#1a1a1a' }}>{d.type === 'percent' ? `${d.value}%` : `₹${d.value}`}</td>
+                  <td className="adm-td" style={{ fontSize: 12, color: '#6b7280' }}>{d.minOrder > 0 ? `₹${d.minOrder}` : '—'}</td>
                   <td className="adm-td">
-                    <div style={{ fontSize: 12 }}>{d.uses} <span style={{ color: 'rgba(240,236,232,.35)' }}>/ {d.maxUses}</span></div>
+                    <div style={{ fontSize: 12 }}>{d.uses} <span style={{ color: '#9ca3af' }}>/ {d.maxUses}</span></div>
                     <div style={{ width: 60, height: 3, background: 'rgba(240,236,232,.06)', borderRadius: 2, marginTop: 3 }}>
                       <div style={{ height: '100%', width: `${(d.uses / d.maxUses) * 100}%`, background: d.uses / d.maxUses > .8 ? '#cc0000' : '#22c55e', borderRadius: 2 }} />
                     </div>
                   </td>
-                  <td className="adm-td" style={{ fontSize: 11, color: 'rgba(240,236,232,.4)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.description || '—'}</td>
+                  <td className="adm-td" style={{ fontSize: 11, color: '#6b7280', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.description || '—'}</td>
                   <td className="adm-td">
                     <button onClick={() => toggle(d.id)} style={{ background: d.active ? 'rgba(34,197,94,.12)' : 'rgba(107,114,128,.15)', border: 'none', color: d.active ? '#22c55e' : '#9ca3af', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, padding: '4px 10px', borderRadius: 20, cursor: 'pointer', transition: 'all .2s', letterSpacing: '.06em' }}>
                       {d.active ? 'Active' : 'Paused'}
                     </button>
                   </td>
                   <td className="adm-td">
-                    <button onClick={() => del(d.id)} style={{ background: 'none', border: 'none', color: 'rgba(240,236,232,.2)', cursor: 'pointer', fontSize: 14, padding: '2px 6px', transition: 'color .2s' }}
+                    <button onClick={() => del(d.id)} style={{ background: 'none', border: 'none', color: '#d1d5db', cursor: 'pointer', fontSize: 14, padding: '2px 6px', transition: 'color .2s' }}
                       onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = '#cc0000'}
                       onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = 'rgba(240,236,232,.2)'}
                     >✕</button>

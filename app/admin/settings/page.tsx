@@ -49,8 +49,8 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2500);
   };
 
-  const inp: React.CSSProperties = { width: '100%', background: 'rgba(240,236,232,.04)', border: '1px solid rgba(240,236,232,.1)', color: '#f0ece8', fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, padding: '10px 12px', outline: 'none', borderRadius: 4, transition: 'border-color .2s' };
-  const lbl: React.CSSProperties = { display: 'block', fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(240,236,232,.4)', marginBottom: 6 };
+  const inp: React.CSSProperties = { width: '100%', background: '#fafafa', border: '1px solid rgba(240,236,232,.1)', color: '#1a1a1a', fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, padding: '10px 12px', outline: 'none', borderRadius: 4, transition: 'border-color .2s' };
+  const lbl: React.CSSProperties = { display: 'block', fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 6 };
   const row: React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 };
 
   const SECTIONS: { id: Section; label: string }[] = [
@@ -66,8 +66,8 @@ export default function SettingsPage() {
     <div className="adm-page" style={{ maxWidth: 860 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#f0ece8', marginBottom: 4 }}>Settings</div>
-          <div style={{ fontSize: 12, color: 'rgba(240,236,232,.35)' }}>Configure your store</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 }}>Settings</div>
+          <div style={{ fontSize: 12, color: '#9ca3af' }}>Configure your store</div>
         </div>
         <button onClick={handleSave} className="adm-btn-red" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {saved ? '✓ Saved!' : 'Save Changes'}
@@ -105,7 +105,7 @@ export default function SettingsPage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'rgba(204,0,0,.06)', border: '1px solid rgba(204,0,0,.15)', borderRadius: 6 }}>
             <input type="checkbox" checked={settings.maintenanceMode} onChange={set('maintenanceMode')} id="maint" style={{ cursor: 'pointer', accentColor: '#cc0000', width: 16, height: 16 }} />
-            <label htmlFor="maint" style={{ fontSize: 13, color: '#f0ece8', cursor: 'pointer' }}>Maintenance Mode <span style={{ fontSize: 11, color: '#cc0000' }}>(store will be hidden)</span></label>
+            <label htmlFor="maint" style={{ fontSize: 13, color: '#1a1a1a', cursor: 'pointer' }}>Maintenance Mode <span style={{ fontSize: 11, color: '#cc0000' }}>(store will be hidden)</span></label>
           </div>
         </>}
 
@@ -114,7 +114,7 @@ export default function SettingsPage() {
             <div>
               <label style={lbl}>Free Shipping Threshold (₹)</label>
               <input style={inp} type="number" value={settings.freeShippingThreshold} onChange={set('freeShippingThreshold')} />
-              <div style={{ fontSize: 10, color: 'rgba(240,236,232,.3)', marginTop: 5 }}>Orders above this get free shipping</div>
+              <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 5 }}>Orders above this get free shipping</div>
             </div>
             <div>
               <label style={lbl}>Default Shipping Rate (₹)</label>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
           </div>
           <div style={{ padding: '14px 16px', background: 'rgba(34,197,94,.06)', border: '1px solid rgba(34,197,94,.15)', borderRadius: 6 }}>
             <div style={{ fontSize: 12, color: '#22c55e', marginBottom: 4 }}>✓ Current shipping setup</div>
-            <div style={{ fontSize: 12, color: 'rgba(240,236,232,.5)' }}>Free for orders above ₹{settings.freeShippingThreshold} · ₹{settings.defaultShipping} flat rate below</div>
+            <div style={{ fontSize: 12, color: '#6b7280' }}>Free for orders above ₹{settings.freeShippingThreshold} · ₹{settings.defaultShipping} flat rate below</div>
           </div>
         </>}
 
@@ -131,14 +131,14 @@ export default function SettingsPage() {
           <div>
             <label style={lbl}>UPI ID</label>
             <input style={inp} value={settings.upiId} onChange={set('upiId')} placeholder="yourstore@upi" />
-            <div style={{ fontSize: 10, color: 'rgba(240,236,232,.3)', marginTop: 5 }}>Shown to customers during UPI checkout</div>
+            <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 5 }}>Shown to customers during UPI checkout</div>
           </div>
           <div>
             <label style={lbl}>Razorpay Key ID <span style={{ color: 'rgba(240,236,232,.25)', fontSize: 9, letterSpacing: 0, textTransform: 'none' }}>(optional)</span></label>
             <input style={inp} value={settings.razorpayKey} onChange={set('razorpayKey')} placeholder="rzp_live_xxxxxxxxxx" />
           </div>
-          <div style={{ padding: '14px 16px', background: 'rgba(240,236,232,.03)', border: '1px solid rgba(240,236,232,.08)', borderRadius: 6 }}>
-            <div style={{ fontSize: 12, color: '#f0ece8', marginBottom: 6 }}>Accepted Payment Methods</div>
+          <div style={{ padding: '14px 16px', background: '#fafafa', border: '1px solid rgba(240,236,232,.08)', borderRadius: 6 }}>
+            <div style={{ fontSize: 12, color: '#1a1a1a', marginBottom: 6 }}>Accepted Payment Methods</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {['UPI', 'Credit/Debit Card', 'Cash on Delivery'].map(m => (
                 <span key={m} style={{ fontSize: 10, padding: '4px 10px', background: 'rgba(34,197,94,.12)', color: '#22c55e', borderRadius: 4, letterSpacing: '.06em' }}>✓ {m}</span>
@@ -165,7 +165,7 @@ export default function SettingsPage() {
           <div>
             <label style={lbl}>Meta Title</label>
             <input style={inp} value={settings.metaTitle} onChange={set('metaTitle')} />
-            <div style={{ fontSize: 10, color: 'rgba(240,236,232,.3)', marginTop: 5 }}>{settings.metaTitle.length}/60 characters</div>
+            <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 5 }}>{settings.metaTitle.length}/60 characters</div>
           </div>
           <div>
             <label style={lbl}>Meta Description</label>
@@ -173,11 +173,11 @@ export default function SettingsPage() {
             <div style={{ fontSize: 10, color: settings.metaDescription.length > 160 ? '#cc0000' : 'rgba(240,236,232,.3)', marginTop: 5 }}>{settings.metaDescription.length}/160 characters</div>
           </div>
           {/* Preview */}
-          <div style={{ padding: '16px', background: 'rgba(240,236,232,.03)', border: '1px solid rgba(240,236,232,.08)', borderRadius: 6 }}>
-            <div style={{ fontSize: 9, letterSpacing: '.14em', color: 'rgba(240,236,232,.3)', marginBottom: 8, textTransform: 'uppercase' }}>Google Preview</div>
+          <div style={{ padding: '16px', background: '#fafafa', border: '1px solid rgba(240,236,232,.08)', borderRadius: 6 }}>
+            <div style={{ fontSize: 9, letterSpacing: '.14em', color: '#9ca3af', marginBottom: 8, textTransform: 'uppercase' }}>Google Preview</div>
             <div style={{ fontSize: 14, color: '#4a9eff' }}>{settings.metaTitle || 'Page Title'}</div>
             <div style={{ fontSize: 11, color: '#22c55e', marginTop: 2 }}>iluminatees.com</div>
-            <div style={{ fontSize: 11, color: 'rgba(240,236,232,.4)', marginTop: 4, lineHeight: 1.5 }}>{settings.metaDescription || 'Meta description...'}</div>
+            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4, lineHeight: 1.5 }}>{settings.metaDescription || 'Meta description...'}</div>
           </div>
         </>}
 
@@ -190,12 +190,12 @@ export default function SettingsPage() {
             { key: 'orderNotifications' as keyof Settings, label: 'New order notifications', sub: 'Get notified when a new order is placed' },
             { key: 'lowStockAlert' as keyof Settings, label: 'Low stock alerts', sub: 'Get notified when product stock is low' },
           ].map(item => (
-            <div key={item.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 16px', background: 'rgba(240,236,232,.03)', border: '1px solid rgba(240,236,232,.08)', borderRadius: 6, cursor: 'pointer' }}
+            <div key={item.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 16px', background: '#fafafa', border: '1px solid rgba(240,236,232,.08)', borderRadius: 6, cursor: 'pointer' }}
               onClick={() => setSettings(p => ({ ...p, [item.key]: !p[item.key] }))}>
               <input type="checkbox" checked={Boolean(settings[item.key])} onChange={set(item.key)} onClick={e => e.stopPropagation()} style={{ marginTop: 2, cursor: 'pointer', accentColor: '#cc0000', width: 15, height: 15, flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: 13, color: '#f0ece8', marginBottom: 2 }}>{item.label}</div>
-                <div style={{ fontSize: 11, color: 'rgba(240,236,232,.35)' }}>{item.sub}</div>
+                <div style={{ fontSize: 13, color: '#1a1a1a', marginBottom: 2 }}>{item.label}</div>
+                <div style={{ fontSize: 11, color: '#9ca3af' }}>{item.sub}</div>
               </div>
             </div>
           ))}

@@ -48,8 +48,8 @@ export default function OrdersPage() {
   return (
     <div className="adm-page">
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 22, fontWeight: 700, color: '#f0ece8', marginBottom: 4 }}>Orders</div>
-        <div style={{ fontSize: 12, color: 'rgba(240,236,232,.35)' }}>{orders.length} total orders · ₹{orders.reduce((s, o) => s + o.total, 0).toLocaleString('en-IN')} revenue</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 }}>Orders</div>
+        <div style={{ fontSize: 12, color: '#9ca3af' }}>{orders.length} total orders · ₹{orders.reduce((s, o) => s + o.total, 0).toLocaleString('en-IN')} revenue</div>
       </div>
 
       {/* Toolbar */}
@@ -65,7 +65,7 @@ export default function OrdersPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="adm-card" style={{ padding: '60px 20px', textAlign: 'center', color: 'rgba(240,236,232,.2)', fontSize: 14 }}>No orders found</div>
+        <div className="adm-card" style={{ padding: '60px 20px', textAlign: 'center', color: '#d1d5db', fontSize: 14 }}>No orders found</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 400px' : '1fr', gap: 16 }}>
           {/* Table */}
@@ -95,10 +95,10 @@ export default function OrdersPage() {
                       <td className="adm-td" style={{ fontSize: 11, color: 'rgba(240,236,232,.45)' }}>{new Date(o.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</td>
                       <td className="adm-td">
                         <div style={{ fontSize: 13, fontWeight: 500 }}>{o.shipping.firstName} {o.shipping.lastName}</div>
-                        <div style={{ fontSize: 10, color: 'rgba(240,236,232,.35)' }}>{o.shipping.city}</div>
+                        <div style={{ fontSize: 10, color: '#9ca3af' }}>{o.shipping.city}</div>
                       </td>
                       <td className="adm-td" style={{ fontWeight: 700 }}>₹{o.total.toLocaleString('en-IN')}</td>
-                      <td className="adm-td"><span style={{ fontSize: 10, color: 'rgba(240,236,232,.4)', letterSpacing: '.08em', textTransform: 'uppercase' }}>{PAY_LABEL[o.payMethod] || o.payMethod}</span></td>
+                      <td className="adm-td"><span style={{ fontSize: 10, color: '#6b7280', letterSpacing: '.08em', textTransform: 'uppercase' }}>{PAY_LABEL[o.payMethod] || o.payMethod}</span></td>
                       <td className="adm-td">
                         <select
                           value={o.status}
@@ -107,11 +107,11 @@ export default function OrdersPage() {
                           className={`adm-badge ${STATUS_COLOR[o.status] || 'adm-badge-gray'}`}
                           style={{ border: 'none', cursor: 'pointer', fontFamily: "'Space Grotesk',sans-serif", letterSpacing: '.06em', textTransform: 'capitalize', background: 'transparent' }}
                         >
-                          {STATUSES.map(s => <option key={s} value={s} style={{ background: '#0d0d0d', color: '#f0ece8' }}>{s}</option>)}
+                          {STATUSES.map(s => <option key={s} value={s} style={{ background: '#fff', color: '#1a1a1a' }}>{s}</option>)}
                         </select>
                       </td>
                       <td className="adm-td" style={{ textAlign: 'right' }}>
-                        <button onClick={e => { e.stopPropagation(); deleteOrder(o.id); }} style={{ background: 'none', border: 'none', color: 'rgba(240,236,232,.2)', cursor: 'pointer', fontSize: 14, padding: '2px 6px', transition: 'color .2s' }}
+                        <button onClick={e => { e.stopPropagation(); deleteOrder(o.id); }} style={{ background: 'none', border: 'none', color: '#d1d5db', cursor: 'pointer', fontSize: 14, padding: '2px 6px', transition: 'color .2s' }}
                           onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = '#cc0000'}
                           onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = 'rgba(240,236,232,.2)'}
                         >✕</button>
@@ -128,15 +128,15 @@ export default function OrdersPage() {
             <div className="adm-card" style={{ padding: 24, height: 'fit-content', position: 'sticky', top: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#f0ece8' }}>{selected.id}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(240,236,232,.35)', marginTop: 2 }}>{new Date(selected.date).toLocaleString('en-IN')}</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a' }}>{selected.id}</div>
+                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{new Date(selected.date).toLocaleString('en-IN')}</div>
                 </div>
-                <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', color: 'rgba(240,236,232,.3)', cursor: 'pointer', fontSize: 18 }}>✕</button>
+                <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: 18 }}>✕</button>
               </div>
 
               {/* Status update */}
               <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', marginBottom: 8 }}>Order Status</div>
+                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 8 }}>Order Status</div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {STATUSES.map(s => (
                     <button key={s} onClick={() => updateStatus(selected.id, s)} style={{ background: selected.status === s ? '#cc0000' : 'transparent', border: `1px solid ${selected.status === s ? '#cc0000' : 'rgba(240,236,232,.12)'}`, color: selected.status === s ? '#fff' : 'rgba(240,236,232,.45)', fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.08em', padding: '6px 12px', borderRadius: 4, cursor: 'pointer', textTransform: 'capitalize', transition: 'all .15s' }}>
@@ -150,15 +150,15 @@ export default function OrdersPage() {
 
               {/* Customer */}
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', marginBottom: 10 }}>Customer</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#f0ece8', marginBottom: 3 }}>{selected.shipping.firstName} {selected.shipping.lastName}</div>
+                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 10 }}>Customer</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', marginBottom: 3 }}>{selected.shipping.firstName} {selected.shipping.lastName}</div>
                 <div style={{ fontSize: 12, color: 'rgba(240,236,232,.45)', marginBottom: 2 }}>{selected.shipping.email}</div>
                 <div style={{ fontSize: 12, color: 'rgba(240,236,232,.45)' }}>{selected.shipping.phone}</div>
               </div>
 
               {/* Shipping address */}
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', marginBottom: 10 }}>Ship To</div>
+                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 10 }}>Ship To</div>
                 <div style={{ fontSize: 12, color: 'rgba(240,236,232,.55)', lineHeight: 1.7 }}>
                   {selected.shipping.address}<br />
                   {selected.shipping.city}, {selected.shipping.state}<br />
@@ -168,7 +168,7 @@ export default function OrdersPage() {
 
               {/* Payment */}
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', marginBottom: 6 }}>Payment</div>
+                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 6 }}>Payment</div>
                 <div style={{ fontSize: 12, color: 'rgba(240,236,232,.55)', textTransform: 'uppercase', letterSpacing: '.1em' }}>{PAY_LABEL[selected.payMethod] || selected.payMethod}</div>
               </div>
 
@@ -176,21 +176,21 @@ export default function OrdersPage() {
 
               {/* Items */}
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(240,236,232,.3)', marginBottom: 10 }}>Items ({selected.items.length})</div>
+                <div style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 10 }}>Items ({selected.items.length})</div>
                 {selected.items.map((item, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: i < selected.items.length - 1 ? '1px solid rgba(240,236,232,.04)' : 'none' }}>
                     <div>
-                      <div style={{ fontSize: 12, color: '#f0ece8' }}>{item.name}</div>
-                      {item.size && <div style={{ fontSize: 10, color: 'rgba(240,236,232,.35)' }}>Size: {item.size} · Qty: {item.quantity}</div>}
+                      <div style={{ fontSize: 12, color: '#1a1a1a' }}>{item.name}</div>
+                      {item.size && <div style={{ fontSize: 10, color: '#9ca3af' }}>Size: {item.size} · Qty: {item.quantity}</div>}
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: '#f0ece8' }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
                   </div>
                 ))}
               </div>
 
               <div style={{ height: 1, background: 'rgba(240,236,232,.06)', marginBottom: 12 }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#f0ece8' }}>Total</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>Total</span>
                 <span style={{ fontSize: 18, fontWeight: 700, color: '#cc0000' }}>₹{selected.total.toLocaleString('en-IN')}</span>
               </div>
             </div>
