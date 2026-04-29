@@ -168,3 +168,166 @@ body.cx .cur-label { opacity: 1; }
 @keyframes pulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-11px)} }
 @keyframes fg { 0%,100%{opacity:.2} 50%{opacity:.9} }
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+
+/* Disable custom cursor on touch */
+@media (hover: none) {
+  body { cursor: auto; }
+  a, button { cursor: pointer; }
+  .cur-dot, .cur-ring, .cur-label { display: none !important; }
+}
+
+/* Shop grid */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+@media (max-width: 1024px) { .shop-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 680px)  { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Collections grid */
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+@media (max-width: 1024px) { .collection-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 680px)  { .collection-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Product page split */
+.product-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+@media (max-width: 768px) {
+  .product-split {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+}
+
+/* Cart layout */
+.cart-split {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  padding: 0 52px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (max-width: 900px) {
+  .cart-split {
+    grid-template-columns: 1fr;
+    padding: 0 20px 60px;
+  }
+}
+
+/* Page sections */
+.page-section { padding: 80px 52px; }
+@media (max-width: 768px) { .page-section { padding: 52px 20px; } }
+
+/* Hero */
+@media (max-width: 768px) {
+  .hero-stamp    { display: none !important; }
+  .hero-float    { display: none !important; }
+  .hero-slides   { display: none !important; }
+  .hero-content  { width: 90% !important; padding: 100px 20px 60px !important; }
+}
+
+/* Featured drop — stack on mobile */
+@media (max-width: 768px) {
+  .featured-drop-inner {
+    flex-direction: column !important;
+    padding: 32px 20px !important;
+  }
+  .featured-drop-label { display: none; }
+  .featured-drop-countdown { border-left: none !important; border-top: 1px solid rgba(240,236,232,.06) !important; padding: 28px 0 0 !important; }
+}
+
+/* Bento grid */
+.bento-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.3fr 1fr;
+  gap: 2px;
+  height: 360px;
+}
+@media (max-width: 1024px) { .bento-top { grid-template-columns: 1fr 1fr; height: auto; } }
+@media (max-width: 600px)  { .bento-top { grid-template-columns: 1fr; height: auto; } }
+
+.bento-bottom {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 0.6fr;
+  gap: 2px;
+}
+@media (max-width: 1024px) { .bento-bottom { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px)  { .bento-bottom { grid-template-columns: 1fr; } }
+
+/* Footer */
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding: 60px 52px 40px;
+}
+@media (max-width: 900px) {
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    padding: 48px 24px 32px;
+  }
+}
+@media (max-width: 560px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 40px 20px 28px;
+  }
+}
+
+/* About page grid */
+.about-split {
+  display: grid;
+  grid-template-columns: 0.6fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+@media (max-width: 768px) { .about-split { grid-template-columns: 1fr; gap: 32px; } }
+
+.about-values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+@media (max-width: 680px) { .about-values { grid-template-columns: 1fr; } }
+
+/* Contact page */
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-bottom: 60px;
+}
+@media (max-width: 768px) { .contact-cards { grid-template-columns: 1fr; } }
+
+/* General section padding on mobile */
+@media (max-width: 768px) {
+  [style*="padding: '0 52px'"],
+  [style*="padding: '60px 52px'"],
+  [style*="padding: '80px 52px'"] {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* Sticky mobile product bar — shown only on small screens */
+.sticky-mobile-bar {
+  display: none;
+}
+@media (max-width: 768px) {
+  .sticky-mobile-bar {
+    display: flex !important;
+  }
+}

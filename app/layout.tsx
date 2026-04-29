@@ -6,6 +6,8 @@ import { ImmersiveFooter } from "@/components/home/ImmersiveFooter";
 import { LenisProvider } from "@/components/LenisProvider";
 import { CustomCursor } from "@/components/CustomCursor";
 import { Loader } from "@/components/Loader";
+import { SocialProofToast } from "@/components/SocialProofToast";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 export const metadata: Metadata = {
   title: "ILUMINATEES® — Not Made To Fit In",
@@ -30,6 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ImmersiveNavbar />
             <main>{children}</main>
             <ImmersiveFooter />
+            <SocialProofToast />
+            <ExitIntentPopup />
           </CartProvider>
         </LenisProvider>
       </body>

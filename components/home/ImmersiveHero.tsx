@@ -46,7 +46,7 @@ export function ImmersiveHero() {
       <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(105deg,rgba(6,6,6,.92) 0%,rgba(6,6,6,.72) 38%,rgba(6,6,6,.22) 62%,rgba(6,6,6,.05) 100%)' }} />
 
       {/* slide numbers */}
-      <div style={{ position: 'absolute', left: 26, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, zIndex: 11, opacity: 0, animation: 'fu .6s ease 3.4s forwards' }}>
+      <div className="hero-slides" style={{ position: 'absolute', left: 26, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, zIndex: 11, opacity: 0, animation: 'fu .6s ease 3.4s forwards' }}>
         {['01','02','03'].map((n, i) => (
           <div key={n} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 9, letterSpacing: '.1em', color: i === 0 ? 'var(--r)' : 'rgba(240,236,232,.3)', fontWeight: i === 0 ? 600 : 400 }}>{n}</span>
@@ -56,7 +56,7 @@ export function ImmersiveHero() {
       </div>
 
       {/* left content */}
-      <div style={{ position: 'relative', zIndex: 10, width: '46%', padding: 'clamp(108px,13vh,155px) 0 60px 52px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <div className="hero-content" style={{ position: 'relative', zIndex: 10, width: '46%', padding: 'clamp(108px,13vh,155px) 0 60px 52px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--r)', display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, opacity: 0, animation: 'fu .6s ease 2.6s forwards' }}>
           NEW DROP — SS&#39;26 →
         </div>
@@ -84,7 +84,7 @@ export function ImmersiveHero() {
       </div>
 
       {/* stamp badge */}
-      <div style={{ position: 'absolute', top: 82, right: 46, zIndex: 11, width: 108, height: 108, opacity: 0, animation: 'fu .7s ease 3.3s forwards' }}>
+      <div className="hero-stamp" style={{ position: 'absolute', top: 82, right: 46, zIndex: 11, width: 108, height: 108, opacity: 0, animation: 'fu .7s ease 3.3s forwards' }}>
         <svg viewBox="0 0 110 110" width="108" height="108">
           <circle cx="55" cy="55" r="50" fill="rgba(10,10,10,0.72)" stroke="rgba(240,236,232,0.15)" strokeWidth="1"/>
           <g style={{ animation: 'spin 22s linear infinite', transformOrigin: 'center' }}>
@@ -102,7 +102,7 @@ export function ImmersiveHero() {
       </div>
 
       {/* floating product card */}
-      <div style={{ position: 'absolute', bottom: 56, right: 40, zIndex: 12, width: 216, background: 'rgba(12,12,12,.88)', backdropFilter: 'blur(24px)', border: '1px solid rgba(240,236,232,.08)', opacity: 0, animation: 'float 5.5s ease-in-out 3.2s infinite, fu .7s ease 3.2s forwards' }}>
+      <div className="hero-float" style={{ position: 'absolute', bottom: 56, right: 40, zIndex: 12, width: 216, background: 'rgba(12,12,12,.88)', backdropFilter: 'blur(24px)', border: '1px solid rgba(240,236,232,.08)', opacity: 0, animation: 'float 5.5s ease-in-out 3.2s infinite, fu .7s ease 3.2s forwards' }}>
         <div style={{ width: '100%', height: 130, overflow: 'hidden' }}>
           <img src="/tee-floating.jpg" alt="Angelo Oversized Tee" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
