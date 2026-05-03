@@ -1,22 +1,26 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
 export default async function HomePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Only check auth if Supabase is configured
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  if (supabaseUrl.startsWith("http")) {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role, company_id, companies(slug)")
-      .eq("id", user.id)
-      .single() as any;
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, company_id, companies(slug)")
+        .eq("id", user.id)
+        .single() as any;
 
-    if (profile?.role === "super_admin") redirect("/super/dashboard");
-    if (profile?.companies?.slug) {
-      if (profile.role === "employee") redirect(`/app/${profile.companies.slug}/employee`);
-      redirect(`/app/${profile.companies.slug}/admin`);
+      if (profile?.role === "super_admin") redirect("/super/dashboard");
+      if (profile?.companies?.slug) {
+        if (profile.role === "employee") redirect(`/app/${profile.companies.slug}/employee`);
+        redirect(`/app/${profile.companies.slug}/admin`);
+      }
     }
   }
 
