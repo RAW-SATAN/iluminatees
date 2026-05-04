@@ -1,13 +1,16 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || "noreply@foundros.io";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://app.foundros.io";
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export async function sendWelcomeEmail({
   to, name, companyName, slug,
 }: { to: string; name: string; companyName: string; slug: string }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `Welcome to FoundrOS, ${name} — let's set up your team`,
@@ -44,7 +47,7 @@ export async function sendWelcomeEmail({
 export async function sendEmployeeInviteEmail({
   to, employeeName, companyName, inviteLink,
 }: { to: string; employeeName: string; companyName: string; inviteLink: string }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `${companyName} has invited you to join FoundrOS`,
@@ -67,7 +70,7 @@ export async function sendEmployeeInviteEmail({
 export async function sendSalarySlipEmail({
   to, employeeName, companyName, month, year, netSalary, downloadUrl,
 }: { to: string; employeeName: string; companyName: string; month: string; year: number; netSalary: number; downloadUrl: string }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `Your salary slip for ${month} ${year} is ready — ${companyName}`,
@@ -93,7 +96,7 @@ export async function sendSalarySlipEmail({
 export async function sendLeaveApprovedEmail({
   to, employeeName, fromDate, toDate, leaveType, remainingBalance,
 }: { to: string; employeeName: string; fromDate: string; toDate: string; leaveType: string; remainingBalance: number }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: "Your leave request has been approved",
@@ -116,7 +119,7 @@ export async function sendLeaveApprovedEmail({
 export async function sendLeaveRejectedEmail({
   to, employeeName, fromDate, toDate, leaveType, reason,
 }: { to: string; employeeName: string; fromDate: string; toDate: string; leaveType: string; reason?: string }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: "Update on your leave request",
@@ -134,7 +137,7 @@ export async function sendLeaveRejectedEmail({
 export async function sendTrialEndingSoonEmail({
   to, name, companyName, slug, employeeCount, daysLeft,
 }: { to: string; name: string; companyName: string; slug: string; employeeCount: number; daysLeft: number }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `Your FoundrOS trial ends in ${daysLeft} day${daysLeft > 1 ? "s" : ""}`,
@@ -158,7 +161,7 @@ export async function sendTrialEndingSoonEmail({
 export async function sendPaymentFailedEmail({
   to, name, slug,
 }: { to: string; name: string; slug: string }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: "Action needed: payment failed for your FoundrOS account",
@@ -180,7 +183,7 @@ export async function sendPaymentFailedEmail({
 export async function sendAccountSuspendedEmail({
   to, name, slug,
 }: { to: string; name: string; slug: string }) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: "Your FoundrOS account has been suspended",
