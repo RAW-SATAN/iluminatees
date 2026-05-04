@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Clock, Calendar, DollarSign,
-  MapPin, LogOut, ChevronRight, Building2,
+  MapPin, LogOut, ChevronRight, Building2, Settings,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ const navItems = [
   { label: "Leaves", icon: Calendar, href: "admin/leaves" },
   { label: "Payroll", icon: DollarSign, href: "admin/payroll" },
   { label: "Office Locations", icon: MapPin, href: "admin/locations" },
+  { label: "Settings", icon: Settings, href: "admin/settings" },
 ];
 
 export default function AdminSidebar({ slug, role, companyName }: Props) {
