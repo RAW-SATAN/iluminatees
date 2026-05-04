@@ -110,16 +110,14 @@ export default async function EmployeeSelfServicePage({ params }: Props) {
                   </p>
                   <p className="text-xs text-[#64748B]">Net: {formatCurrency(slip.netSalary)}</p>
                 </div>
-                {slip.slipPdfUrl && (
-                  <a
-                    href={slip.slipPdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-medium text-[#E94560] border border-[#E94560] px-2.5 py-1 rounded-lg hover:bg-red-50 transition"
-                  >
-                    Download
-                  </a>
-                )}
+                <a
+                  href={`/api/payroll/slip-pdf?slipId=${slip.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-[#E94560] border border-[#E94560] px-2.5 py-1 rounded-lg hover:bg-red-50 transition"
+                >
+                  View Slip
+                </a>
               </div>
             ))}
           </div>

@@ -1,14 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
+const INVITE_ERRORS: Record<string, string> = {
+  invalid_invite: "This invite link is invalid or has expired.",
+  invite_used: "This invite link has already been used. Please sign in.",
+  invite_expired: "This invite link has expired. Ask your employer to resend it.",
+};
+
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const errKey = searchParams.get("error");
+    if (errKey && INVITE_ERRORS[errKey]) setError(INVITE_ERRORS[errKey]);
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

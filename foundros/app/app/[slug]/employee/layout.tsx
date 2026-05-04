@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { companies } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import EmployeeBottomNav from "@/components/EmployeeBottomNav";
 
 interface Props {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ export default async function EmployeeLayout({ children, params }: Props) {
   if (!company) redirect("/login");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] max-w-md mx-auto">
+    <div className="min-h-screen bg-[#F8FAFC] max-w-md mx-auto flex flex-col">
       {/* Mobile top bar */}
       <div className="bg-[#1A1A2E] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-10">
         <div>
@@ -32,7 +33,8 @@ export default async function EmployeeLayout({ children, params }: Props) {
           <p className="text-white/60 text-xs">{company.name}</p>
         </div>
       </div>
-      <main>{children}</main>
+      <main className="flex-1 pb-20">{children}</main>
+      <EmployeeBottomNav slug={slug} />
     </div>
   );
 }
