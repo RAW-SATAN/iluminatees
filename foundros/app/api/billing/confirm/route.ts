@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { companies } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 const EMPLOYEE_LIMITS: Record<string, number> = {
   starter: 10,
@@ -8,20 +10,17 @@ const EMPLOYEE_LIMITS: Record<string, number> = {
 };
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
   const { companyId, planId, razorpay_subscription_id } = await req.json();
 
-  const { error } = await supabase
-    .from("companies")
-    .update({
+  await db
+    .update(companies)
+    .set({
       plan: planId,
-      billing_status: "active",
-      razorpay_subscription_id,
-      employee_limit: EMPLOYEE_LIMITS[planId] || 10,
+      billingStatus: "active",
+      razorpaySubscriptionId: razorpay_subscription_id,
+      employeeLimit: EMPLOYEE_LIMITS[planId] || 10,
     })
-    .eq("id", companyId);
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    .where(eq(companies.id, companyId));
 
   return NextResponse.json({ success: true });
 }

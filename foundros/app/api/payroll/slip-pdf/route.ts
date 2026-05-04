@@ -1,30 +1,34 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { salarySlips, employees, payrollRuns, companies } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { getMonthName, formatCurrency } from "@/lib/utils";
 
-// Generates a minimal HTML-based payslip and returns it as a downloadable HTML file
-// For production, swap with puppeteer or @react-pdf/renderer
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   const slipId = searchParams.get("slipId");
 
   if (!slipId) return NextResponse.json({ error: "Missing slipId" }, { status: 400 });
 
-  const { data: slip } = await supabase
-    .from("salary_slips")
-    .select("*, employees(name, email, department, role, date_of_joining, employee_code, pan), payroll_runs(month, year), companies(name, address, gstin, logo_url)")
-    .eq("id", slipId)
-    .single() as any;
+  const [slip] = await db
+    .select()
+    .from(salarySlips)
+    .where(eq(salarySlips.id, slipId))
+    .limit(1);
 
   if (!slip) return NextResponse.json({ error: "Slip not found" }, { status: 404 });
 
-  const emp = slip.employees;
-  const company = slip.companies;
-  const run = slip.payroll_runs;
+  const [[emp], [run], [company]] = await Promise.all([
+    db.select().from(employees).where(eq(employees.id, slip.employeeId)).limit(1),
+    db.select().from(payrollRuns).where(eq(payrollRuns.id, slip.payrollRunId)).limit(1),
+    db.select().from(companies).where(eq(companies.id, slip.companyId)).limit(1),
+  ]);
+
+  if (!emp || !run || !company) return NextResponse.json({ error: "Slip data not found" }, { status: 404 });
   const monthName = getMonthName(run.month);
 
   const html = `<!DOCTYPE html>
@@ -67,10 +71,10 @@ export async function GET(req: NextRequest) {
 
 <div class="info-grid">
   <div class="info-item"><label>Employee Name</label><span>${emp.name}</span></div>
-  <div class="info-item"><label>Employee ID</label><span>${emp.employee_code || slipId.slice(0, 8).toUpperCase()}</span></div>
+  <div class="info-item"><label>Employee ID</label><span>${emp.employeeCode || slipId.slice(0, 8).toUpperCase()}</span></div>
   <div class="info-item"><label>Department</label><span>${emp.department || "—"}</span></div>
   <div class="info-item"><label>Designation</label><span>${emp.role || "—"}</span></div>
-  <div class="info-item"><label>Date of Joining</label><span>${emp.date_of_joining || "—"}</span></div>
+  <div class="info-item"><label>Date of Joining</label><span>${emp.dateOfJoining || "—"}</span></div>
   <div class="info-item"><label>PAN</label><span>${emp.pan || "—"}</span></div>
 </div>
 
@@ -85,8 +89,8 @@ export async function GET(req: NextRequest) {
   <tbody>
     <tr><td style="border-right:1px solid #E2E8F0">Basic</td><td style="text-align:right;border-right:1px solid #E2E8F0">${formatCurrency(slip.basic)}</td><td></td></tr>
     <tr><td style="border-right:1px solid #E2E8F0">HRA</td><td style="text-align:right;border-right:1px solid #E2E8F0">${formatCurrency(slip.hra)}</td><td></td></tr>
-    <tr><td style="border-right:1px solid #E2E8F0">Special Allowance</td><td style="text-align:right;border-right:1px solid #E2E8F0">${formatCurrency(slip.special_allowance)}</td><td></td></tr>
-    <tr><td style="border-right:1px solid #E2E8F0"><strong>Gross Total</strong></td><td style="text-align:right;border-right:1px solid #E2E8F0"><strong>${formatCurrency(slip.gross_salary)}</strong></td><td></td></tr>
+    <tr><td style="border-right:1px solid #E2E8F0">Special Allowance</td><td style="text-align:right;border-right:1px solid #E2E8F0">${formatCurrency(slip.specialAllowance)}</td><td></td></tr>
+    <tr><td style="border-right:1px solid #E2E8F0"><strong>Gross Total</strong></td><td style="text-align:right;border-right:1px solid #E2E8F0"><strong>${formatCurrency(slip.grossSalary)}</strong></td><td></td></tr>
   </tbody>
 </table>
 
@@ -98,26 +102,26 @@ export async function GET(req: NextRequest) {
     </tr>
   </thead>
   <tbody>
-    <tr><td>PF (Employee)</td><td style="text-align:right">${formatCurrency(slip.pf_employee)}</td></tr>
-    <tr><td>PF (Employer)</td><td style="text-align:right">${formatCurrency(slip.pf_employer)}</td></tr>
-    <tr><td>ESI (Employee)</td><td style="text-align:right">${formatCurrency(slip.esi_employee)}</td></tr>
-    <tr><td>Professional Tax</td><td style="text-align:right">${formatCurrency(slip.professional_tax)}</td></tr>
+    <tr><td>PF (Employee)</td><td style="text-align:right">${formatCurrency(slip.pfEmployee)}</td></tr>
+    <tr><td>PF (Employer)</td><td style="text-align:right">${formatCurrency(slip.pfEmployer)}</td></tr>
+    <tr><td>ESI (Employee)</td><td style="text-align:right">${formatCurrency(slip.esiEmployee)}</td></tr>
+    <tr><td>Professional Tax</td><td style="text-align:right">${formatCurrency(slip.professionalTax)}</td></tr>
     <tr><td>TDS</td><td style="text-align:right">${formatCurrency(slip.tds)}</td></tr>
-    ${slip.lop_amount > 0 ? `<tr><td>Loss of Pay (LOP)</td><td style="text-align:right">${formatCurrency(slip.lop_amount)}</td></tr>` : ""}
-    <tr><td><strong>Total Deductions</strong></td><td style="text-align:right"><strong>${formatCurrency(slip.total_deductions)}</strong></td></tr>
+    ${slip.lopAmount > 0 ? `<tr><td>Loss of Pay (LOP)</td><td style="text-align:right">${formatCurrency(slip.lopAmount)}</td></tr>` : ""}
+    <tr><td><strong>Total Deductions</strong></td><td style="text-align:right"><strong>${formatCurrency(slip.totalDeductions)}</strong></td></tr>
   </tbody>
 </table>
 
 <div class="net-salary">
   <div class="label">Net Salary</div>
-  <div class="amount">${formatCurrency(slip.net_salary)}</div>
+  <div class="amount">${formatCurrency(slip.netSalary)}</div>
 </div>
 
 <div class="attendance-row">
-  <div class="att-item"><label>Working Days</label><span>${slip.working_days}</span></div>
-  <div class="att-item"><label>Present</label><span>${slip.present_days}</span></div>
-  <div class="att-item"><label>Absent</label><span>${slip.absent_days}</span></div>
-  <div class="att-item"><label>Leave</label><span>${slip.leave_days}</span></div>
+  <div class="att-item"><label>Working Days</label><span>${slip.workingDays}</span></div>
+  <div class="att-item"><label>Present</label><span>${slip.presentDays}</span></div>
+  <div class="att-item"><label>Absent</label><span>${slip.absentDays}</span></div>
+  <div class="att-item"><label>Leave</label><span>${slip.leaveDays}</span></div>
 </div>
 
 <div class="footer">

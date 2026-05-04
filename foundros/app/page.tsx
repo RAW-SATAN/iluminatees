@@ -1,25 +1,24 @@
 import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { db } from "@/lib/db";
+import { companies } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import Link from "next/link";
 
 export default async function HomePage() {
-  // Only check auth if Supabase is configured
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  if (supabaseUrl.startsWith("http")) {
-    const { createClient } = await import("@/lib/supabase/server");
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+  const session = await auth();
 
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role, company_id, companies(slug)")
-        .eq("id", user.id)
-        .single() as any;
-
-      if (profile?.role === "super_admin") redirect("/super/dashboard");
-      if (profile?.companies?.slug) {
-        if (profile.role === "employee") redirect(`/app/${profile.companies.slug}/employee`);
-        redirect(`/app/${profile.companies.slug}/admin`);
+  if (session?.user) {
+    const user = session.user as any;
+    if (user.role === "super_admin") redirect("/super/dashboard");
+    if (user.companyId) {
+      const [company] = await db
+        .select({ slug: companies.slug })
+        .from(companies)
+        .where(eq(companies.id, user.companyId))
+        .limit(1);
+      if (company?.slug) {
+        redirect(user.role === "employee" ? `/app/${company.slug}/employee` : `/app/${company.slug}/admin`);
       }
     }
   }

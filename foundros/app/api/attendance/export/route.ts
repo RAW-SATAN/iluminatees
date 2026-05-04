@@ -1,11 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { attendance, employees } from "@/lib/db/schema";
+import { eq, and, gte, lte } from "drizzle-orm";
 import * as XLSX from "xlsx";
 
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   const companyId = searchParams.get("companyId");
@@ -16,26 +18,40 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing params" }, { status: 400 });
   }
 
-  const { data: attendance } = await supabase
-    .from("attendance")
-    .select("date, status, check_in_time, check_out_time, location_verified, notes, employees(name, department)")
-    .eq("company_id", companyId)
-    .gte("date", from)
-    .lte("date", to)
-    .order("date");
+  const rows = await db
+    .select({
+      date: attendance.date,
+      status: attendance.status,
+      checkInTime: attendance.checkInTime,
+      checkOutTime: attendance.checkOutTime,
+      locationVerified: attendance.locationVerified,
+      notes: attendance.notes,
+      employeeName: employees.name,
+      department: employees.department,
+    })
+    .from(attendance)
+    .leftJoin(employees, eq(attendance.employeeId, employees.id))
+    .where(
+      and(
+        eq(attendance.companyId, companyId),
+        gte(attendance.date, from),
+        lte(attendance.date, to)
+      )
+    )
+    .orderBy(attendance.date);
 
-  const rows = (attendance || []).map((a: any) => ({
+  const sheetRows = rows.map((a) => ({
     Date: a.date,
-    Employee: a.employees?.name || "—",
-    Department: a.employees?.department || "—",
+    Employee: a.employeeName || "—",
+    Department: a.department || "—",
     Status: a.status,
-    "Check In": a.check_in_time ? new Date(a.check_in_time).toLocaleTimeString("en-IN") : "—",
-    "Check Out": a.check_out_time ? new Date(a.check_out_time).toLocaleTimeString("en-IN") : "—",
-    "Location Verified": a.location_verified ? "Yes" : "No",
+    "Check In": a.checkInTime ? new Date(a.checkInTime).toLocaleTimeString("en-IN") : "—",
+    "Check Out": a.checkOutTime ? new Date(a.checkOutTime).toLocaleTimeString("en-IN") : "—",
+    "Location Verified": a.locationVerified ? "Yes" : "No",
     Notes: a.notes || "",
   }));
 
-  const ws = XLSX.utils.json_to_sheet(rows);
+  const ws = XLSX.utils.json_to_sheet(sheetRows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Attendance");
   const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });

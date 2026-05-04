@@ -1,9 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, employees, attendance, leaves, dailyInsights } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import StatCard from "@/components/ui/StatCard";
 import PageHeader from "@/components/ui/PageHeader";
-import Badge from "@/components/ui/Badge";
-import { Users, Clock, DollarSign, CalendarX, Brain, TrendingUp } from "lucide-react";
+import { Users, Clock, DollarSign, CalendarX, Brain } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface Props {
@@ -12,44 +13,29 @@ interface Props {
 
 export default async function AdminDashboard({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
   const today = new Date().toISOString().split("T")[0];
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
 
-  // Fetch all data in parallel
-  const [
-    { data: employees },
-    { data: todayAttendance },
-    { data: pendingLeaves },
-    { data: insight },
-  ] = await Promise.all([
-    supabase.from("employees").select("id, base_salary, status").eq("company_id", company.id).eq("status", "active"),
-    supabase.from("attendance").select("status").eq("company_id", company.id).eq("date", today),
-    supabase.from("leaves").select("id").eq("company_id", company.id).eq("status", "pending"),
-    supabase.from("daily_insights").select("insight, created_at").eq("company_id", company.id).eq("date", today).single(),
+  const [empRows, todayAttendance, pendingLeaves, [insight]] = await Promise.all([
+    db.select({ id: employees.id, baseSalary: employees.baseSalary }).from(employees).where(and(eq(employees.companyId, company.id), eq(employees.status, "active"))),
+    db.select({ status: attendance.status }).from(attendance).where(and(eq(attendance.companyId, company.id), eq(attendance.date, today))),
+    db.select({ id: leaves.id }).from(leaves).where(and(eq(leaves.companyId, company.id), eq(leaves.status, "pending"))),
+    db.select({ insight: dailyInsights.insight, createdAt: dailyInsights.createdAt }).from(dailyInsights).where(and(eq(dailyInsights.companyId, company.id), eq(dailyInsights.date, today))).limit(1),
   ]);
 
-  const totalEmployees = employees?.length || 0;
-  const totalSalaryDue = employees?.reduce((sum, e) => sum + (e.base_salary || 0), 0) || 0;
-  const pendingLeaveCount = pendingLeaves?.length || 0;
+  const totalEmployees = empRows.length;
+  const totalSalaryDue = empRows.reduce((sum, e) => sum + parseFloat(e.baseSalary || "0"), 0);
+  const pendingLeaveCount = pendingLeaves.length;
 
-  const presentCount = todayAttendance?.filter((a) => a.status === "present").length || 0;
-  const absentCount = todayAttendance?.filter((a) => a.status === "absent").length || 0;
-  const lateCount = todayAttendance?.filter((a) => a.status === "late").length || 0;
-  const onLeaveCount = todayAttendance?.filter((a) => a.status === "leave").length || 0;
+  const presentCount = todayAttendance.filter((a) => a.status === "present").length;
+  const absentCount = todayAttendance.filter((a) => a.status === "absent").length;
+  const lateCount = todayAttendance.filter((a) => a.status === "late").length;
+  const onLeaveCount = todayAttendance.filter((a) => a.status === "leave").length;
 
-  const trialEndsAt = company.trial_ends_at ? new Date(company.trial_ends_at) : null;
+  const trialEndsAt = company.trialEndsAt ? new Date(company.trialEndsAt) : null;
   const daysLeftInTrial = trialEndsAt
     ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
@@ -62,7 +48,7 @@ export default async function AdminDashboard({ params }: Props) {
       />
 
       {/* Trial Banner */}
-      {company.billing_status === "trial" && daysLeftInTrial !== null && daysLeftInTrial <= 5 && (
+      {company.billingStatus === "trial" && daysLeftInTrial !== null && daysLeftInTrial <= 5 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
           <p className="text-amber-800 text-sm font-medium">
             Trial ends in <strong>{daysLeftInTrial} day{daysLeftInTrial !== 1 ? "s" : ""}</strong>. Upgrade to keep your data.

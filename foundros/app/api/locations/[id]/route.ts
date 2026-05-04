@@ -1,14 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { officeLocations } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { error } = await supabase.from("office_locations").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
+  await db.delete(officeLocations).where(eq(officeLocations.id, id));
   return NextResponse.json({ success: true });
 }

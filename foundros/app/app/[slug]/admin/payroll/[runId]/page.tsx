@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, payrollRuns, salarySlips, employees } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import PageHeader from "@/components/ui/PageHeader";
 import Badge from "@/components/ui/Badge";
 import { formatCurrency, getMonthName } from "@/lib/utils";
@@ -12,31 +14,33 @@ interface Props {
 
 export default async function PayrollRunDetailPage({ params }: Props) {
   const { slug, runId } = await params;
-  const supabase = await createClient();
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name, address, gstin, logo_url")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
-  const { data: run } = await supabase
-    .from("payroll_runs")
-    .select("*")
-    .eq("id", runId)
-    .eq("company_id", company.id)
-    .single();
-
+  const [run] = await db.select().from(payrollRuns).where(and(eq(payrollRuns.id, runId), eq(payrollRuns.companyId, company.id))).limit(1);
   if (!run) redirect(`/app/${slug}/admin/payroll`);
 
-  const { data: slips } = await supabase
-    .from("salary_slips")
-    .select("*, employees(name, email, department, role, date_of_joining, employee_code, pan)")
-    .eq("payroll_run_id", runId)
-    .eq("company_id", company.id)
-    .order("created_at");
+  const slips = await db
+    .select({
+      id: salarySlips.id,
+      grossSalary: salarySlips.grossSalary,
+      netSalary: salarySlips.netSalary,
+      pfEmployee: salarySlips.pfEmployee,
+      esiEmployee: salarySlips.esiEmployee,
+      professionalTax: salarySlips.professionalTax,
+      presentDays: salarySlips.presentDays,
+      leaveDays: salarySlips.leaveDays,
+      absentDays: salarySlips.absentDays,
+      workingDays: salarySlips.workingDays,
+      employeeName: employees.name,
+      employeeDept: employees.department,
+      employeeRole: employees.role,
+    })
+    .from(salarySlips)
+    .leftJoin(employees, eq(salarySlips.employeeId, employees.id))
+    .where(and(eq(salarySlips.payrollRunId, runId), eq(salarySlips.companyId, company.id)))
+    .orderBy(salarySlips.createdAt);
 
   return (
     <div>
@@ -59,46 +63,46 @@ export default async function PayrollRunDetailPage({ params }: Props) {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-4">
           <p className="text-xs text-[#64748B]">Total Gross</p>
-          <p className="text-xl font-bold text-[#1A1A1A]">{formatCurrency(run.total_gross)}</p>
+          <p className="text-xl font-bold text-[#1A1A1A]">{formatCurrency(run.totalGross)}</p>
         </div>
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-4">
           <p className="text-xs text-[#64748B]">Total Deductions</p>
-          <p className="text-xl font-bold text-red-600">{formatCurrency(run.total_deductions)}</p>
+          <p className="text-xl font-bold text-red-600">{formatCurrency(run.totalDeductions)}</p>
         </div>
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-4">
           <p className="text-xs text-[#64748B]">Net Payout</p>
-          <p className="text-xl font-bold text-green-600">{formatCurrency(run.total_net)}</p>
+          <p className="text-xl font-bold text-green-600">{formatCurrency(run.totalNet)}</p>
         </div>
       </div>
 
       {/* Salary Slips */}
       <div className="space-y-3">
-        {slips?.map((slip: any) => (
+        {slips.map((slip) => (
           <div key={slip.id} className="bg-white rounded-xl border border-[#E2E8F0] p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-semibold text-[#1A1A1A]">{slip.employees?.name}</p>
-                <p className="text-sm text-[#64748B]">{slip.employees?.department || slip.employees?.role || "—"}</p>
+                <p className="font-semibold text-[#1A1A1A]">{slip.employeeName}</p>
+                <p className="text-sm text-[#64748B]">{slip.employeeDept || slip.employeeRole || "—"}</p>
               </div>
               <div className="text-right">
                 <p className="text-xs text-[#64748B]">Net Salary</p>
-                <p className="text-xl font-bold text-green-600">{formatCurrency(slip.net_salary)}</p>
+                <p className="text-xl font-bold text-green-600">{formatCurrency(slip.netSalary)}</p>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div><p className="text-xs text-[#64748B]">Gross</p><p className="font-medium">{formatCurrency(slip.gross_salary)}</p></div>
-              <div><p className="text-xs text-[#64748B]">PF (Employee)</p><p className="font-medium text-red-500">{formatCurrency(slip.pf_employee)}</p></div>
-              <div><p className="text-xs text-[#64748B]">ESI (Employee)</p><p className="font-medium text-red-500">{formatCurrency(slip.esi_employee)}</p></div>
-              <div><p className="text-xs text-[#64748B]">Prof Tax</p><p className="font-medium text-red-500">{formatCurrency(slip.professional_tax)}</p></div>
+              <div><p className="text-xs text-[#64748B]">Gross</p><p className="font-medium">{formatCurrency(slip.grossSalary)}</p></div>
+              <div><p className="text-xs text-[#64748B]">PF (Employee)</p><p className="font-medium text-red-500">{formatCurrency(slip.pfEmployee)}</p></div>
+              <div><p className="text-xs text-[#64748B]">ESI (Employee)</p><p className="font-medium text-red-500">{formatCurrency(slip.esiEmployee)}</p></div>
+              <div><p className="text-xs text-[#64748B]">Prof Tax</p><p className="font-medium text-red-500">{formatCurrency(slip.professionalTax)}</p></div>
             </div>
             <div className="mt-3 flex items-center gap-2 text-xs text-[#64748B]">
-              <span>{slip.present_days}P</span>
+              <span>{slip.presentDays}P</span>
               <span>·</span>
-              <span>{slip.leave_days}L</span>
+              <span>{slip.leaveDays}L</span>
               <span>·</span>
-              <span>{slip.absent_days}A</span>
+              <span>{slip.absentDays}A</span>
               <span>·</span>
-              <span>{slip.working_days} working days</span>
+              <span>{slip.workingDays} working days</span>
             </div>
             <div className="mt-3 flex justify-end">
               <SalarySlipPDF

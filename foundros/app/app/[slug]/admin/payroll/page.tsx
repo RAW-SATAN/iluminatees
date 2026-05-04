@@ -1,9 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, payrollRuns as payrollRunsTable, employees } from "@/lib/db/schema";
+import { eq, and, desc } from "drizzle-orm";
 import PageHeader from "@/components/ui/PageHeader";
 import Badge from "@/components/ui/Badge";
 import StatCard from "@/components/ui/StatCard";
-import { formatCurrency, formatDate, getMonthName } from "@/lib/utils";
+import { formatCurrency, getMonthName } from "@/lib/utils";
 import { DollarSign, Users, Play } from "lucide-react";
 import Link from "next/link";
 
@@ -13,32 +15,22 @@ interface Props {
 
 export default async function PayrollPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name, billing_status")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
   const now = new Date();
   const thisMonth = now.getMonth() + 1;
   const thisYear = now.getFullYear();
 
-  const [
-    { data: payrollRuns },
-    { data: employees },
-    { data: thisMonthRun },
-  ] = await Promise.all([
-    supabase.from("payroll_runs").select("*").eq("company_id", company.id).order("year", { ascending: false }).order("month", { ascending: false }),
-    supabase.from("employees").select("id, base_salary").eq("company_id", company.id).eq("status", "active"),
-    supabase.from("payroll_runs").select("*").eq("company_id", company.id).eq("month", thisMonth).eq("year", thisYear).single(),
+  const [payrollRuns, empRows, [thisMonthRun]] = await Promise.all([
+    db.select().from(payrollRunsTable).where(eq(payrollRunsTable.companyId, company.id)).orderBy(desc(payrollRunsTable.year), desc(payrollRunsTable.month)),
+    db.select({ id: employees.id, baseSalary: employees.baseSalary }).from(employees).where(and(eq(employees.companyId, company.id), eq(employees.status, "active"))),
+    db.select().from(payrollRunsTable).where(and(eq(payrollRunsTable.companyId, company.id), eq(payrollRunsTable.month, thisMonth), eq(payrollRunsTable.year, thisYear))).limit(1),
   ]);
 
-  const totalPayroll = employees?.reduce((s, e) => s + (e.base_salary || 0), 0) || 0;
-  const isSuspended = company.billing_status === "suspended";
+  const totalPayroll = empRows.reduce((s, e) => s + parseFloat(e.baseSalary || "0"), 0);
+  const isSuspended = company.billingStatus === "suspended";
 
   return (
     <div>
@@ -69,14 +61,14 @@ export default async function PayrollPage({ params }: Props) {
         />
         <StatCard
           label="Total Payout This Month"
-          value={thisMonthRun ? formatCurrency(thisMonthRun.total_net) : formatCurrency(totalPayroll)}
+          value={thisMonthRun ? formatCurrency(thisMonthRun.totalNet) : formatCurrency(totalPayroll)}
           icon={DollarSign}
           iconBg="bg-blue-50"
           iconColor="text-blue-600"
         />
         <StatCard
           label="Active Employees"
-          value={employees?.length || 0}
+          value={empRows.length}
           icon={Users}
           iconBg="bg-purple-50"
           iconColor="text-purple-600"
@@ -85,7 +77,7 @@ export default async function PayrollPage({ params }: Props) {
 
       {/* Payroll Runs */}
       <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4">Payroll History</h2>
-      {!payrollRuns || payrollRuns.length === 0 ? (
+      {payrollRuns.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 text-center">
           <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="font-semibold text-[#1A1A1A]">No payroll runs yet</p>
@@ -116,9 +108,9 @@ export default async function PayrollPage({ params }: Props) {
                   <td className="px-4 py-3 font-medium text-[#1A1A1A]">
                     {getMonthName(run.month)} {run.year}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[#64748B]">{formatCurrency(run.total_gross)}</td>
-                  <td className="px-4 py-3 text-sm text-[#64748B]">{formatCurrency(run.total_deductions)}</td>
-                  <td className="px-4 py-3 text-sm font-semibold text-[#1A1A1A]">{formatCurrency(run.total_net)}</td>
+                  <td className="px-4 py-3 text-sm text-[#64748B]">{formatCurrency(run.totalGross)}</td>
+                  <td className="px-4 py-3 text-sm text-[#64748B]">{formatCurrency(run.totalDeductions)}</td>
+                  <td className="px-4 py-3 text-sm font-semibold text-[#1A1A1A]">{formatCurrency(run.totalNet)}</td>
                   <td className="px-4 py-3"><Badge label={run.status} /></td>
                   <td className="px-4 py-3">
                     <Link href={`/app/${slug}/admin/payroll/${run.id}`} className="text-xs text-[#E94560] hover:underline font-medium">

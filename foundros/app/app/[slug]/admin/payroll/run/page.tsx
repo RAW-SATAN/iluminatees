@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, payrollRuns, employees, attendance } from "@/lib/db/schema";
+import { eq, and, gte, lte } from "drizzle-orm";
 import PageHeader from "@/components/ui/PageHeader";
 import PayrollRunClient from "@/components/PayrollRunClient";
 import { daysInMonth, getMonthName } from "@/lib/utils";
@@ -13,58 +15,34 @@ interface Props {
 export default async function RunPayrollPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const { month: mParam, year: yParam } = await searchParams;
-  const supabase = await createClient();
 
   const now = new Date();
   const month = mParam ? parseInt(mParam) : now.getMonth() + 1;
   const year = yParam ? parseInt(yParam) : now.getFullYear();
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name, state")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
-  // Check if already run
-  const { data: existing } = await supabase
-    .from("payroll_runs")
-    .select("id, status")
-    .eq("company_id", company.id)
-    .eq("month", month)
-    .eq("year", year)
-    .single();
-
-  const { data: employees } = await supabase
-    .from("employees")
-    .select("*")
-    .eq("company_id", company.id)
-    .eq("status", "active");
-
-  // Get attendance for the month
   const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
   const monthEnd = `${year}-${String(month).padStart(2, "0")}-${daysInMonth(year, month)}`;
 
-  const { data: attendance } = await supabase
-    .from("attendance")
-    .select("employee_id, status")
-    .eq("company_id", company.id)
-    .gte("date", monthStart)
-    .lte("date", monthEnd);
+  const [[existing], empRows, attRows] = await Promise.all([
+    db.select({ id: payrollRuns.id, status: payrollRuns.status }).from(payrollRuns).where(and(eq(payrollRuns.companyId, company.id), eq(payrollRuns.month, month), eq(payrollRuns.year, year))).limit(1),
+    db.select().from(employees).where(and(eq(employees.companyId, company.id), eq(employees.status, "active"))),
+    db.select({ employeeId: attendance.employeeId, status: attendance.status }).from(attendance).where(and(eq(attendance.companyId, company.id), gte(attendance.date, monthStart), lte(attendance.date, monthEnd))),
+  ]);
 
-  // Calculate payroll for each employee
-  const calculations = (employees || []).map((emp) => {
-    const empAttendance = attendance?.filter((a) => a.employee_id === emp.id) || [];
-    const presentDays = empAttendance.filter((a) => ["present", "late"].includes(a.status)).length;
-    const leaveDays = empAttendance.filter((a) => a.status === "leave").length;
+  const calculations = empRows.map((emp) => {
+    const empAtt = attRows.filter((a) => a.employeeId === emp.id);
+    const presentDays = empAtt.filter((a) => ["present", "late"].includes(a.status)).length;
+    const leaveDays = empAtt.filter((a) => a.status === "leave").length;
     const absentDays = daysInMonth(year, month) - presentDays - leaveDays;
 
     const result = calculatePayroll({
-      baseSalary: emp.base_salary,
-      salaryType: emp.salary_type as "monthly" | "daily",
-      pfApplicable: emp.pf_applicable,
-      esiApplicable: emp.esi_applicable,
+      baseSalary: emp.baseSalary,
+      salaryType: emp.salaryType as "monthly" | "daily",
+      pfApplicable: emp.pfApplicable,
+      esiApplicable: emp.esiApplicable,
       presentDays,
       leaveDays,
       absentDays: Math.max(0, absentDays),

@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Clock, Calendar, DollarSign,
   MapPin, LogOut, ChevronRight, Building2,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -30,8 +30,7 @@ export default function AdminSidebar({ slug, role, companyName }: Props) {
   const router = useRouter();
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut({ redirect: false });
     router.push("/login");
   }
 

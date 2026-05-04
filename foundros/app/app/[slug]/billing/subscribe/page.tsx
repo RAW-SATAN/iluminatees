@@ -1,5 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import BillingPlans from "@/components/BillingPlans";
 
 interface Props {
@@ -36,17 +39,10 @@ export const PLANS = [
 
 export default async function SubscribePage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const session = await auth();
+  if (!session?.user) redirect("/login");
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name, plan, billing_status")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
   return (
@@ -60,7 +56,7 @@ export default async function SubscribePage({ params }: Props) {
         <BillingPlans
           slug={slug}
           companyId={company.id}
-          currentPlan={company.plan}
+          currentPlan={company.plan || "starter"}
           razorpayKeyId={process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || ""}
         />
 

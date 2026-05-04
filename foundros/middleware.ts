@@ -1,96 +1,60 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import NextAuth from "next-auth";
+import { authConfig } from "./auth.config";
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { companies } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
-export async function middleware(request: NextRequest) {
-  // Skip if Supabase not configured yet (local dev without credentials)
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  if (!supabaseUrl.startsWith("http")) {
-    return NextResponse.next({ request });
-  }
+const { auth } = NextAuth(authConfig);
 
-  let supabaseResponse = NextResponse.next({ request });
+export default auth(async (req) => {
+  const session = req.auth;
+  const pathname = req.nextUrl.pathname;
 
-  const supabase = createServerClient(
-    supabaseUrl,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
-
-  // Public routes that don't need auth
-  const publicRoutes = ["/", "/signup", "/login", "/auth/callback", "/api/webhooks"];
+  const publicRoutes = ["/", "/signup", "/login", "/api/webhooks", "/api/auth", "/demo"];
   const isPublic = publicRoutes.some((r) => pathname.startsWith(r));
 
-  // Super admin route protection
   if (pathname.startsWith("/super")) {
-    if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+    if (!session) return NextResponse.redirect(new URL("/login", req.url));
+    if (session.user?.email !== process.env.SUPER_ADMIN_EMAIL) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
-    if (user.email !== process.env.SUPER_ADMIN_EMAIL) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    return supabaseResponse;
+    return NextResponse.next();
   }
 
-  // Protected app routes
   if (pathname.startsWith("/app/")) {
-    if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+    if (!session) return NextResponse.redirect(new URL("/login", req.url));
 
-    // Extract slug from URL
     const segments = pathname.split("/");
     const slug = segments[2];
 
     if (slug) {
-      // Validate company slug exists
-      const { data: company } = await supabase
-        .from("companies")
-        .select("id, billing_status, trial_ends_at, grace_ends_at")
-        .eq("slug", slug)
-        .single();
+      const [company] = await db
+        .select()
+        .from(companies)
+        .where(eq(companies.slug, slug))
+        .limit(1);
 
-      if (!company) {
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
+      if (!company) return NextResponse.redirect(new URL("/login", req.url));
 
-      // Check trial expiry → redirect to billing
-      if (company.billing_status === "trial" && company.trial_ends_at) {
-        const trialEnd = new Date(company.trial_ends_at);
-        if (new Date() > trialEnd && !pathname.includes("/billing")) {
-          return NextResponse.redirect(
-            new URL(`/app/${slug}/billing/subscribe`, request.url)
-          );
-        }
+      if (
+        company.billingStatus === "trial" &&
+        company.trialEndsAt &&
+        new Date() > new Date(company.trialEndsAt) &&
+        !pathname.includes("/billing")
+      ) {
+        return NextResponse.redirect(new URL(`/app/${slug}/billing/subscribe`, req.url));
       }
     }
+    return NextResponse.next();
   }
 
-  if (!isPublic && !pathname.startsWith("/app/") && !pathname.startsWith("/super")) {
-    if (!user && !pathname.startsWith("/api/")) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+  if (!isPublic && !pathname.startsWith("/api/")) {
+    if (!session) return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  return supabaseResponse;
-}
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [

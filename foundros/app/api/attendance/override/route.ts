@@ -1,31 +1,42 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { attendance } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { employeeId, companyId, date, status, attendanceId } = await req.json();
 
   if (attendanceId) {
-    const { error } = await supabase
-      .from("attendance")
-      .update({ status, notes: `Manual override by admin` })
-      .eq("id", attendanceId)
-      .eq("company_id", companyId);
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    await db
+      .update(attendance)
+      .set({ status, notes: "Manual override by admin" })
+      .where(and(eq(attendance.id, attendanceId), eq(attendance.companyId, companyId)));
   } else {
-    const { error } = await supabase.from("attendance").upsert({
-      employee_id: employeeId,
-      company_id: companyId,
-      date,
-      status,
-      notes: "Manual override by admin",
-    }, { onConflict: "employee_id,date" });
+    // Upsert: try insert, update on conflict
+    const [existing] = await db
+      .select({ id: attendance.id })
+      .from(attendance)
+      .where(and(eq(attendance.employeeId, employeeId), eq(attendance.date, date)))
+      .limit(1);
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (existing) {
+      await db
+        .update(attendance)
+        .set({ status, notes: "Manual override by admin" })
+        .where(eq(attendance.id, existing.id));
+    } else {
+      await db.insert(attendance).values({
+        employeeId,
+        companyId,
+        date,
+        status,
+        notes: "Manual override by admin",
+      });
+    }
   }
 
   return NextResponse.json({ success: true });

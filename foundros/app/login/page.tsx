@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,33 +19,37 @@ export default function LoginPage() {
     const email = form.get("email") as string;
     const password = form.get("password") as string;
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-    if (authError) {
-      setError(authError.message);
+    if (result?.error) {
+      setError("Invalid email or password");
       setLoading(false);
       return;
     }
 
-    // Get profile to redirect
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role, company_id, companies(slug)")
-      .single() as any;
+    // Fetch session to get role/companyId for redirect
+    const res = await fetch("/api/auth/session");
+    const session = await res.json();
+    const role = session?.user?.role;
+    const companyId = session?.user?.companyId;
 
-    if (profile?.role === "super_admin") {
+    if (email === process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || role === "super_admin") {
       router.push("/super/dashboard");
       return;
     }
 
-    if (profile?.companies?.slug) {
-      if (profile.role === "employee") {
-        router.push(`/app/${profile.companies.slug}/employee`);
-      } else {
-        router.push(`/app/${profile.companies.slug}/admin`);
+    if (companyId) {
+      // Get company slug
+      const slugRes = await fetch(`/api/auth/company-slug?companyId=${companyId}`);
+      const { slug } = await slugRes.json();
+      if (slug) {
+        router.push(role === "employee" ? `/app/${slug}/employee` : `/app/${slug}/admin`);
+        return;
       }
-      return;
     }
 
     router.push("/");

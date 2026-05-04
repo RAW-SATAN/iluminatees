@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -7,10 +7,9 @@ interface Props {
 }
 
 export default async function SuperAdminLayout({ children }: Props) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await auth();
 
-  if (!user || user.email !== process.env.SUPER_ADMIN_EMAIL) {
+  if (!session?.user || session.user.email !== process.env.SUPER_ADMIN_EMAIL) {
     redirect("/login");
   }
 

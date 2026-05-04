@@ -1,5 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 interface Props {
   children: React.ReactNode;
@@ -8,16 +11,15 @@ interface Props {
 
 export default async function EmployeeLayout({ children, params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const session = await auth();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!session?.user) redirect("/login");
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name, billing_status")
-    .eq("slug", slug)
-    .single();
+  const [company] = await db
+    .select({ id: companies.id, name: companies.name })
+    .from(companies)
+    .where(eq(companies.slug, slug))
+    .limit(1);
 
   if (!company) redirect("/login");
 

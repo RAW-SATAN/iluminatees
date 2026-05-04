@@ -1,80 +1,73 @@
-import { createClient } from "@/lib/supabase/server";
-import { getAdminClient } from "@/lib/supabase/admin";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { companies, employees, inviteTokens } from "@/lib/db/schema";
+import { eq, and, count } from "drizzle-orm";
 import { sendEmployeeInviteEmail } from "@/lib/email/sender";
+import { randomUUID } from "crypto";
 
 export async function POST(req: NextRequest) {
-  const adminClient = getAdminClient();
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  try {
     const body = await req.json();
     const { companyId, name, email, phone, role, department, dateOfJoining, baseSalary, salaryType, pfApplicable, esiApplicable } = body;
 
-    // Check employee limit
-    const { data: company } = await supabase
-      .from("companies")
-      .select("employee_limit, billing_status")
-      .eq("id", companyId)
-      .single();
-
+    const [company] = await db.select().from(companies).where(eq(companies.id, companyId)).limit(1);
     if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
-    if (company.billing_status === "suspended") {
+    if (company.billingStatus === "suspended") {
       return NextResponse.json({ error: "Account suspended" }, { status: 403 });
     }
 
-    const { count } = await supabase
-      .from("employees")
-      .select("id", { count: "exact" })
-      .eq("company_id", companyId)
-      .eq("status", "active");
+    const [{ value: empCount }] = await db
+      .select({ value: count() })
+      .from(employees)
+      .where(and(eq(employees.companyId, companyId), eq(employees.status, "active")));
 
-    if (count && count >= company.employee_limit) {
+    if (empCount >= company.employeeLimit) {
       return NextResponse.json(
-        { error: `Employee limit of ${company.employee_limit} reached. Please upgrade your plan.` },
+        { error: `Employee limit of ${company.employeeLimit} reached. Please upgrade your plan.` },
         { status: 403 }
       );
     }
 
-    // Insert employee
-    const { data: employee, error: empError } = await adminClient
-      .from("employees")
-      .insert({
-        company_id: companyId,
+    const [employee] = await db
+      .insert(employees)
+      .values({
+        companyId,
         name,
         email,
         phone,
         role,
         department,
-        date_of_joining: dateOfJoining || null,
-        base_salary: baseSalary || 0,
-        salary_type: salaryType || "monthly",
-        pf_applicable: pfApplicable ?? true,
-        esi_applicable: esiApplicable ?? true,
+        dateOfJoining: dateOfJoining || null,
+        baseSalary: baseSalary?.toString() || "0",
+        salaryType: salaryType || "monthly",
+        pfApplicable: pfApplicable ?? true,
+        esiApplicable: esiApplicable ?? true,
         status: "active",
       })
-      .select()
-      .single();
+      .returning();
 
-    if (empError) {
-      return NextResponse.json({ error: empError.message }, { status: 500 });
-    }
+    // Create invite token
+    const token = randomUUID();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
-    // Send invite email via magic link
-    const { data: { company: companyData } } = await supabase
-      .from("companies")
-      .select("name, slug")
-      .eq("id", companyId)
-      .single() as any;
+    await db.insert(inviteTokens).values({
+      token,
+      email,
+      companyId,
+      employeeId: employee.id,
+      expiresAt,
+    });
 
-    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/invite?email=${encodeURIComponent(email)}&company=${companyData?.slug || ""}`;
-
+    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/invite?token=${token}`;
     sendEmployeeInviteEmail({
       to: email,
       employeeName: name,
-      companyName: companyData?.name || "Your Company",
+      companyName: company.name,
       inviteLink,
     }).catch(console.error);
 

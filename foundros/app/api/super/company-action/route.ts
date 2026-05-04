@@ -1,13 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
-import { getAdminClient } from "@/lib/supabase/admin";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { companies } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
-  const adminClient = getAdminClient();
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user || user.email !== process.env.SUPER_ADMIN_EMAIL) {
+  const session = await auth();
+  if (!session?.user || session.user.email !== process.env.SUPER_ADMIN_EMAIL) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -15,18 +14,18 @@ export async function POST(req: NextRequest) {
 
   switch (action) {
     case "extend_trial": {
-      const { data: company } = await adminClient.from("companies").select("trial_ends_at").eq("id", companyId).single();
-      const current = company?.trial_ends_at ? new Date(company.trial_ends_at) : new Date();
+      const [company] = await db.select({ trialEndsAt: companies.trialEndsAt }).from(companies).where(eq(companies.id, companyId)).limit(1);
+      const current = company?.trialEndsAt ? new Date(company.trialEndsAt) : new Date();
       const extended = new Date(current);
       extended.setDate(extended.getDate() + 7);
-      await adminClient.from("companies").update({ trial_ends_at: extended.toISOString() }).eq("id", companyId);
+      await db.update(companies).set({ trialEndsAt: extended }).where(eq(companies.id, companyId));
       break;
     }
     case "suspend":
-      await adminClient.from("companies").update({ billing_status: "suspended" }).eq("id", companyId);
+      await db.update(companies).set({ billingStatus: "suspended" }).where(eq(companies.id, companyId));
       break;
     case "unsuspend":
-      await adminClient.from("companies").update({ billing_status: "active" }).eq("id", companyId);
+      await db.update(companies).set({ billingStatus: "active" }).where(eq(companies.id, companyId));
       break;
     default:
       return NextResponse.json({ error: "Unknown action" }, { status: 400 });

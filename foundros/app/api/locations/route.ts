@@ -1,27 +1,30 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { officeLocations } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { companyId, name, lat, lng, radiusMeters, isDefault } = await req.json();
 
   if (isDefault) {
-    await supabase.from("office_locations").update({ is_default: false }).eq("company_id", companyId);
+    await db
+      .update(officeLocations)
+      .set({ isDefault: false })
+      .where(eq(officeLocations.companyId, companyId));
   }
 
-  const { error } = await supabase.from("office_locations").insert({
-    company_id: companyId,
+  await db.insert(officeLocations).values({
+    companyId,
     name,
-    lat,
-    lng,
-    radius_meters: radiusMeters || 100,
-    is_default: isDefault || false,
+    lat: lat.toString(),
+    lng: lng.toString(),
+    radiusMeters: radiusMeters || 100,
+    isDefault: isDefault || false,
   });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ success: true });
 }

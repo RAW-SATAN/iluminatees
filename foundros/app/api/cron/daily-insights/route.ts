@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminClient } from "@/lib/supabase/admin";
+import { db } from "@/lib/db";
+import { companies, attendance, employees, leaves, dailyInsights, usageLogs, users } from "@/lib/db/schema";
+import { eq, and, inArray, lt, gte, count } from "drizzle-orm";
 import Anthropic from "@anthropic-ai/sdk";
 import { sendTrialEndingSoonEmail } from "@/lib/email/sender";
 
 export async function POST(req: NextRequest) {
-  const adminClient = getAdminClient();
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
-  // Verify cron secret
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,97 +15,98 @@ export async function POST(req: NextRequest) {
 
   const today = new Date().toISOString().split("T")[0];
 
-  // Get all active companies
-  const { data: companies } = await adminClient
-    .from("companies")
-    .select("id, owner_id, trial_ends_at, billing_status")
-    .in("billing_status", ["active", "trial"]);
-
-  if (!companies) return NextResponse.json({ processed: 0 });
+  const activeCompanies = await db
+    .select()
+    .from(companies)
+    .where(inArray(companies.billingStatus, ["active", "trial"]));
 
   let processed = 0;
 
-  for (const company of companies) {
+  for (const company of activeCompanies) {
     try {
-      // Send trial ending emails (day 11 and day 13)
-      if (company.billing_status === "trial" && company.trial_ends_at) {
-        const trialEnd = new Date(company.trial_ends_at);
+      // Trial ending emails
+      if (company.billingStatus === "trial" && company.trialEndsAt) {
+        const trialEnd = new Date(company.trialEndsAt);
         const daysLeft = Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
         if (daysLeft === 3 || daysLeft === 1) {
-          const { data: owner } = await adminClient.auth.admin.getUserById(company.owner_id);
-          const { data: profile } = await adminClient.from("profiles").select("full_name, companies(slug)").eq("id", company.owner_id).single() as any;
-          const { count: empCount } = await adminClient.from("employees").select("id", { count: "exact" }).eq("company_id", company.id).eq("status", "active");
+          const [owner] = await db.select().from(users).where(eq(users.id, company.ownerId)).limit(1);
+          const [{ value: empCount }] = await db
+            .select({ value: count() })
+            .from(employees)
+            .where(and(eq(employees.companyId, company.id), eq(employees.status, "active")));
 
-          if (owner?.user?.email && profile?.companies?.slug) {
+          if (owner?.email) {
             await sendTrialEndingSoonEmail({
-              to: owner.user.email,
-              name: profile.full_name || "Founder",
-              companyName: profile.companies.name || "",
-              slug: profile.companies.slug,
-              employeeCount: empCount || 0,
+              to: owner.email,
+              name: owner.name || "Founder",
+              companyName: company.name,
+              slug: company.slug,
+              employeeCount: Number(empCount) || 0,
               daysLeft,
             });
           }
         }
       }
 
-      // Check if insight already exists for today
-      const { data: existingInsight } = await adminClient
-        .from("daily_insights")
-        .select("id")
-        .eq("company_id", company.id)
-        .eq("date", today)
-        .single();
+      // Check if insight already exists
+      const [existingInsight] = await db
+        .select({ id: dailyInsights.id })
+        .from(dailyInsights)
+        .where(and(eq(dailyInsights.companyId, company.id), eq(dailyInsights.date, today)))
+        .limit(1);
 
       if (existingInsight) continue;
 
       // Gather attendance data
-      const { data: attendance } = await adminClient
-        .from("attendance")
-        .select("status")
-        .eq("company_id", company.id)
-        .eq("date", today);
+      const todayAttendance = await db
+        .select({ status: attendance.status })
+        .from(attendance)
+        .where(and(eq(attendance.companyId, company.id), eq(attendance.date, today)));
 
-      const { count: totalEmployees } = await adminClient
-        .from("employees")
-        .select("id", { count: "exact" })
-        .eq("company_id", company.id)
-        .eq("status", "active");
+      const [{ value: totalEmployees }] = await db
+        .select({ value: count() })
+        .from(employees)
+        .where(and(eq(employees.companyId, company.id), eq(employees.status, "active")));
 
-      const { data: pendingLeaves } = await adminClient
-        .from("leaves")
-        .select("id")
-        .eq("company_id", company.id)
-        .eq("status", "pending");
+      const pendingLeavesRows = await db
+        .select({ id: leaves.id })
+        .from(leaves)
+        .where(and(eq(leaves.companyId, company.id), eq(leaves.status, "pending")));
 
       // Find employees with 3+ absences this month
       const monthStart = today.slice(0, 7) + "-01";
-      const { data: absences } = await adminClient
-        .from("attendance")
-        .select("employee_id, employees(name)")
-        .eq("company_id", company.id)
-        .eq("status", "absent")
-        .gte("date", monthStart) as any;
+      const absences = await db
+        .select({ employeeId: attendance.employeeId, name: employees.name })
+        .from(attendance)
+        .leftJoin(employees, eq(attendance.employeeId, employees.id))
+        .where(
+          and(
+            eq(attendance.companyId, company.id),
+            eq(attendance.status, "absent"),
+            gte(attendance.date, monthStart)
+          )
+        );
 
       const absentCounts: Record<string, { name: string; count: number }> = {};
-      for (const a of absences || []) {
-        const id = a.employee_id;
-        if (!absentCounts[id]) absentCounts[id] = { name: a.employees?.name || "Unknown", count: 0 };
+      for (const a of absences) {
+        const id = a.employeeId;
+        if (!absentCounts[id]) absentCounts[id] = { name: a.name || "Unknown", count: 0 };
         absentCounts[id].count++;
       }
       const highAbsence = Object.values(absentCounts)
         .filter((e) => e.count >= 3)
         .map((e) => e.name);
 
-      const presentCount = attendance?.filter((a) => ["present", "late"].includes(a.status)).length || 0;
-      const absentCount = attendance?.filter((a) => a.status === "absent").length || 0;
-      const lateCount = attendance?.filter((a) => a.status === "late").length || 0;
-      const presentPct = totalEmployees ? Math.round((presentCount / totalEmployees) * 100) : 0;
+      const presentCount = todayAttendance.filter((a) => ["present", "late"].includes(a.status)).length;
+      const absentCount = todayAttendance.filter((a) => a.status === "absent").length;
+      const lateCount = todayAttendance.filter((a) => a.status === "late").length;
+      const total = Number(totalEmployees) || 1;
+      const presentPct = Math.round((presentCount / total) * 100);
 
       const prompt = `You are an HR assistant for an Indian company. Based on this data, give 3 short insights in plain English (not bullet points, just 3 sentences):
 Attendance today: ${presentPct}% present, ${lateCount} late, ${absentCount} absent.
-Pending leave requests: ${pendingLeaves?.length || 0}.
+Pending leave requests: ${pendingLeavesRows.length}.
 Employees with 3+ absences this month: ${highAbsence.length > 0 ? highAbsence.join(", ") : "None"}.
 Keep it under 60 words total. Be direct, practical, no fluff.`;
 
@@ -118,19 +119,18 @@ Keep it under 60 words total. Be direct, practical, no fluff.`;
       const insight = (response.content[0] as any).text;
       const tokensUsed = (response.usage.input_tokens || 0) + (response.usage.output_tokens || 0);
 
-      await adminClient.from("daily_insights").insert({
-        company_id: company.id,
+      await db.insert(dailyInsights).values({
+        companyId: company.id,
         date: today,
         insight,
-        tokens_used: tokensUsed,
+        tokensUsed,
       });
 
-      // Log usage
-      await adminClient.from("usage_logs").insert({
-        company_id: company.id,
+      await db.insert(usageLogs).values({
+        companyId: company.id,
         feature: "daily_insight",
-        tokens_input: response.usage.input_tokens,
-        tokens_output: response.usage.output_tokens,
+        tokensInput: response.usage.input_tokens,
+        tokensOutput: response.usage.output_tokens,
       });
 
       processed++;
@@ -139,16 +139,15 @@ Keep it under 60 words total. Be direct, practical, no fluff.`;
     }
   }
 
-  // Check grace period expiry → suspend
-  const { data: graceCompanies } = await adminClient
-    .from("companies")
-    .select("id")
-    .eq("billing_status", "grace_period")
-    .lt("grace_ends_at", new Date().toISOString());
+  // Expire grace period → suspend
+  const graceExpired = await db
+    .select({ id: companies.id })
+    .from(companies)
+    .where(and(eq(companies.billingStatus, "grace_period"), lt(companies.graceEndsAt, new Date())));
 
-  for (const c of graceCompanies || []) {
-    await adminClient.from("companies").update({ billing_status: "suspended" }).eq("id", c.id);
+  for (const c of graceExpired) {
+    await db.update(companies).set({ billingStatus: "suspended" }).where(eq(companies.id, c.id));
   }
 
-  return NextResponse.json({ processed, graceExpired: graceCompanies?.length || 0 });
+  return NextResponse.json({ processed, graceExpired: graceExpired.length });
 }

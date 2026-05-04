@@ -1,15 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { companies } from "@/lib/db/schema";
 import { formatCurrency, getMonthName } from "@/lib/utils";
 
 const PLAN_PRICES: Record<string, number> = { starter: 999, growth: 2499, pro: 4999 };
 
 export default async function SuperRevenuePage() {
-  const supabase = await createClient();
-
-  const { data: companies } = await supabase
-    .from("companies")
-    .select("plan, billing_status, created_at")
-    .order("created_at");
+  const allCompanies = await db
+    .select({ plan: companies.plan, billingStatus: companies.billingStatus, createdAt: companies.createdAt })
+    .from(companies)
+    .orderBy(companies.createdAt);
 
   const now = new Date();
   const monthlyRevenue: Record<string, number> = {};
@@ -20,18 +19,18 @@ export default async function SuperRevenuePage() {
     monthlyRevenue[key] = 0;
   }
 
-  companies?.forEach((c) => {
-    if (c.billing_status === "active") {
-      const key = new Date(c.created_at).toISOString().slice(0, 7);
+  allCompanies.forEach((c) => {
+    if (c.billingStatus === "active") {
+      const key = new Date(c.createdAt).toISOString().slice(0, 7);
       if (monthlyRevenue[key] !== undefined) {
         monthlyRevenue[key] += PLAN_PRICES[c.plan] || 0;
       }
     }
   });
 
-  const currentMRR = companies
-    ?.filter((c) => c.billing_status === "active")
-    .reduce((s, c) => s + (PLAN_PRICES[c.plan] || 0), 0) || 0;
+  const currentMRR = allCompanies
+    .filter((c) => c.billingStatus === "active")
+    .reduce((s, c) => s + (PLAN_PRICES[c.plan] || 0), 0);
 
   const maxRevenue = Math.max(...Object.values(monthlyRevenue), 1);
 
@@ -51,7 +50,7 @@ export default async function SuperRevenuePage() {
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
           <p className="text-sm text-[#64748B]">Paying Customers</p>
           <p className="text-2xl font-bold text-[#1A1A1A] mt-1">
-            {companies?.filter((c) => c.billing_status === "active").length || 0}
+            {allCompanies.filter((c) => c.billingStatus === "active").length}
           </p>
         </div>
       </div>

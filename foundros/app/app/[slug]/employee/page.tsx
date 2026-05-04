@@ -1,5 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, employees, attendance, officeLocations, leaves, salarySlips, payrollRuns } from "@/lib/db/schema";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
 import CheckInWidget from "@/components/CheckInWidget";
 import AttendanceCalendar from "@/components/AttendanceCalendar";
 import Badge from "@/components/ui/Badge";
@@ -11,26 +14,15 @@ interface Props {
 
 export default async function EmployeeSelfServicePage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const session = await auth();
+  if (!session?.user) redirect("/login");
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const userId = (session.user as any).id;
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select({ id: companies.id, name: companies.name }).from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
-  const { data: employee } = await supabase
-    .from("employees")
-    .select("*")
-    .eq("company_id", company.id)
-    .eq("user_id", user.id)
-    .single();
-
+  const [employee] = await db.select().from(employees).where(and(eq(employees.companyId, company.id), eq(employees.userId, userId))).limit(1);
   if (!employee) redirect("/login");
 
   const today = new Date().toISOString().split("T")[0];
@@ -40,18 +32,19 @@ export default async function EmployeeSelfServicePage({ params }: Props) {
   const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
   const monthEnd = `${year}-${String(month).padStart(2, "0")}-${new Date(year, month, 0).getDate()}`;
 
-  const [
-    { data: todayAttendance },
-    { data: monthAttendance },
-    { data: officeLocations },
-    { data: leaveHistory },
-    { data: salarySlips },
-  ] = await Promise.all([
-    supabase.from("attendance").select("*").eq("employee_id", employee.id).eq("date", today).single(),
-    supabase.from("attendance").select("date, status").eq("employee_id", employee.id).gte("date", monthStart).lte("date", monthEnd),
-    supabase.from("office_locations").select("*").eq("company_id", company.id),
-    supabase.from("leaves").select("*").eq("employee_id", employee.id).order("created_at", { ascending: false }).limit(5),
-    supabase.from("salary_slips").select("*, payroll_runs(month, year, status)").eq("employee_id", employee.id).order("created_at", { ascending: false }).limit(6),
+  const [[todayAttendance], monthAttendanceRows, officeLocationRows, leaveHistory, slipRows] = await Promise.all([
+    db.select().from(attendance).where(and(eq(attendance.employeeId, employee.id), eq(attendance.date, today))).limit(1),
+    db.select({ date: attendance.date, status: attendance.status }).from(attendance).where(and(eq(attendance.employeeId, employee.id), gte(attendance.date, monthStart), lte(attendance.date, monthEnd))),
+    db.select().from(officeLocations).where(eq(officeLocations.companyId, company.id)),
+    db.select().from(leaves).where(eq(leaves.employeeId, employee.id)).orderBy(desc(leaves.createdAt)).limit(5),
+    db.select({
+      id: salarySlips.id,
+      netSalary: salarySlips.netSalary,
+      slipPdfUrl: salarySlips.slipPdfUrl,
+      month: payrollRuns.month,
+      year: payrollRuns.year,
+      runStatus: payrollRuns.status,
+    }).from(salarySlips).leftJoin(payrollRuns, eq(salarySlips.payrollRunId, payrollRuns.id)).where(eq(salarySlips.employeeId, employee.id)).orderBy(desc(salarySlips.createdAt)).limit(6),
   ]);
 
   return (
@@ -69,13 +62,13 @@ export default async function EmployeeSelfServicePage({ params }: Props) {
         employeeId={employee.id}
         companyId={company.id}
         todayRecord={todayAttendance as any}
-        officeLocations={officeLocations || []}
+        officeLocations={officeLocationRows}
       />
 
       {/* Attendance Calendar */}
       <div className="bg-white rounded-2xl border border-[#E2E8F0] p-4">
         <h3 className="font-semibold text-[#1A1A1A] mb-4">My Attendance</h3>
-        <AttendanceCalendar attendance={monthAttendance || []} year={year} month={month} />
+        <AttendanceCalendar attendance={monthAttendanceRows} year={year} month={month} />
       </div>
 
       {/* Apply Leave */}
@@ -85,15 +78,15 @@ export default async function EmployeeSelfServicePage({ params }: Props) {
       </div>
 
       {/* Leave History */}
-      {leaveHistory && leaveHistory.length > 0 && (
+      {leaveHistory.length > 0 && (
         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-4">
           <h3 className="font-semibold text-[#1A1A1A] mb-3">Leave History</h3>
           <div className="space-y-2">
-            {leaveHistory.map((leave: any) => (
+            {leaveHistory.map((leave) => (
               <div key={leave.id} className="flex items-center justify-between py-2 border-b border-[#E2E8F0] last:border-0">
                 <div>
-                  <p className="text-sm font-medium text-[#1A1A1A] capitalize">{leave.leave_type}</p>
-                  <p className="text-xs text-[#64748B]">{formatDate(leave.from_date)} – {formatDate(leave.to_date)}</p>
+                  <p className="text-sm font-medium text-[#1A1A1A] capitalize">{leave.leaveType}</p>
+                  <p className="text-xs text-[#64748B]">{formatDate(leave.fromDate)} – {formatDate(leave.toDate)}</p>
                 </div>
                 <Badge label={leave.status} />
               </div>
@@ -103,23 +96,23 @@ export default async function EmployeeSelfServicePage({ params }: Props) {
       )}
 
       {/* Salary Slips */}
-      {salarySlips && salarySlips.length > 0 && (
+      {slipRows.length > 0 && (
         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-4">
           <h3 className="font-semibold text-[#1A1A1A] mb-3">My Salary Slips</h3>
           <div className="space-y-2">
-            {salarySlips.map((slip: any) => (
+            {slipRows.map((slip) => (
               <div key={slip.id} className="flex items-center justify-between py-2 border-b border-[#E2E8F0] last:border-0">
                 <div>
                   <p className="text-sm font-medium text-[#1A1A1A]">
-                    {slip.payroll_runs
-                      ? `${new Date(2000, slip.payroll_runs.month - 1).toLocaleString("en-IN", { month: "long" })} ${slip.payroll_runs.year}`
+                    {slip.month
+                      ? `${new Date(2000, slip.month - 1).toLocaleString("en-IN", { month: "long" })} ${slip.year}`
                       : "—"}
                   </p>
-                  <p className="text-xs text-[#64748B]">Net: {formatCurrency(slip.net_salary)}</p>
+                  <p className="text-xs text-[#64748B]">Net: {formatCurrency(slip.netSalary)}</p>
                 </div>
-                {slip.slip_pdf_url && (
+                {slip.slipPdfUrl && (
                   <a
-                    href={slip.slip_pdf_url}
+                    href={slip.slipPdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs font-medium text-[#E94560] border border-[#E94560] px-2.5 py-1 rounded-lg hover:bg-red-50 transition"

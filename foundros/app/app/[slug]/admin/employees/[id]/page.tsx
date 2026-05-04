@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, employees, attendance, salarySlips, payrollRuns } from "@/lib/db/schema";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
 import PageHeader from "@/components/ui/PageHeader";
 import Badge from "@/components/ui/Badge";
 import Avatar from "@/components/ui/Avatar";
@@ -14,52 +16,40 @@ interface Props {
 
 export default async function EmployeeProfilePage({ params }: Props) {
   const { slug, id } = await params;
-  const supabase = await createClient();
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select({ id: companies.id, name: companies.name }).from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
-  const { data: employee } = await supabase
-    .from("employees")
-    .select("*")
-    .eq("id", id)
-    .eq("company_id", company.id)
-    .single();
-
+  const [employee] = await db.select().from(employees).where(and(eq(employees.id, id), eq(employees.companyId, company.id))).limit(1);
   if (!employee) redirect(`/app/${slug}/admin/employees`);
 
-  // Get current month attendance
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
   const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
   const monthEnd = `${year}-${String(month).padStart(2, "0")}-${new Date(year, month, 0).getDate()}`;
 
-  const { data: attendance } = await supabase
-    .from("attendance")
-    .select("date, status")
-    .eq("employee_id", id)
-    .eq("company_id", company.id)
-    .gte("date", monthStart)
-    .lte("date", monthEnd);
+  const [attendanceRows, slipRows] = await Promise.all([
+    db.select({ date: attendance.date, status: attendance.status })
+      .from(attendance)
+      .where(and(eq(attendance.employeeId, id), eq(attendance.companyId, company.id), gte(attendance.date, monthStart), lte(attendance.date, monthEnd))),
+    db.select({
+      id: salarySlips.id,
+      netSalary: salarySlips.netSalary,
+      slipPdfUrl: salarySlips.slipPdfUrl,
+      month: payrollRuns.month,
+      year: payrollRuns.year,
+    })
+      .from(salarySlips)
+      .leftJoin(payrollRuns, eq(salarySlips.payrollRunId, payrollRuns.id))
+      .where(and(eq(salarySlips.employeeId, id), eq(salarySlips.companyId, company.id)))
+      .orderBy(desc(salarySlips.createdAt))
+      .limit(6),
+  ]);
 
-  // Get salary slips
-  const { data: slips } = await supabase
-    .from("salary_slips")
-    .select("id, net_salary, created_at, payroll_runs(month, year, status)")
-    .eq("employee_id", id)
-    .eq("company_id", company.id)
-    .order("created_at", { ascending: false })
-    .limit(6);
-
-  const casualBalance = employee.date_of_joining ? getLeaveBalance(employee.date_of_joining, "casual") : 12;
-  const sickBalance = employee.date_of_joining ? getLeaveBalance(employee.date_of_joining, "sick") : 12;
-  const earnedBalance = employee.date_of_joining ? getLeaveBalance(employee.date_of_joining, "earned") : 15;
+  const casualBalance = employee.dateOfJoining ? getLeaveBalance(employee.dateOfJoining, "casual") : 12;
+  const sickBalance = employee.dateOfJoining ? getLeaveBalance(employee.dateOfJoining, "sick") : 12;
+  const earnedBalance = employee.dateOfJoining ? getLeaveBalance(employee.dateOfJoining, "earned") : 15;
 
   return (
     <div>
@@ -85,7 +75,7 @@ export default async function EmployeeProfilePage({ params }: Props) {
         <div className="space-y-6">
           {/* Profile Card */}
           <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 text-center">
-            <Avatar name={employee.name} photoUrl={employee.profile_photo_url} size="lg" />
+            <Avatar name={employee.name} photoUrl={employee.profilePhotoUrl} size="lg" />
             <h2 className="text-lg font-semibold text-[#1A1A1A] mt-3">{employee.name}</h2>
             <p className="text-sm text-[#64748B]">{employee.role || "—"}</p>
             <div className="mt-3">
@@ -111,16 +101,16 @@ export default async function EmployeeProfilePage({ params }: Props) {
                 <Building2 className="w-4 h-4 text-[#64748B] shrink-0" />
                 <span className="text-sm text-[#1A1A1A]">{employee.department || "—"}</span>
               </div>
-              {employee.date_of_joining && (
+              {employee.dateOfJoining && (
                 <div className="flex items-center gap-3">
                   <Calendar className="w-4 h-4 text-[#64748B] shrink-0" />
-                  <span className="text-sm text-[#1A1A1A]">{formatDate(employee.date_of_joining)}</span>
+                  <span className="text-sm text-[#1A1A1A]">{formatDate(employee.dateOfJoining)}</span>
                 </div>
               )}
               <div className="flex items-center gap-3">
                 <DollarSign className="w-4 h-4 text-[#64748B] shrink-0" />
                 <span className="text-sm text-[#1A1A1A] font-medium">
-                  {formatCurrency(employee.base_salary)}/{employee.salary_type === "daily" ? "day" : "mo"}
+                  {formatCurrency(employee.baseSalary)}/{employee.salaryType === "daily" ? "day" : "mo"}
                 </span>
               </div>
             </div>
@@ -157,26 +147,28 @@ export default async function EmployeeProfilePage({ params }: Props) {
           {/* Attendance Calendar */}
           <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
             <h3 className="font-semibold text-[#1A1A1A] mb-4">Attendance — {new Date(year, month - 1).toLocaleString("en-IN", { month: "long", year: "numeric" })}</h3>
-            <AttendanceCalendar attendance={attendance || []} year={year} month={month} />
+            <AttendanceCalendar attendance={attendanceRows} year={year} month={month} />
           </div>
 
           {/* Salary History */}
           <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
             <h3 className="font-semibold text-[#1A1A1A] mb-4">Salary History</h3>
-            {slips && slips.length > 0 ? (
+            {slipRows.length > 0 ? (
               <div className="space-y-2">
-                {slips.map((slip: any) => (
+                {slipRows.map((slip) => (
                   <div key={slip.id} className="flex items-center justify-between py-2 border-b border-[#E2E8F0] last:border-0">
                     <div>
                       <p className="text-sm font-medium text-[#1A1A1A]">
-                        {slip.payroll_runs ? `${new Date(2000, slip.payroll_runs.month - 1).toLocaleString("en-IN", { month: "long" })} ${slip.payroll_runs.year}` : "—"}
+                        {slip.month
+                          ? `${new Date(2000, slip.month - 1).toLocaleString("en-IN", { month: "long" })} ${slip.year}`
+                          : "—"}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(slip.net_salary)}</span>
-                      {slip.slip_pdf_url && (
+                      <span className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(slip.netSalary)}</span>
+                      {slip.slipPdfUrl && (
                         <a
-                          href={slip.slip_pdf_url}
+                          href={slip.slipPdfUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-[#E94560] hover:underline"

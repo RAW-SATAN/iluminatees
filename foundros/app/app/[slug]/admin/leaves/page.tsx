@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, leaves, employees } from "@/lib/db/schema";
+import { eq, and, desc } from "drizzle-orm";
 import PageHeader from "@/components/ui/PageHeader";
 import Badge from "@/components/ui/Badge";
 import Avatar from "@/components/ui/Avatar";
@@ -14,27 +16,31 @@ interface Props {
 export default async function LeavesPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const { status } = await searchParams;
-  const supabase = await createClient();
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
-  let query = supabase
-    .from("leaves")
-    .select("*, employees(name, profile_photo_url, department)")
-    .eq("company_id", company.id)
-    .order("created_at", { ascending: false });
+  const allLeaves = await db
+    .select({
+      id: leaves.id,
+      leaveType: leaves.leaveType,
+      fromDate: leaves.fromDate,
+      toDate: leaves.toDate,
+      reason: leaves.reason,
+      status: leaves.status,
+      createdAt: leaves.createdAt,
+      employeeName: employees.name,
+      employeePhoto: employees.profilePhotoUrl,
+      employeeDept: employees.department,
+      employeeEmail: employees.email,
+    })
+    .from(leaves)
+    .leftJoin(employees, eq(leaves.employeeId, employees.id))
+    .where(eq(leaves.companyId, company.id))
+    .orderBy(desc(leaves.createdAt));
 
-  if (status) query = query.eq("status", status);
-
-  const { data: leaves } = await query;
-
-  const pendingCount = leaves?.filter((l) => l.status === "pending").length || 0;
+  const filtered = status ? allLeaves.filter((l) => l.status === status) : allLeaves;
+  const pendingCount = allLeaves.filter((l) => l.status === "pending").length;
 
   return (
     <div>
@@ -60,20 +66,20 @@ export default async function LeavesPage({ params, searchParams }: Props) {
         ))}
       </div>
 
-      {!leaves || leaves.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 text-center">
           <p className="text-[#64748B] text-sm">No leave requests found.</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {leaves.map((leave: any) => (
+          {filtered.map((leave) => (
             <div key={leave.id} className="bg-white rounded-xl border border-[#E2E8F0] p-5">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <Avatar name={leave.employees?.name || "?"} photoUrl={leave.employees?.profile_photo_url} size="sm" />
+                  <Avatar name={leave.employeeName || "?"} photoUrl={leave.employeePhoto} size="sm" />
                   <div>
-                    <p className="text-sm font-semibold text-[#1A1A1A]">{leave.employees?.name}</p>
-                    <p className="text-xs text-[#64748B]">{leave.employees?.department || "—"}</p>
+                    <p className="text-sm font-semibold text-[#1A1A1A]">{leave.employeeName}</p>
+                    <p className="text-xs text-[#64748B]">{leave.employeeDept || "—"}</p>
                   </div>
                 </div>
                 <Badge label={leave.status} />
@@ -81,19 +87,19 @@ export default async function LeavesPage({ params, searchParams }: Props) {
               <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <p className="text-xs text-[#64748B]">Type</p>
-                  <p className="font-medium text-[#1A1A1A] capitalize">{leave.leave_type}</p>
+                  <p className="font-medium text-[#1A1A1A] capitalize">{leave.leaveType}</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#64748B]">From</p>
-                  <p className="font-medium text-[#1A1A1A]">{formatDate(leave.from_date)}</p>
+                  <p className="font-medium text-[#1A1A1A]">{formatDate(leave.fromDate)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#64748B]">To</p>
-                  <p className="font-medium text-[#1A1A1A]">{formatDate(leave.to_date)}</p>
+                  <p className="font-medium text-[#1A1A1A]">{formatDate(leave.toDate)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#64748B]">Applied</p>
-                  <p className="font-medium text-[#1A1A1A]">{formatDate(leave.created_at)}</p>
+                  <p className="font-medium text-[#1A1A1A]">{formatDate(leave.createdAt.toISOString())}</p>
                 </div>
               </div>
               {leave.reason && (
@@ -101,7 +107,7 @@ export default async function LeavesPage({ params, searchParams }: Props) {
               )}
               {leave.status === "pending" && (
                 <div className="mt-4">
-                  <LeaveActionButtons leaveId={leave.id} employeeEmail={leave.employees?.email} />
+                  <LeaveActionButtons leaveId={leave.id} employeeEmail={leave.employeeEmail || ""} />
                 </div>
               )}
             </div>

@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { slugify } from "@/lib/utils";
 import { sendWelcomeEmail } from "@/lib/email/sender";
-import { getAdminClient } from "@/lib/supabase/admin";
+import { db } from "@/lib/db";
+import { companies, users } from "@/lib/db/schema";
+import { like, eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
-  const supabaseAdmin = getAdminClient();
   try {
     const { companyName, ownerName, email, phone, password } = await req.json();
 
@@ -12,68 +14,56 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
-    // Create auth user
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
-
-    if (authError || !authData.user) {
-      return NextResponse.json({ error: authError?.message || "Failed to create user" }, { status: 400 });
+    // Check if email already exists
+    const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (existing) {
+      return NextResponse.json({ error: "Email already registered" }, { status: 400 });
     }
-
-    const userId = authData.user.id;
 
     // Generate unique slug
     let slug = slugify(companyName);
-    const { data: existing } = await supabaseAdmin
-      .from("companies")
-      .select("slug")
-      .like("slug", `${slug}%`);
+    const existingSlugs = await db
+      .select({ slug: companies.slug })
+      .from(companies)
+      .where(like(companies.slug, `${slug}%`));
 
-    if (existing && existing.length > 0) {
-      slug = `${slug}-${existing.length}`;
-    }
+    if (existingSlugs.length > 0) slug = `${slug}-${existingSlugs.length}`;
 
-    // Create company
+    // Create company first
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
-    const { data: company, error: companyError } = await supabaseAdmin
-      .from("companies")
-      .insert({
+    const [company] = await db
+      .insert(companies)
+      .values({
         name: companyName,
         slug,
-        owner_id: userId,
+        ownerId: "00000000-0000-0000-0000-000000000000", // placeholder; updated below
         plan: "starter",
-        employee_limit: 10,
-        billing_status: "trial",
-        trial_ends_at: trialEndsAt.toISOString(),
+        employeeLimit: 10,
+        billingStatus: "trial",
+        trialEndsAt,
       })
-      .select()
-      .single();
+      .returning();
 
-    if (companyError || !company) {
-      await supabaseAdmin.auth.admin.deleteUser(userId);
-      return NextResponse.json({ error: "Failed to create company" }, { status: 500 });
-    }
+    // Hash password and create owner user
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create profile
-    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
-      id: userId,
-      company_id: company.id,
-      role: "owner",
-      full_name: ownerName,
-      phone,
-    });
+    const [user] = await db
+      .insert(users)
+      .values({
+        name: ownerName,
+        email,
+        password: hashedPassword,
+        phone,
+        role: "owner",
+        companyId: company.id,
+      })
+      .returning();
 
-    if (profileError) {
-      await supabaseAdmin.auth.admin.deleteUser(userId);
-      return NextResponse.json({ error: "Failed to create profile" }, { status: 500 });
-    }
+    // Update company ownerId
+    await db.update(companies).set({ ownerId: user.id }).where(eq(companies.id, company.id));
 
-    // Send welcome email (non-blocking)
     sendWelcomeEmail({ to: email, name: ownerName, companyName, slug }).catch(console.error);
 
     return NextResponse.json({ slug, companyId: company.id });

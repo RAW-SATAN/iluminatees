@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
-import { slugify } from "@/lib/utils";
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -38,8 +37,7 @@ export default function SignupPage() {
       }
 
       // Sign in immediately after signup
-      const supabase = createClient();
-      await supabase.auth.signInWithPassword({ email, password });
+      await signIn("credentials", { email, password, redirect: false });
 
       router.push(`/app/${data.slug}/admin`);
     } catch {

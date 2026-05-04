@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { companies, employees } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
 import PageHeader from "@/components/ui/PageHeader";
 import Badge from "@/components/ui/Badge";
 import Avatar from "@/components/ui/Avatar";
@@ -17,29 +19,20 @@ interface Props {
 export default async function EmployeesPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const { search, department, status } = await searchParams;
-  const supabase = await createClient();
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id, name, billing_status")
-    .eq("slug", slug)
-    .single();
-
+  const [company] = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
   if (!company) redirect("/login");
 
-  let query = supabase
-    .from("employees")
-    .select("*")
-    .eq("company_id", company.id)
-    .order("created_at", { ascending: false });
+  const allEmps = await db.select().from(employees).where(eq(employees.companyId, company.id)).orderBy(desc(employees.createdAt));
 
-  if (search) query = query.ilike("name", `%${search}%`);
-  if (department) query = query.eq("department", department);
-  if (status) query = query.eq("status", status);
+  const filtered = allEmps.filter((e) => {
+    if (search && !e.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (department && e.department !== department) return false;
+    if (status && e.status !== status) return false;
+    return true;
+  });
 
-  const { data: employees } = await query;
-
-  const isSuspended = company.billing_status === "suspended";
+  const isSuspended = company.billingStatus === "suspended";
 
   return (
     <div>
@@ -90,7 +83,7 @@ export default async function EmployeesPage({ params, searchParams }: Props) {
       </form>
 
       {/* Table */}
-      {!employees || employees.length === 0 ? (
+      {filtered.length === 0 ? (
         <EmptyState
           icon={Users}
           title="No employees yet"
@@ -110,11 +103,11 @@ export default async function EmployeesPage({ params, searchParams }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2E8F0]">
-              {employees.map((emp) => (
+              {filtered.map((emp) => (
                 <tr key={emp.id} className="hover:bg-[#F8FAFC] transition">
                   <td className="px-4 py-3">
                     <Link href={`/app/${slug}/admin/employees/${emp.id}`} className="flex items-center gap-3 group">
-                      <Avatar name={emp.name} photoUrl={emp.profile_photo_url} size="sm" />
+                      <Avatar name={emp.name} photoUrl={emp.profilePhotoUrl} size="sm" />
                       <div>
                         <p className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#E94560] transition">{emp.name}</p>
                         <p className="text-xs text-[#64748B]">{emp.email}</p>
@@ -126,11 +119,11 @@ export default async function EmployeesPage({ params, searchParams }: Props) {
                     <p className="text-xs text-[#64748B]">{emp.department || "—"}</p>
                   </td>
                   <td className="px-4 py-3 text-sm text-[#64748B]">
-                    {emp.date_of_joining ? formatDate(emp.date_of_joining) : "—"}
+                    {emp.dateOfJoining ? formatDate(emp.dateOfJoining) : "—"}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-[#1A1A1A]">
-                    {formatCurrency(emp.base_salary)}
-                    <span className="text-xs text-[#64748B] font-normal">/{emp.salary_type === "daily" ? "day" : "mo"}</span>
+                    {formatCurrency(emp.baseSalary)}
+                    <span className="text-xs text-[#64748B] font-normal">/{emp.salaryType === "daily" ? "day" : "mo"}</span>
                   </td>
                   <td className="px-4 py-3">
                     <Badge label={emp.status} />

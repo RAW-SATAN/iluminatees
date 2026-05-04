@@ -1,4 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { companies, employees, users } from "@/lib/db/schema";
+import { eq, ilike, count } from "drizzle-orm";
 import Badge from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import SuperCompanyActions from "@/components/SuperCompanyActions";
@@ -9,24 +11,39 @@ interface Props {
 
 export default async function SuperCompaniesPage({ searchParams }: Props) {
   const { search, status } = await searchParams;
-  const supabase = await createClient();
 
-  let query = supabase
-    .from("companies")
-    .select("*, profiles!companies_owner_id_fkey(full_name, phone)")
-    .order("created_at", { ascending: false });
+  let query = db
+    .select({
+      id: companies.id,
+      name: companies.name,
+      slug: companies.slug,
+      plan: companies.plan,
+      billingStatus: companies.billingStatus,
+      employeeLimit: companies.employeeLimit,
+      trialEndsAt: companies.trialEndsAt,
+      createdAt: companies.createdAt,
+      ownerId: companies.ownerId,
+    })
+    .from(companies)
+    .orderBy(companies.createdAt)
+    .$dynamic();
 
-  if (search) query = query.ilike("name", `%${search}%`);
-  if (status) query = query.eq("billing_status", status);
+  const allCompanies = await query;
 
-  const { data: companies } = await query;
+  const filtered = allCompanies.filter((c) => {
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (status && c.billingStatus !== status) return false;
+    return true;
+  });
 
-  // Get employee counts
-  const { data: empCounts } = await supabase.from("employees").select("company_id, id");
-  const empMap = (empCounts || []).reduce((acc: any, e) => {
-    acc[e.company_id] = (acc[e.company_id] || 0) + 1;
-    return acc;
-  }, {});
+  const empCounts = await db.select({ companyId: employees.companyId, count: count() }).from(employees).groupBy(employees.companyId);
+  const empMap = empCounts.reduce((acc: any, e) => { acc[e.companyId] = Number(e.count); return acc; }, {});
+
+  const ownerIds = [...new Set(filtered.map((c) => c.ownerId))];
+  const owners = ownerIds.length > 0
+    ? await db.select({ id: users.id, name: users.name }).from(users)
+    : [];
+  const ownerMap = owners.reduce((acc: any, u) => { acc[u.id] = u.name; return acc; }, {});
 
   return (
     <div>
@@ -58,19 +75,19 @@ export default async function SuperCompaniesPage({ searchParams }: Props) {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E2E8F0]">
-            {companies?.map((company: any) => (
+            {filtered.map((company) => (
               <tr key={company.id} className="hover:bg-[#F8FAFC] transition">
                 <td className="px-4 py-3">
                   <p className="font-medium text-[#1A1A1A]">{company.name}</p>
                   <p className="text-xs text-[#64748B]">{company.slug}</p>
                 </td>
-                <td className="px-4 py-3 text-[#64748B]">{company.profiles?.full_name || "—"}</td>
+                <td className="px-4 py-3 text-[#64748B]">{ownerMap[company.ownerId] || "—"}</td>
                 <td className="px-4 py-3 capitalize text-[#1A1A1A]">{company.plan}</td>
-                <td className="px-4 py-3 text-[#1A1A1A]">{empMap[company.id] || 0} / {company.employee_limit}</td>
-                <td className="px-4 py-3"><Badge label={company.billing_status} /></td>
-                <td className="px-4 py-3 text-[#64748B]">{formatDate(company.created_at)}</td>
+                <td className="px-4 py-3 text-[#1A1A1A]">{empMap[company.id] || 0} / {company.employeeLimit}</td>
+                <td className="px-4 py-3"><Badge label={company.billingStatus} /></td>
+                <td className="px-4 py-3 text-[#64748B]">{formatDate(company.createdAt.toISOString())}</td>
                 <td className="px-4 py-3">
-                  <SuperCompanyActions companyId={company.id} currentStatus={company.billing_status} trialEndsAt={company.trial_ends_at} />
+                  <SuperCompanyActions companyId={company.id} currentStatus={company.billingStatus} trialEndsAt={company.trialEndsAt?.toISOString() || null} />
                 </td>
               </tr>
             ))}
