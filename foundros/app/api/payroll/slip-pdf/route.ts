@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
     <tr><td>ESI (Employee)</td><td style="text-align:right">${formatCurrency(slip.esiEmployee)}</td></tr>
     <tr><td>Professional Tax</td><td style="text-align:right">${formatCurrency(slip.professionalTax)}</td></tr>
     <tr><td>TDS</td><td style="text-align:right">${formatCurrency(slip.tds)}</td></tr>
-    ${slip.lopAmount > 0 ? `<tr><td>Loss of Pay (LOP)</td><td style="text-align:right">${formatCurrency(slip.lopAmount)}</td></tr>` : ""}
+    ${parseFloat(slip.lopAmount ?? "0") > 0 ? `<tr><td>Loss of Pay (LOP)</td><td style="text-align:right">${formatCurrency(slip.lopAmount)}</td></tr>` : ""}
     <tr><td><strong>Total Deductions</strong></td><td style="text-align:right"><strong>${formatCurrency(slip.totalDeductions)}</strong></td></tr>
   </tbody>
 </table>

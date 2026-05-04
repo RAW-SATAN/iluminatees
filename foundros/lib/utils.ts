@@ -14,12 +14,12 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export function formatCurrency(amount: number): string {
+export function formatCurrency(amount: number | string | null | undefined): string {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(parseFloat(String(amount ?? 0)));
 }
 
 export function formatDate(date: string | Date): string {
