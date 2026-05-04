@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { auth } from "@/auth";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
-
 const PLAN_IDS: Record<string, string> = {
   starter: process.env.RAZORPAY_STARTER_PLAN_ID || "",
   growth: process.env.RAZORPAY_GROWTH_PLAN_ID || "",
@@ -29,6 +24,11 @@ export async function POST(req: NextRequest) {
   if (!planRazorpayId) {
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
   }
+
+  const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  });
 
   try {
     const subscription = await razorpay.subscriptions.create({
