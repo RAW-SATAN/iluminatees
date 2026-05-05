@@ -21,52 +21,63 @@
     {%- comment -%}────────── LEFT: Images ──────────{%- endcomment -%}
     <div class="pdp__gallery">
 
-      {%- comment -%} Thumbnail strip {%- endcomment -%}
-      <div class="pdp__thumbs" id="PdpThumbs-{{ section.id }}">
-        <button class="pdp__thumbs-arrow pdp__thumbs-arrow--up" aria-label="Scroll up">&#8963;</button>
-        <div class="pdp__thumbs-track">
-          {%- for image in product_images -%}
-            <button
-              class="pdp__thumb{% if forloop.first %} is-active{% endif %}"
-              data-index="{{ forloop.index0 }}"
-              aria-label="Image {{ forloop.index }}"
-            >
-              <img
-                src="{{ image | image_url: width: 120 }}"
-                alt="{{ image.alt | default: product.title | escape }}"
-                width="80" height="100"
-                loading="lazy"
-              >
-            </button>
-          {%- endfor -%}
-        </div>
-        <button class="pdp__thumbs-arrow pdp__thumbs-arrow--down" aria-label="Scroll down">&#8964;</button>
-      </div>
+      {%- comment -%} Thumb + Main image row {%- endcomment -%}
+      <div class="pdp__gallery-top">
 
-      {%- comment -%} Main image {%- endcomment -%}
-      <div class="pdp__main-img-wrap">
-        {%- if product.tags contains 'BESTSELLER' or product.tags contains 'bestseller' -%}
-          <span class="pdp__badge pdp__badge--bestseller">BESTSELLER</span>
-        {%- endif -%}
-        <button class="pdp__share-btn" aria-label="Share">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        </button>
-
-        <div class="pdp__main-imgs" id="PdpMainImgs-{{ section.id }}">
-          {%- for image in product_images -%}
-            <div class="pdp__main-img-slide{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}">
-              <img
-                src="{{ image | image_url: width: 900 }}"
-                alt="{{ image.alt | default: product.title | escape }}"
-                class="pdp__main-img"
-                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                width="{{ image.width }}"
-                height="{{ image.height }}"
+        {%- comment -%} Thumbnail strip {%- endcomment -%}
+        <div class="pdp__thumbs" id="PdpThumbs-{{ section.id }}">
+          <button class="pdp__thumbs-arrow pdp__thumbs-arrow--up" aria-label="Scroll up">&#8963;</button>
+          <div class="pdp__thumbs-track">
+            {%- for image in product_images -%}
+              <button
+                class="pdp__thumb{% if forloop.first %} is-active{% endif %}"
+                data-index="{{ forloop.index0 }}"
+                aria-label="Image {{ forloop.index }}"
               >
-            </div>
-          {%- endfor -%}
+                <img
+                  src="{{ image | image_url: width: 120 }}"
+                  alt="{{ image.alt | default: product.title | escape }}"
+                  width="80" height="100"
+                  loading="lazy"
+                >
+              </button>
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'pdp__thumb-placeholder' }}
+            {%- endfor -%}
+          </div>
+          <button class="pdp__thumbs-arrow pdp__thumbs-arrow--down" aria-label="Scroll down">&#8964;</button>
         </div>
-      </div>
+
+        {%- comment -%} Main image with zoom {%- endcomment -%}
+        <div class="pdp__main-img-wrap pdp__main-img-wrap--zoom" id="PdpMainImgWrap-{{ section.id }}">
+          {%- if product.tags contains 'BESTSELLER' or product.tags contains 'bestseller' -%}
+            <span class="pdp__badge pdp__badge--bestseller">BESTSELLER</span>
+          {%- endif -%}
+          <button class="pdp__share-btn" aria-label="Share">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+
+          <div class="pdp__main-imgs" id="PdpMainImgs-{{ section.id }}">
+            {%- for image in product_images -%}
+              <div class="pdp__main-img-slide{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}">
+                <img
+                  src="{{ image | image_url: width: 900 }}"
+                  alt="{{ image.alt | default: product.title | escape }}"
+                  class="pdp__main-img"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                  width="{{ image.width }}"
+                  height="{{ image.height }}"
+                >
+              </div>
+            {%- else -%}
+              <div class="pdp__main-img-slide is-active">
+                {{ 'product-1' | placeholder_svg_tag: 'pdp__main-img-placeholder' }}
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+
+      </div>{%- comment -%} /pdp__gallery-top {%- endcomment -%}
 
       {%- comment -%} Tabs: Shopping Assistant / Returns / Our Promise {%- endcomment -%}
       <div class="pdp__tabs">
@@ -120,6 +131,14 @@
         {%- endif -%}
       </div>
       <p class="pdp__tax-note">Price inclusive of all taxes</p>
+
+      {%- comment -%} Countdown timer {%- endcomment -%}
+      <div class="pdp__countdown" id="PdpCountdown-{{ section.id }}">
+        <svg viewBox="0 0 20 20" fill="none" class="pdp__countdown-icon"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="pdp__countdown-label">{{ section.settings.countdown_label | default: 'Deal ends in' }}:</span>
+        <span class="pdp__countdown-timer" id="PdpTimer-{{ section.id }}">02:00:00</span>
+        <span class="pdp__countdown-badge">LIMITED OFFER</span>
+      </div>
 
       {%- comment -%} Promo code card {%- endcomment -%}
       {%- if section.settings.promo_code != blank -%}
@@ -236,6 +255,48 @@
         </button>
       </div>
 
+      {%- comment -%} Frequently Bought Together {%- endcomment -%}
+      {%- if section.settings.fbt_collection != blank -%}
+        {%- assign fbt_col = collections[section.settings.fbt_collection] -%}
+        {%- assign fbt_products = fbt_col.products | where: 'id', product.id | map: 'id' -%}
+        <div class="pdp__fbt">
+          <h3 class="pdp__fbt-title">Frequently Bought Together</h3>
+          <div class="pdp__fbt-items">
+            <div class="pdp__fbt-item">
+              {%- if product.featured_image -%}
+                <img src="{{ product.featured_image | image_url: width: 200 }}" alt="{{ product.title | escape }}" class="pdp__fbt-img">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'pdp__fbt-img' }}
+              {%- endif -%}
+              <span class="pdp__fbt-check">✓</span>
+              <p class="pdp__fbt-name">{{ product.title | truncate: 30 }}</p>
+              <p class="pdp__fbt-price">{{ current_variant.price | money }}</p>
+            </div>
+            {%- assign fbt_shown = 0 -%}
+            {%- for rel in fbt_col.products -%}
+              {%- unless rel.id == product.id or fbt_shown >= 2 -%}
+                <span class="pdp__fbt-plus">+</span>
+                <div class="pdp__fbt-item">
+                  {%- if rel.featured_image -%}
+                    <img src="{{ rel.featured_image | image_url: width: 200 }}" alt="{{ rel.title | escape }}" class="pdp__fbt-img">
+                  {%- else -%}
+                    {{ 'product-2' | placeholder_svg_tag: 'pdp__fbt-img' }}
+                  {%- endif -%}
+                  <span class="pdp__fbt-check">✓</span>
+                  <p class="pdp__fbt-name">{{ rel.title | truncate: 30 }}</p>
+                  <p class="pdp__fbt-price">{{ rel.price | money }}</p>
+                </div>
+                {%- assign fbt_shown = fbt_shown | plus: 1 -%}
+              {%- endunless -%}
+            {%- endfor -%}
+          </div>
+          <div class="pdp__fbt-footer">
+            <p class="pdp__fbt-total-label">Bundle Price: <strong id="PdpFbtTotal-{{ section.id }}" data-base="{{ current_variant.price }}">{{ current_variant.price | money }}</strong></p>
+            <button class="pdp__fbt-btn">Add All to Cart</button>
+          </div>
+        </div>
+      {%- endif -%}
+
       {%- comment -%} Product details table {%- endcomment -%}
       <div class="pdp__details" id="PdpDetails-{{ section.id }}">
         <h3 class="pdp__details-title">Product Details</h3>
@@ -246,38 +307,20 @@
               <div class="pdp__detail-val">{{ block.settings.value }}</div>
             {%- endif -%}
           {%- endfor -%}
-          {%- comment -%} Metafield-driven details {%- endcomment -%}
           {%- if product.metafields.details.style_type != blank -%}
-            <div class="pdp__detail-key">Style Type</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.style_type }}</div>
+            <div class="pdp__detail-key">Style Type</div><div class="pdp__detail-val">{{ product.metafields.details.style_type }}</div>
           {%- endif -%}
           {%- if product.metafields.details.sleeve != blank -%}
-            <div class="pdp__detail-key">Sleeve</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.sleeve }}</div>
+            <div class="pdp__detail-key">Sleeve</div><div class="pdp__detail-val">{{ product.metafields.details.sleeve }}</div>
           {%- endif -%}
           {%- if product.metafields.details.length != blank -%}
-            <div class="pdp__detail-key">Length</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.length }}</div>
+            <div class="pdp__detail-key">Length</div><div class="pdp__detail-val">{{ product.metafields.details.length }}</div>
           {%- endif -%}
           {%- if product.metafields.details.package_contains != blank -%}
-            <div class="pdp__detail-key">Package Contains</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.package_contains }}</div>
-          {%- endif -%}
-          {%- if product.metafields.details.transparency != blank -%}
-            <div class="pdp__detail-key">Transparency</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.transparency }}</div>
+            <div class="pdp__detail-key">Package Contains</div><div class="pdp__detail-val">{{ product.metafields.details.package_contains }}</div>
           {%- endif -%}
           {%- if product.metafields.details.wash_care != blank -%}
-            <div class="pdp__detail-key">Wash Care</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.wash_care }}</div>
-          {%- endif -%}
-          {%- if product.metafields.details.primary_color != blank -%}
-            <div class="pdp__detail-key">Primary Color</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.primary_color }}</div>
-          {%- endif -%}
-          {%- if product.metafields.details.model_size != blank -%}
-            <div class="pdp__detail-key">Size worn by Model</div>
-            <div class="pdp__detail-val">{{ product.metafields.details.model_size }}</div>
+            <div class="pdp__detail-key">Wash Care</div><div class="pdp__detail-val">{{ product.metafields.details.wash_care }}</div>
           {%- endif -%}
         </div>
         <button class="pdp__more-details" id="PdpMoreDetails-{{ section.id }}">+ MORE DETAILS</button>
@@ -287,22 +330,17 @@
   </div>
 
   {%- comment -%}──────── Shop More / Similar ────────{%- endcomment -%}
-
   {%- if section.settings.show_shop_more -%}
     <div class="pdp__shop-more">
       <p class="pdp__shop-more-label">Shop More {{ product.type }}</p>
       <div class="pdp__shop-more-pills">
-        <a href="{{ product.type | handleize | prepend: '/collections/' }}" class="pdp__shop-pill">
-          All {{ product.type }} ›
-        </a>
+        <a href="{{ product.type | handleize | prepend: '/collections/' }}" class="pdp__shop-pill">All {{ product.type }} ›</a>
         {%- for tag in product.tags -%}
           {%- if tag contains 'Style:' -%}
             <a href="/collections/all?filter.p.tag={{ tag | url_encode }}" class="pdp__shop-pill">{{ tag }} ›</a>
           {%- endif -%}
         {%- endfor -%}
-        <a href="/collections/all?filter.p.vendor={{ product.vendor | url_encode }}" class="pdp__shop-pill">
-          Brand : {{ product.vendor }} ›
-        </a>
+        <a href="/collections/all?filter.p.vendor={{ product.vendor | url_encode }}" class="pdp__shop-pill">Brand: {{ product.vendor }} ›</a>
       </div>
     </div>
   {%- endif -%}
@@ -353,26 +391,55 @@
 
 </div>
 
+{%- comment -%} ── Social Proof Popup ── {%- endcomment -%}
+<div class="sp-popup" id="SpPopup" aria-hidden="true">
+  <div class="sp-popup__avatar" id="SpPopupAvatar">R</div>
+  <div class="sp-popup__text">
+    <p class="sp-popup__action"><strong id="SpPopupName">Rahul</strong> from <strong id="SpPopupCity">Mumbai</strong> just bought this!</p>
+    <p class="sp-popup__time" id="SpPopupTime">2 minutes ago</p>
+  </div>
+  <button class="sp-popup__close" id="SpPopupClose" aria-label="Close">✕</button>
+</div>
+
+{%- comment -%} ── Exit Intent Popup ── {%- endcomment -%}
+<div class="exit-popup" id="ExitPopup" aria-hidden="true">
+  <div class="exit-popup__overlay" id="ExitPopupOverlay"></div>
+  <div class="exit-popup__box">
+    <button class="exit-popup__close" id="ExitPopupClose" aria-label="Close">✕</button>
+    <div class="exit-popup__emoji">🎁</div>
+    <h2 class="exit-popup__heading">Wait! Don't leave yet...</h2>
+    <p class="exit-popup__sub">Get <strong>10% off</strong> your first order — exclusive subscribers only</p>
+    <form class="exit-popup__form" id="ExitPopupForm">
+      <input type="email" placeholder="Enter your email address" class="exit-popup__input" id="ExitPopupEmail" required>
+      <button type="submit" class="exit-popup__btn">Claim My 10% Off</button>
+    </form>
+    <button class="exit-popup__skip" id="ExitPopupSkip">No thanks, I'll pay full price</button>
+  </div>
+</div>
+
 {% schema %}
 {
   "name": "Product Page",
   "tag": "section",
   "class": "section-product-page",
   "settings": [
-    { "type": "text",     "id": "helpline_number", "label": "Helpline number",        "default": "9920705705" },
-    { "type": "url",      "id": "faq_url",         "label": "Service FAQ link" },
-    { "type": "textarea", "id": "returns_text",    "label": "Returns tab text",       "default": "Easy 30-day returns & exchanges on all orders. No questions asked." },
-    { "type": "textarea", "id": "promise_text",    "label": "Our Promise tab text",   "default": "100% authentic products sourced directly from brands. Every product goes through a quality check before shipping." },
-    { "type": "text",     "id": "promo_code",      "label": "Promo code",             "default": "NEWPREMIUM" },
-    { "type": "text",     "id": "promo_headline",  "label": "Promo headline",         "default": "Get it for ₹27999" },
-    { "type": "text",     "id": "promo_sub",       "label": "Promo sub-text",         "default": "Get 20% off on premium brands on your first purchase" },
-    { "type": "url",      "id": "promo_link",      "label": "Promo 'view all' link" },
-    { "type": "checkbox", "id": "show_size_unit",  "label": "Show size unit",         "default": true },
-    { "type": "text",     "id": "size_unit",       "label": "Size unit label",        "default": "UNI" },
-    { "type": "url",      "id": "size_chart_url",  "label": "Size chart link" },
-    { "type": "checkbox", "id": "show_shop_more",  "label": "Show Shop More section", "default": true },
-    { "type": "collection","id": "similar_collection","label": "Similar styles collection" },
-    { "type": "text",     "id": "similar_title",   "label": "Similar styles heading", "default": "Similar Styles" }
+    { "type": "text",       "id": "helpline_number",   "label": "Helpline number",           "default": "9920705705" },
+    { "type": "url",        "id": "faq_url",            "label": "Service FAQ link" },
+    { "type": "textarea",   "id": "returns_text",       "label": "Returns tab text",          "default": "Easy 30-day returns & exchanges on all orders. No questions asked." },
+    { "type": "textarea",   "id": "promise_text",       "label": "Our Promise tab text",      "default": "100% authentic products sourced directly from brands. Every product goes through a quality check before shipping." },
+    { "type": "text",       "id": "promo_code",         "label": "Promo code",                "default": "NEWPREMIUM" },
+    { "type": "text",       "id": "promo_headline",     "label": "Promo headline",            "default": "Get it for ₹27999" },
+    { "type": "text",       "id": "promo_sub",          "label": "Promo sub-text",            "default": "Get 20% off on premium brands on your first purchase" },
+    { "type": "url",        "id": "promo_link",         "label": "Promo 'view all' link" },
+    { "type": "text",       "id": "countdown_label",    "label": "Countdown label",           "default": "Deal ends in" },
+    { "type": "number",     "id": "countdown_hours",    "label": "Countdown hours",           "default": 2 },
+    { "type": "checkbox",   "id": "show_size_unit",     "label": "Show size unit",            "default": true },
+    { "type": "text",       "id": "size_unit",          "label": "Size unit label",           "default": "UNI" },
+    { "type": "url",        "id": "size_chart_url",     "label": "Size chart link" },
+    { "type": "collection", "id": "fbt_collection",     "label": "Frequently Bought Together collection" },
+    { "type": "checkbox",   "id": "show_shop_more",     "label": "Show Shop More section",    "default": true },
+    { "type": "collection", "id": "similar_collection", "label": "Similar styles collection" },
+    { "type": "text",       "id": "similar_title",      "label": "Similar styles heading",    "default": "Similar Styles" }
   ],
   "blocks": [
     {
@@ -388,12 +455,12 @@
     {
       "name": "Product Page",
       "blocks": [
-        { "type": "detail_row", "settings": { "key": "Style Type",        "value": "Polo" } },
-        { "type": "detail_row", "settings": { "key": "Sleeve",            "value": "Short" } },
-        { "type": "detail_row", "settings": { "key": "Length",            "value": "Medium" } },
-        { "type": "detail_row", "settings": { "key": "Package Contains",  "value": "1 T-shirt" } },
-        { "type": "detail_row", "settings": { "key": "Transparency",      "value": "Opaque" } },
-        { "type": "detail_row", "settings": { "key": "Wash Care",         "value": "Machine wash" } }
+        { "type": "detail_row", "settings": { "key": "Style Type",       "value": "Polo" } },
+        { "type": "detail_row", "settings": { "key": "Sleeve",           "value": "Short" } },
+        { "type": "detail_row", "settings": { "key": "Length",           "value": "Medium" } },
+        { "type": "detail_row", "settings": { "key": "Package Contains", "value": "1 T-shirt" } },
+        { "type": "detail_row", "settings": { "key": "Transparency",     "value": "Opaque" } },
+        { "type": "detail_row", "settings": { "key": "Wash Care",        "value": "Machine wash" } }
       ]
     }
   ]

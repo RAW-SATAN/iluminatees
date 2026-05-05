@@ -301,4 +301,104 @@
     });
   });
 
+
+  /* ── Image zoom on hover ────────────────────────────────── */
+  document.querySelectorAll('.pdp__main-img-wrap--zoom').forEach(function (wrap) {
+    wrap.addEventListener('mousemove', function (e) {
+      var rect = wrap.getBoundingClientRect();
+      var x = (((e.clientX - rect.left) / rect.width) * 100).toFixed(1) + '%';
+      var y = (((e.clientY - rect.top)  / rect.height) * 100).toFixed(1) + '%';
+      wrap.style.setProperty('--zoom-x', x);
+      wrap.style.setProperty('--zoom-y', y);
+    });
+    wrap.addEventListener('mouseleave', function () {
+      wrap.style.setProperty('--zoom-x', '50%');
+      wrap.style.setProperty('--zoom-y', '50%');
+    });
+  });
+
+  /* ── Countdown timer ────────────────────────────────────── */
+  document.querySelectorAll('[id^="PdpTimer-"]').forEach(function (el) {
+    var section = el.closest('[data-section-id]');
+    var hours   = section ? parseInt(section.querySelector('[data-countdown-hours]') && section.querySelector('[data-countdown-hours]').dataset.countdownHours || '2', 10) : 2;
+    var end     = Date.now() + hours * 3600000;
+    (function tick() {
+      var rem = Math.max(0, end - Date.now());
+      var h   = Math.floor(rem / 3600000);
+      var m   = Math.floor((rem % 3600000) / 60000);
+      var s   = Math.floor((rem % 60000) / 1000);
+      el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+      if (rem > 0) setTimeout(tick, 1000);
+    })();
+  });
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  /* ── Social proof popup ─────────────────────────────────── */
+  (function () {
+    var popup    = document.getElementById('SpPopup');
+    if (!popup) return;
+    var nameEl   = document.getElementById('SpPopupName');
+    var cityEl   = document.getElementById('SpPopupCity');
+    var timeEl   = document.getElementById('SpPopupTime');
+    var avatarEl = document.getElementById('SpPopupAvatar');
+    var closeBtn = document.getElementById('SpPopupClose');
+    var data     = [
+      { name: 'Rahul',   city: 'Mumbai',    time: '2 minutes ago',  color: '#003d35' },
+      { name: 'Priya',   city: 'Delhi',     time: '5 minutes ago',  color: '#e31837' },
+      { name: 'Arjun',   city: 'Bangalore', time: '8 minutes ago',  color: '#1a2f6e' },
+      { name: 'Sneha',   city: 'Pune',      time: '12 minutes ago', color: '#7b3f00' },
+      { name: 'Vikram',  city: 'Chennai',   time: '3 minutes ago',  color: '#4a4a4a' },
+      { name: 'Meera',   city: 'Hyderabad', time: '7 minutes ago',  color: '#003d35' },
+      { name: 'Rohit',   city: 'Kolkata',   time: '15 minutes ago', color: '#e31837' },
+      { name: 'Anjali',  city: 'Jaipur',    time: '1 minute ago',   color: '#1a2f6e' }
+    ];
+    var hideTimer;
+    function show() {
+      var d = data[Math.floor(Math.random() * data.length)];
+      nameEl.textContent   = d.name;
+      cityEl.textContent   = d.city;
+      timeEl.textContent   = d.time;
+      avatarEl.textContent = d.name[0];
+      avatarEl.style.background = d.color;
+      popup.classList.add('is-visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () { popup.classList.remove('is-visible'); }, 4500);
+    }
+    setTimeout(show, 4000);
+    setInterval(show, 18000);
+    if (closeBtn) closeBtn.addEventListener('click', function () {
+      popup.classList.remove('is-visible');
+      clearTimeout(hideTimer);
+    });
+  })();
+
+  /* ── Exit intent popup ──────────────────────────────────── */
+  (function () {
+    var popup    = document.getElementById('ExitPopup');
+    if (!popup) return;
+    var closeBtn = document.getElementById('ExitPopupClose');
+    var overlay  = document.getElementById('ExitPopupOverlay');
+    var skipBtn  = document.getElementById('ExitPopupSkip');
+    var form     = document.getElementById('ExitPopupForm');
+    var shown    = false;
+
+    function open()  { popup.classList.add('is-visible'); }
+    function close() { popup.classList.remove('is-visible'); }
+
+    document.addEventListener('mouseleave', function (e) {
+      if (e.clientY <= 0 && !shown) { shown = true; open(); }
+    });
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (overlay)  overlay.addEventListener('click',  close);
+    if (skipBtn)  skipBtn.addEventListener('click',  close);
+    if (form) form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = document.getElementById('ExitPopupEmail').value;
+      if (email) {
+        form.innerHTML = '<p style="color:#003d35;font-weight:700;font-size:16px;">✓ You\'re in! Check your inbox for the discount code.</p>';
+        setTimeout(close, 3000);
+      }
+    });
+  })();
+
 })();
