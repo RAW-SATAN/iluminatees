@@ -10,12 +10,12 @@ img  { max-width: 100%; display: block; }
 a    { text-decoration: none; color: inherit; }
 
 :root {
-  --primary:   #cc0000;
+  --primary:   #e31837;
   --bg:        #ffffff;
   --text:      #111111;
   --muted:     #888888;
   --light-bg:  #f5f2ef;
-  --dark-bg:   #0d0d0d;
+  --dark-bg:   #003d35;
   --font-head: 'Bebas Neue', sans-serif;
   --font-body: 'Space Grotesk', system-ui, sans-serif;
   --radius:    12px;
@@ -100,7 +100,7 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 /* ── SEASON DROPS ────────────────────────────────────────── */
 .season-drops {
   position: relative; overflow: hidden;
-  background: linear-gradient(160deg,#0a2a2e 0%,#0d1a1c 60%,#060606 100%);
+  background: linear-gradient(160deg,#003d35 0%,#002b25 60%,#001a15 100%);
   padding: 52px 0 60px;
 }
 .season-drops__bg-glow {
@@ -198,7 +198,7 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 
 /* gift card banner */
 .gift-banner {
-  width: 100%; background: #8b1a1a;
+  width: 100%; background: #e31837;
   padding: 36px 48px;
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;
 }
@@ -210,11 +210,11 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 .gift-banner__desc { font-size: 14px; color: rgba(240,236,232,.7); line-height: 1.7; }
 .gift-banner__btn {
   display: inline-block; margin-top: 20px;
-  padding: 12px 28px; background: #0d0d0d;
+  padding: 12px 28px; background: #003d35;
   color: #f0ece8; font-size: 12px; letter-spacing: .2em; font-weight: 600;
   border-radius: 2px; transition: background var(--trans);
 }
-.gift-banner__btn:hover { background: #222; }
+.gift-banner__btn:hover { background: #002b25; }
 .gift-banner__icon { font-size: 80px; opacity: .25; user-select: none; }
 
 /* ── NEW ARRIVALS ────────────────────────────────────────── */
@@ -508,7 +508,7 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 /* ── EXCLUSIVE BRANDS ────────────────────────────────────── */
 .excl-brands {
   position: relative; overflow: hidden;
-  background-color: #22b5c8;
+  background-color: #003d35;
   background-size: cover; background-position: center;
   padding-bottom: 48px;
 }
@@ -602,7 +602,7 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 
 /* ── EDITOR'S PICKS ──────────────────────────────────────── */
 .editor-picks {
-  background-color: #22b5c8;
+  background-color: #003d35;
   background-size: cover; background-position: center;
   padding: 0 0 52px;
 }
@@ -668,9 +668,9 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 }
 
 /* ── FOOTER ──────────────────────────────────────────────── */
-.site-footer { background: #111; color: rgba(255,255,255,.65); }
+.site-footer { background: #002b25; color: rgba(255,255,255,.65); }
 .site-footer__seo {
-  background: #0d0d0d; padding: 14px 32px;
+  background: #001a15; padding: 14px 32px;
   font-size: 12px; line-height: 1.6; color: rgba(255,255,255,.4);
   border-bottom: 1px solid rgba(255,255,255,.07);
 }
@@ -717,7 +717,7 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 .site-footer__secure-label { font-size: 12px; font-weight: 600; color: #f0ece8; }
 .site-footer__secure-sub   { font-size: 10px; letter-spacing: .1em; color: rgba(255,255,255,.4); }
 .site-footer__copy {
-  background: #0d0d0d; text-align: center;
+  background: #001a15; text-align: center;
   font-size: 11px; color: rgba(255,255,255,.3);
   padding: 12px 24px; letter-spacing: .08em;
 }
@@ -979,7 +979,7 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
   padding: 14px 16px; margin-bottom: 20px; background: #fafafa;
 }
 .pdp__promo-code-wrap {
-  text-align: center; background: #111; color: #fff; border-radius: 4px;
+  text-align: center; background: #e31837; color: #fff; border-radius: 4px;
   padding: 10px 14px; flex-shrink: 0; min-width: 90px;
 }
 .pdp__promo-code-label { font-size: 9px; letter-spacing: .12em; opacity: .7; margin-bottom: 4px; }
@@ -1021,7 +1021,7 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 .pdp__size-label { font-size: 14px; font-weight: 600; color: #111; }
 .pdp__size-stock { font-size: 10px; color: #888; }
 .pdp__size-stock--out { color: #e53935; }
-.pdp__size-btn.is-selected { border-color: #111; background: #111; }
+.pdp__size-btn.is-selected { border-color: #003d35; background: #003d35; }
 .pdp__size-btn.is-selected .pdp__size-label { color: #fff; }
 .pdp__size-btn.is-sold-out { opacity: .45; cursor: not-allowed; }
 
@@ -1037,12 +1037,12 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 .pdp__ctas { display: flex; gap: 12px; margin-bottom: 28px; }
 .pdp__add-to-cart {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: #111; color: #fff; border: none;
+  background: #e31837; color: #fff; border: none;
   padding: 15px 24px; font-size: 13px; font-weight: 700; letter-spacing: .12em;
   cursor: pointer; transition: background var(--trans), opacity var(--trans);
   border-radius: 2px;
 }
-.pdp__add-to-cart:hover   { background: #333; }
+.pdp__add-to-cart:hover   { background: #c0102a; }
 .pdp__add-to-cart:disabled{ opacity: .4; cursor: not-allowed; }
 .pdp__cart-icon { width: 18px; height: 18px; }
 .pdp__wishlist {
