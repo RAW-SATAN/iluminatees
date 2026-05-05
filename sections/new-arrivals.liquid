@@ -1,0 +1,76 @@
+<div class="new-arrivals">
+
+  <div class="new-arrivals__head">
+    <p class="new-arrivals__eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="new-arrivals__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="new-arrivals__track-wrap">
+    <button class="new-arrivals__arrow new-arrivals__arrow--prev" aria-label="Previous">&#8249;</button>
+
+    <div class="new-arrivals__track" id="NewArrivalsTrack-{{ section.id }}">
+      {%- if section.settings.collection != blank -%}
+        {%- assign arrivals_collection = collections[section.settings.collection] -%}
+        {%- for product in arrivals_collection.products limit: section.settings.products_to_show -%}
+          <div class="new-arrivals__card">
+            <a href="{{ product.url }}" class="new-arrivals__card-link">
+              <div class="new-arrivals__card-img-wrap">
+                {%- if product.featured_image != blank -%}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 480 }}"
+                    alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                    class="new-arrivals__card-img"
+                    loading="lazy"
+                    width="{{ product.featured_image.width }}"
+                    height="{{ product.featured_image.height }}"
+                  >
+                {%- else -%}
+                  <div class="new-arrivals__card-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+                {%- endif -%}
+              </div>
+              <div class="new-arrivals__card-info">
+                <p class="new-arrivals__card-vendor">{{ product.vendor }}</p>
+                <p class="new-arrivals__card-type">{{ product.type }}</p>
+                <p class="new-arrivals__card-price">{{ product.price | money }}</p>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..6) -%}
+          <div class="new-arrivals__card new-arrivals__card--placeholder">
+            <div class="new-arrivals__card-img-wrap">
+              {{ 'product-' | append: i | placeholder_svg_tag: 'new-arrivals__card-placeholder-svg' }}
+            </div>
+            <div class="new-arrivals__card-info">
+              <p class="new-arrivals__card-vendor">Brand {{ i }}</p>
+              <p class="new-arrivals__card-type">Category</p>
+              <p class="new-arrivals__card-price">{{ 1000 | times: i | money }}</p>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+    <button class="new-arrivals__arrow new-arrivals__arrow--next" aria-label="Next">&#8250;</button>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "New Arrivals",
+  "tag": "section",
+  "class": "section-new-arrivals",
+  "settings": [
+    { "type": "text",            "id": "eyebrow",          "label": "Eyebrow",          "default": "THIS IS JUST IN" },
+    { "type": "text",            "id": "title",            "label": "Heading",          "default": "NEW ARRIVALS" },
+    { "type": "collection",      "id": "collection",       "label": "Collection" },
+    { "type": "range",           "id": "products_to_show", "label": "Products to show",
+      "min": 4, "max": 12, "step": 1, "default": 6 }
+  ],
+  "presets": [
+    { "name": "New Arrivals" }
+  ]
+}
+{% endschema %}

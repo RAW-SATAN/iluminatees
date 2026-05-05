@@ -1,0 +1,149 @@
+<footer class="site-footer">
+
+  {%- if section.settings.seo_text != blank -%}
+    <div class="site-footer__seo">
+      <p>{{ section.settings.seo_text }}</p>
+    </div>
+  {%- endif -%}
+
+  <div class="site-footer__main">
+
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'link_column' -%}
+        <div class="site-footer__col" {{ block.shopify_attributes }}>
+          <h3 class="site-footer__col-title">{{ block.settings.heading }}</h3>
+          <ul class="site-footer__links">
+            {%- assign links = block.settings.links | newline_to_br | split: '<br />' -%}
+            {%- assign hrefs = block.settings.hrefs | newline_to_br | split: '<br />' -%}
+            {%- for link_text in links -%}
+              {%- assign trimmed = link_text | strip -%}
+              {%- if trimmed != blank -%}
+                <li>
+                  <a href="{{ hrefs[forloop.index0] | strip | default: '#' }}">{{ trimmed }}</a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+
+  </div>
+
+  <div class="site-footer__bottom">
+    <div class="site-footer__payment">
+      <p class="site-footer__payment-title">{{ section.settings.payment_title }}</p>
+      <div class="site-footer__payment-icons">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'payment_icon' -%}
+            <div class="site-footer__payment-badge" {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | image_url: width: 120 }}" alt="{{ block.settings.label | escape }}" loading="lazy">
+              {%- else -%}
+                <span>{{ block.settings.label }}</span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="site-footer__secure">
+      <svg class="site-footer__lock" viewBox="0 0 32 40" fill="none">
+        <rect x="2" y="16" width="28" height="22" rx="3" stroke="currentColor" stroke-width="2"/>
+        <path d="M8 16v-6a8 8 0 0116 0v6" stroke="currentColor" stroke-width="2"/>
+        <rect x="12" y="24" width="8" height="6" rx="2" fill="currentColor"/>
+      </svg>
+      <div>
+        <p class="site-footer__secure-label">{{ section.settings.secure_label }}</p>
+        <p class="site-footer__secure-sub">{{ section.settings.secure_sub }}</p>
+      </div>
+    </div>
+  </div>
+
+  {%- if section.settings.copyright != blank -%}
+    <div class="site-footer__copy">{{ section.settings.copyright }}</div>
+  {%- endif -%}
+
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "tag": "section",
+  "class": "section-footer",
+  "limit": 1,
+  "settings": [
+    { "type": "textarea", "id": "seo_text",      "label": "SEO description text", "default": "Shop from our luxury collection of fashion wear, beauty & home decor products online. We offer authentic luxury products. Shop Now! Assured Quality. COD." },
+    { "type": "text",     "id": "payment_title", "label": "Payment section title", "default": "Payment methods" },
+    { "type": "text",     "id": "secure_label",  "label": "Secure system label",   "default": "Secure system" },
+    { "type": "text",     "id": "secure_sub",    "label": "Secure system sublabel","default": "256 BIT SSL ENCRYPTION" },
+    { "type": "text",     "id": "copyright",     "label": "Copyright text",        "default": "© 2026 Banani. All rights reserved." }
+  ],
+  "blocks": [
+    {
+      "type": "link_column",
+      "name": "Link Column",
+      "limit": 6,
+      "settings": [
+        { "type": "text",     "id": "heading", "label": "Column heading", "default": "Company" },
+        { "type": "textarea", "id": "links",   "label": "Link labels (one per line)", "default": "Who We Are\nJoin Our Team\nTerms & Conditions" },
+        { "type": "textarea", "id": "hrefs",   "label": "Link URLs (one per line, same order)", "default": "/pages/about\n/pages/careers\n/policies/terms-of-service" }
+      ]
+    },
+    {
+      "type": "payment_icon",
+      "name": "Payment Icon",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Payment icon image" },
+        { "type": "text",         "id": "label", "label": "Fallback label", "default": "Visa" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer",
+      "blocks": [
+        {
+          "type": "link_column",
+          "settings": {
+            "heading": "Company",
+            "links": "Who We Are\nJoin Our Team\nTerms & Conditions\nWe Respect Your Privacy\nFees & Payments\nReturns & Refunds Policy\nPromotions Terms & Conditions",
+            "hrefs": "/pages/about\n/pages/careers\n/policies/terms-of-service\n/policies/privacy-policy\n/pages/fees\n/policies/refund-policy\n/pages/promotions-terms"
+          }
+        },
+        {
+          "type": "link_column",
+          "settings": {
+            "heading": "Help",
+            "links": "Track Your Order\nFrequently Asked Questions\nReturns\nCancellations\nPayments\nCustomer Care\nHow Do I Redeem My Coupon",
+            "hrefs": "/pages/track-order\n/pages/faq\n/policies/refund-policy\n/pages/cancellations\n/pages/payments\n/pages/contact\n/pages/coupon"
+          }
+        },
+        {
+          "type": "link_column",
+          "settings": {
+            "heading": "Shop by",
+            "links": "Men\nWomen\nKids\nHome\nBeauty\nThe Edit\nNew Arrival",
+            "hrefs": "/collections/men\n/collections/women\n/collections/kids\n/collections/home\n/collections/beauty\n/collections/the-edit\n/collections/new-arrivals"
+          }
+        },
+        {
+          "type": "link_column",
+          "settings": {
+            "heading": "Follow us",
+            "links": "Facebook\nInstagram\nTwitter\nPinterest",
+            "hrefs": "https://facebook.com\nhttps://instagram.com\nhttps://twitter.com\nhttps://pinterest.com"
+          }
+        },
+        { "type": "payment_icon", "settings": { "label": "Net Banking" } },
+        { "type": "payment_icon", "settings": { "label": "Verified by Visa" } },
+        { "type": "payment_icon", "settings": { "label": "Mastercard" } },
+        { "type": "payment_icon", "settings": { "label": "Amex" } },
+        { "type": "payment_icon", "settings": { "label": "Cash on Delivery" } },
+        { "type": "payment_icon", "settings": { "label": "Jio Money" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

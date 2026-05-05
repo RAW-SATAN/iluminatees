@@ -1,0 +1,228 @@
+{% comment %} Collection page — filter sidebar + product grid {% endcomment %}
+
+<div class="col-page">
+
+  {%- comment -%} Breadcrumb {%- endcomment -%}
+  <nav class="breadcrumb" aria-label="breadcrumb">
+    <a href="/" class="breadcrumb__link">Home</a>
+    <span class="breadcrumb__sep">/</span>
+    {%- if collection.metafields.custom.parent_title != blank -%}
+      <span class="breadcrumb__link">{{ collection.metafields.custom.parent_title }}</span>
+      <span class="breadcrumb__sep">/</span>
+    {%- endif -%}
+    <span class="breadcrumb__current">{{ collection.title }}</span>
+  </nav>
+
+  <h1 class="col-page__title">{{ collection.title }}</h1>
+
+  <div class="col-page__body">
+
+    {%- comment -%}──────────────── SIDEBAR ────────────────{%- endcomment -%}
+    <aside class="col-page__sidebar" id="ColFilterSidebar">
+      <div class="col-page__sidebar-head">
+        <h2 class="col-page__sidebar-title">Filters</h2>
+      </div>
+
+      {%- for filter in collection.filters -%}
+        <div class="filter-group" data-filter-id="{{ filter.param_name }}">
+          <button class="filter-group__toggle" aria-expanded="true">
+            <span>{{ filter.label }}</span>
+            <svg class="filter-group__chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+
+          <div class="filter-group__body">
+            {%- if filter.type == 'boolean' or filter.type == 'list' -%}
+              <ul class="filter-group__list">
+                {%- for value in filter.values -%}
+                  <li class="filter-group__item">
+                    <label class="filter-group__label">
+                      <input
+                        type="checkbox"
+                        name="{{ value.param_name }}"
+                        value="{{ value.value }}"
+                        class="filter-group__checkbox"
+                        {% if value.active %}checked{% endif %}
+                        {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                        data-filter-url="{{ value.url_to_add }}"
+                        data-filter-remove="{{ value.url_to_remove }}"
+                      >
+                      <span class="filter-group__check-custom"></span>
+                      <span class="filter-group__value-label">{{ value.label }}</span>
+                      <span class="filter-group__count">({{ value.count }})</span>
+                    </label>
+                  </li>
+                {%- endfor -%}
+              </ul>
+              {%- if filter.values.size > 5 -%}
+                <button class="filter-group__show-more">+{{ filter.values.size | minus: 5 }} More</button>
+              {%- endif -%}
+
+            {%- elsif filter.type == 'price_range' -%}
+              <div class="filter-group__price">
+                <input type="number" class="filter-group__price-input" placeholder="Min" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | divided_by: 100 | ceil }}">
+                <span class="filter-group__price-sep">–</span>
+                <input type="number" class="filter-group__price-input" placeholder="Max" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | divided_by: 100 | ceil }}">
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+
+      {%- if collection.filters.size == 0 -%}
+        {%- comment -%} Placeholder filters for theme preview {%- endcomment -%}
+        {%- assign placeholder_filters = 'Shop For,Category,Price,Brands,Occasion,Discount Ranges,Colors,Size & Fit,Highlights' | split: ',' -%}
+        {%- for f in placeholder_filters -%}
+          <div class="filter-group">
+            <button class="filter-group__toggle{% if forloop.index > 2 %} is-collapsed{% endif %}" aria-expanded="{{ forloop.index <= 2 }}">
+              <span>{{ f }}</span>
+              <svg class="filter-group__chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="filter-group__body" style="{% if forloop.index > 2 %}display:none{% endif %}"></div>
+          </div>
+        {%- endfor -%}
+        <div class="filter-group__more-filters">
+          <button class="filter-group__more-btn">More Filters <span class="filter-group__more-chevron">∨</span></button>
+          <p class="filter-group__more-note">Please select upto 3 categories to view more filters</p>
+        </div>
+      {%- endif -%}
+    </aside>
+
+    {%- comment -%}──────────────── MAIN ────────────────{%- endcomment -%}
+    <div class="col-page__main">
+
+      {%- comment -%} Toolbar {%- endcomment -%}
+      <div class="col-page__toolbar">
+        <p class="col-page__count">
+          <strong>{{ collection.products_count }}</strong> Items Found
+        </p>
+
+        <div class="col-page__toolbar-right">
+          <div class="col-page__grid-toggle">
+            <span class="col-page__grid-label">GRID</span>
+            {%- for cols in (2..5) -%}
+              <button
+                class="col-page__grid-btn{% if cols == 3 %} is-active{% endif %}"
+                data-cols="{{ cols }}"
+                aria-label="{{ cols }} columns"
+              >
+                {%- for i in (1..cols) -%}<span class="col-page__grid-bar"></span>{%- endfor -%}
+              </button>
+            {%- endfor -%}
+          </div>
+
+          <div class="col-page__sort">
+            <label class="col-page__sort-label" for="ColSort">SORT BY</label>
+            <div class="col-page__sort-wrap">
+              <select id="ColSort" class="col-page__sort-select" name="sort_by">
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected{% endif %}>
+                    {{ option.name }}
+                  </option>
+                {%- endfor -%}
+                {%- if collection.sort_options.size == 0 -%}
+                  <option value="relevance" selected>Relevance</option>
+                  <option value="price-ascending">Price: Low to High</option>
+                  <option value="price-descending">Price: High to Low</option>
+                  <option value="created-descending">Newest First</option>
+                {%- endif -%}
+              </select>
+              <svg class="col-page__sort-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} Active filters {%- endcomment -%}
+      {%- assign active_filters = collection.filters | where: "active_values" -%}
+      {%- if active_filters.size > 0 -%}
+        <div class="col-page__active-filters">
+          {%- for filter in collection.filters -%}
+            {%- for value in filter.active_values -%}
+              <a href="{{ value.url_to_remove }}" class="col-page__active-tag">
+                {{ value.label }} <span>✕</span>
+              </a>
+            {%- endfor -%}
+          {%- endfor -%}
+          <a href="{{ collection.url }}" class="col-page__clear-all">Clear all</a>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Product grid {%- endcomment -%}
+      <div class="col-page__grid" id="ColProductGrid" data-cols="3">
+        {%- for product in collection.products -%}
+          <div class="prod-card">
+            <div class="prod-card__img-wrap">
+              {%- if product.featured_image != blank -%}
+                <img
+                  src="{{ product.featured_image | image_url: width: 600 }}"
+                  alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                  class="prod-card__img"
+                  loading="{{ forloop.index | modulo: 6 | at_most: 1 | times: 0 | plus: 1 | modulo: 2 | case }}{% if forloop.index <= 6 %}eager{% else %}lazy{% endif %}"
+                  width="{{ product.featured_image.width }}"
+                  height="{{ product.featured_image.height }}"
+                >
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'prod-card__placeholder' }}
+              {%- endif -%}
+
+              {%- assign is_bestseller = product.tags | where: 'BESTSELLER' -%}
+              {%- if product.tags contains 'BESTSELLER' or product.tags contains 'bestseller' -%}
+                <span class="prod-card__badge prod-card__badge--bestseller">BESTSELLER</span>
+              {%- elsif product.tags contains 'EXCLUSIVE' or product.tags contains 'exclusive' -%}
+                <span class="prod-card__badge prod-card__badge--exclusive">EXCLUSIVE</span>
+              {%- elsif product.tags contains 'NEW' -%}
+                <span class="prod-card__badge prod-card__badge--new">NEW</span>
+              {%- endif -%}
+
+              <button class="prod-card__wish" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+            </div>
+
+            <div class="prod-card__info">
+              <p class="prod-card__brand">{{ product.vendor }}</p>
+              <a href="{{ product.url }}" class="prod-card__name">{{ product.title }}</a>
+              <div class="prod-card__pricing">
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="prod-card__price">{{ product.price | money }}</span>
+                  <span class="prod-card__compare">{{ product.compare_at_price | money }}</span>
+                  <span class="prod-card__discount">
+                    ({{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}% off)
+                  </span>
+                {%- else -%}
+                  <span class="prod-card__price">{{ product.price | money }}</span>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+        {%- else -%}
+          <div class="col-page__empty">
+            <p>No products found. <a href="{{ collection.url }}">Clear filters</a></p>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} Pagination {%- endcomment -%}
+      {%- if paginate.pages > 1 -%}
+        <div class="col-page__pagination">
+          {{ paginate | default_pagination: next: 'Next →', previous: '← Prev' }}
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection Page",
+  "tag": "section",
+  "class": "section-collection-page",
+  "settings": [
+    { "type": "range",    "id": "products_per_page", "label": "Products per page", "min": 12, "max": 48, "step": 4, "default": 24 },
+    { "type": "checkbox", "id": "show_filter_count",  "label": "Show filter counts", "default": true },
+    { "type": "checkbox", "id": "sticky_sidebar",     "label": "Sticky filter sidebar", "default": true }
+  ],
+  "presets": [{ "name": "Collection Page" }]
+}
+{% endschema %}

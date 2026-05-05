@@ -1,0 +1,83 @@
+<div class="luxe-loves" style="--ll-bg: {{ section.settings.bg_color }};">
+
+  <div class="luxe-loves__head">
+    <div class="luxe-loves__head-inner">
+      <span class="luxe-loves__wave">〜</span>
+      <div>
+        <p class="luxe-loves__eyebrow">{{ section.settings.eyebrow }}</p>
+        <h2 class="luxe-loves__title">{{ section.settings.title }}</h2>
+      </div>
+      <span class="luxe-loves__wave">〜</span>
+    </div>
+  </div>
+
+  <div class="luxe-loves__track-wrap">
+    <div class="luxe-loves__track" id="LuxeLovesTrack-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div class="luxe-loves__card" {{ block.shopify_attributes }}>
+          <div class="luxe-loves__card-img-wrap">
+            {%- if block.settings.image != blank -%}
+              <img
+                src="{{ block.settings.image | image_url: width: 500 }}"
+                alt="{{ block.settings.brand | escape }}"
+                class="luxe-loves__card-img"
+                loading="lazy"
+              >
+            {%- else -%}
+              <div class="luxe-loves__card-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+            {%- endif -%}
+          </div>
+          <div class="luxe-loves__card-info">
+            <p class="luxe-loves__card-brand">{{ block.settings.brand }}</p>
+            <p class="luxe-loves__card-desc">{{ block.settings.desc }}</p>
+          </div>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="luxe-loves__card-link" aria-label="{{ block.settings.brand }}"></a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <button class="luxe-loves__arrow luxe-loves__arrow--prev" aria-label="Previous">&#8249;</button>
+    <button class="luxe-loves__arrow luxe-loves__arrow--next" aria-label="Next">&#8250;</button>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Luxe Loves",
+  "tag": "section",
+  "class": "section-luxe-loves",
+  "settings": [
+    { "type": "text",  "id": "eyebrow",  "label": "Eyebrow", "default": "TRENDING NOW" },
+    { "type": "text",  "id": "title",    "label": "Heading", "default": "LUXE LOVES" },
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#f5f5c8" }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Product Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text",         "id": "brand", "label": "Brand name",   "default": "JIMMY CHOO" },
+        { "type": "text",         "id": "desc",  "label": "Description",  "default": "Statement heels" },
+        { "type": "url",          "id": "link",  "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxe Loves",
+      "blocks": [
+        { "type": "item", "settings": { "brand": "JIMMY CHOO",       "desc": "Statement heels" } },
+        { "type": "item", "settings": { "brand": "FERRAGAMO",        "desc": "Buckle up" } },
+        { "type": "item", "settings": { "brand": "CASABLANCA",       "desc": "Beach day out" } },
+        { "type": "item", "settings": { "brand": "STELLA McCARTNEY", "desc": "Signature shoulder bags" } },
+        { "type": "item", "settings": { "brand": "MASERATI",         "desc": "Everyday formal watches" } },
+        { "type": "item", "settings": { "brand": "PRADA",            "desc": "Sunny day statements" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,77 @@
+<div class="season-drops">
+  <div class="season-drops__bg-glow"></div>
+
+  <div class="season-drops__head">
+    <p class="season-drops__eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="season-drops__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="season-drops__track-wrap">
+    <button class="season-drops__arrow season-drops__arrow--prev" aria-label="Previous">&#8249;</button>
+
+    <div class="season-drops__track" id="SeasonDropsTrack-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div class="season-drops__card" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img
+              src="{{ block.settings.image | image_url: width: 600 }}"
+              alt="{{ block.settings.image.alt | default: block.settings.brand_name | escape }}"
+              class="season-drops__card-img"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="season-drops__card-placeholder">{{ 'collection-1' | placeholder_svg_tag }}</div>
+          {%- endif -%}
+          <div class="season-drops__card-overlay"></div>
+          <div class="season-drops__card-name">{{ block.settings.brand_name }}</div>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="season-drops__card-link" aria-label="{{ block.settings.brand_name }}"></a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <button class="season-drops__arrow season-drops__arrow--next" aria-label="Next">&#8250;</button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Season Drops",
+  "tag": "section",
+  "class": "section-season-drops",
+  "settings": [
+    {
+      "type": "text", "id": "eyebrow",
+      "label": "Eyebrow text", "default": "JUST IN FOR SUMMER"
+    },
+    {
+      "type": "text", "id": "title",
+      "label": "Heading", "default": "SPRING–SUMMER '26 DROPS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Brand Card",
+      "settings": [
+        { "type": "image_picker", "id": "image",      "label": "Image" },
+        { "type": "text",         "id": "brand_name", "label": "Brand name", "default": "BRAND" },
+        { "type": "url",          "id": "link",       "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Season Drops",
+      "blocks": [
+        { "type": "brand", "settings": { "brand_name": "BALLY" } },
+        { "type": "brand", "settings": { "brand_name": "BOSS" } },
+        { "type": "brand", "settings": { "brand_name": "FARM RIO" } },
+        { "type": "brand", "settings": { "brand_name": "EMPORIO" } },
+        { "type": "brand", "settings": { "brand_name": "VERSACE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

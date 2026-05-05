@@ -1,0 +1,32 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Banani",
+    "theme_version": "1.0.0",
+    "theme_author": "Banani Studio",
+    "theme_documentation_url": "",
+    "theme_support_url": ""
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      { "type": "color", "id": "color_primary",    "label": "Primary",    "default": "#cc0000" },
+      { "type": "color", "id": "color_background",  "label": "Background", "default": "#ffffff" },
+      { "type": "color", "id": "color_text",        "label": "Text",       "default": "#111111" },
+      { "type": "color", "id": "color_text_muted",  "label": "Muted text", "default": "#888888" }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker", "id": "heading_font",
+        "label": "Heading font", "default": "bebas_neue_n4"
+      },
+      {
+        "type": "font_picker", "id": "body_font",
+        "label": "Body font", "default": "space_grotesk_n4"
+      }
+    ]
+  }
+]

@@ -1,0 +1,71 @@
+<div class="editor-picks">
+
+  <div class="editor-picks__head">
+    <p class="editor-picks__eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="editor-picks__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="editor-picks__grid">
+    {%- for block in section.blocks -%}
+      <div class="editor-picks__card" {{ block.shopify_attributes }}>
+        <div class="editor-picks__card-img-wrap">
+          {%- if block.settings.image != blank -%}
+            <img
+              src="{{ block.settings.image | image_url: width: 700 }}"
+              alt="{{ block.settings.title | escape }}"
+              class="editor-picks__card-img"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="editor-picks__card-placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+          {%- endif -%}
+        </div>
+        <div class="editor-picks__card-info">
+          <p class="editor-picks__card-title">{{ block.settings.title }}</p>
+          <p class="editor-picks__card-desc">{{ block.settings.desc }}</p>
+        </div>
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="editor-picks__card-link" aria-label="{{ block.settings.title }}"></a>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Editor's Picks",
+  "tag": "section",
+  "class": "section-editor-picks",
+  "settings": [
+    { "type": "text",         "id": "eyebrow",  "label": "Eyebrow",          "default": "TRENDS TO WATCH" },
+    { "type": "text",         "id": "title",    "label": "Heading",          "default": "EDITOR'S PICKS" },
+    { "type": "image_picker", "id": "bg_image", "label": "Background image (water texture, optional)" },
+    { "type": "color",        "id": "bg_color", "label": "Background color fallback", "default": "#22b5c8" }
+  ],
+  "blocks": [
+    {
+      "type": "pick",
+      "name": "Pick",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text",         "id": "title", "label": "Title",       "default": "SHIRT CHECK" },
+        { "type": "text",         "id": "desc",  "label": "Description", "default": "Everyday, half-sleeve styles" },
+        { "type": "url",          "id": "link",  "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editor's Picks",
+      "blocks": [
+        { "type": "pick", "settings": { "title": "SHIRT CHECK",        "desc": "Everyday, half-sleeve styles" } },
+        { "type": "pick", "settings": { "title": "PLAN YOUR TRAVEL",   "desc": "Luggage & backpack picks" } },
+        { "type": "pick", "settings": { "title": "SWIM SEASON",        "desc": "Poolside & beach essentials" } },
+        { "type": "pick", "settings": { "title": "FOR YOUR LITTLE ONES","desc": "Must-have kidswear styles" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

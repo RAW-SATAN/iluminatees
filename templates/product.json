@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "product_page": {
+      "type": "product-page",
+      "blocks": {
+        "d1": { "type": "detail_row", "settings": { "key": "Style Type",       "value": "Polo" } },
+        "d2": { "type": "detail_row", "settings": { "key": "Sleeve",           "value": "Short" } },
+        "d3": { "type": "detail_row", "settings": { "key": "Length",           "value": "Medium" } },
+        "d4": { "type": "detail_row", "settings": { "key": "Package Contains", "value": "1 T-shirt" } },
+        "d5": { "type": "detail_row", "settings": { "key": "Transparency",     "value": "Opaque" } },
+        "d6": { "type": "detail_row", "settings": { "key": "Wash Care",        "value": "Machine wash" } }
+      },
+      "block_order": ["d1","d2","d3","d4","d5","d6"],
+      "settings": {
+        "helpline_number": "9920705705",
+        "promo_code": "NEWPREMIUM",
+        "promo_headline": "Get it for ₹27999",
+        "promo_sub": "Get 20% off on premium brands on your first purchase",
+        "show_size_unit": true,
+        "size_unit": "UNI",
+        "show_shop_more": true,
+        "similar_title": "Similar Styles"
+      }
+    }
+  },
+  "order": ["product_page"]
+}

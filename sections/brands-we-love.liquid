@@ -1,0 +1,118 @@
+<div class="brands-love" id="BrandsLove-{{ section.id }}" data-section-id="{{ section.id }}">
+
+  <div class="brands-love__head">
+    {%- assign active_slide = section.blocks[0] -%}
+    <p class="brands-love__offer" id="BrandsLoveOffer-{{ section.id }}">
+      {{ active_slide.settings.offer_text }}
+    </p>
+    <h2 class="brands-love__title">
+      {{ section.settings.title_prefix }}
+      <span class="brands-love__heart">♥</span>
+      {{ section.settings.title_suffix }}
+    </h2>
+    <div class="brands-love__dots-top">
+      {%- for block in section.blocks -%}
+        <button
+          class="brands-love__dot-top{% if forloop.first %} is-active{% endif %}"
+          data-index="{{ forloop.index0 }}"
+          aria-label="Slide {{ forloop.index }}"
+        ></button>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <div class="brands-love__slider">
+    {%- for block in section.blocks -%}
+      <div
+        class="brands-love__slide{% if forloop.first %} is-active{% endif %}"
+        data-index="{{ forloop.index0 }}"
+        {{ block.shopify_attributes }}
+      >
+        {%- if block.settings.image != blank -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 1400 }}"
+            alt="{{ block.settings.brand_name | escape }}"
+            class="brands-love__slide-img"
+            loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+          >
+        {%- else -%}
+          <div class="brands-love__slide-placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="brands-love__foot">
+    <div class="brands-love__foot-inner">
+      <p class="brands-love__foot-text" id="BrandsLoveFootText-{{ section.id }}">
+        {{ section.blocks[0].settings.foot_text }}
+      </p>
+      <a href="#" class="brands-love__foot-cta" id="BrandsLoveFootCta-{{ section.id }}">
+        {{ section.blocks[0].settings.cta_label }}
+      </a>
+    </div>
+
+    <div class="brands-love__dots-bottom">
+      {%- for block in section.blocks -%}
+        <button
+          class="brands-love__dot-bottom{% if forloop.first %} is-active{% endif %}"
+          data-index="{{ forloop.index0 }}"
+          aria-label="Slide {{ forloop.index }}"
+        ></button>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <button class="brands-love__pause" aria-label="Pause">⏸</button>
+  <button class="brands-love__nav brands-love__nav--prev" aria-label="Previous">&#8249;</button>
+  <button class="brands-love__nav brands-love__nav--next" aria-label="Next">&#8250;</button>
+
+</div>
+
+<script type="application/json" id="BrandsLoveData-{{ section.id }}">
+  [
+    {%- for block in section.blocks -%}
+    {
+      "offerText": {{ block.settings.offer_text | json }},
+      "footText":  {{ block.settings.foot_text  | json }},
+      "ctaLabel":  {{ block.settings.cta_label  | json }},
+      "ctaLink":   {{ block.settings.link        | default: '#' | json }}
+    }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+</script>
+
+{% schema %}
+{
+  "name": "Brands We Love",
+  "tag": "section",
+  "class": "section-brands-love",
+  "settings": [
+    { "type": "text", "id": "title_prefix", "label": "Title before heart", "default": "BRANDS WE" },
+    { "type": "text", "id": "title_suffix", "label": "Title after heart",  "default": "VE" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Brand Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image",      "label": "Image" },
+        { "type": "text",         "id": "brand_name", "label": "Brand name",  "default": "KATE SPADE" },
+        { "type": "text",         "id": "offer_text", "label": "Offer text",  "default": "KATE SPADE — UP TO 45% + ADD. 15% OFF" },
+        { "type": "textarea",     "id": "foot_text",  "label": "Footer text", "default": "Use code 'LUXE15' & grab your favourite bags, footwear, accessories & more" },
+        { "type": "text",         "id": "cta_label",  "label": "CTA label",   "default": "Shop now" },
+        { "type": "url",          "id": "link",       "label": "CTA link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brands We Love",
+      "blocks": [
+        { "type": "slide", "settings": { "brand_name": "KATE SPADE", "offer_text": "KATE SPADE — UP TO 45% + ADD. 15% OFF", "cta_label": "Shop now" } },
+        { "type": "slide", "settings": { "brand_name": "FERRAGAMO",  "offer_text": "FERRAGAMO — UP TO 40% OFF",               "cta_label": "Shop now" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

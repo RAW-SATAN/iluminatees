@@ -1,0 +1,92 @@
+<div class="curated">
+
+  <div class="curated__head">
+    <h2 class="curated__title">{{ section.settings.title }}</h2>
+    <p class="curated__subtitle">{{ section.settings.subtitle }}</p>
+  </div>
+
+  <div class="curated__grid">
+    {%- for block in section.blocks -%}
+      <div class="curated__panel" {{ block.shopify_attributes }}>
+        <div class="curated__panel-img-wrap">
+          {%- if block.settings.image != blank -%}
+            <img
+              src="{{ block.settings.image | image_url: width: 900 }}"
+              alt="{{ block.settings.heading | escape }}"
+              class="curated__panel-img"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="curated__panel-placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+          {%- endif -%}
+
+          {%- if block.settings.badge != blank -%}
+            <div class="curated__panel-badge">{{ block.settings.badge }}</div>
+          {%- endif -%}
+        </div>
+
+        <div class="curated__panel-info">
+          <h3 class="curated__panel-heading">{{ block.settings.heading }}</h3>
+          <p class="curated__panel-desc">{{ block.settings.desc }}</p>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="curated__panel-btn">
+              {{ block.settings.cta | default: 'SHOP NOW' }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Curated For You",
+  "tag": "section",
+  "class": "section-curated",
+  "settings": [
+    { "type": "text", "id": "title",    "label": "Title",    "default": "CURATED FOR YOU" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "STYLES TO INSPIRE YOUR OUTFITS" }
+  ],
+  "blocks": [
+    {
+      "type": "panel",
+      "name": "Panel",
+      "settings": [
+        { "type": "image_picker", "id": "image",   "label": "Image" },
+        { "type": "text",         "id": "badge",   "label": "Badge text (e.g. 200+ STYLES)", "default": "200+ STYLES" },
+        { "type": "text",         "id": "heading", "label": "Heading",     "default": "For Her" },
+        { "type": "textarea",     "id": "desc",    "label": "Description", "default": "Chic, statement-making prints to define her style this season" },
+        { "type": "text",         "id": "cta",     "label": "CTA label",   "default": "SHOP NOW" },
+        { "type": "url",          "id": "link",    "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Curated For You",
+      "blocks": [
+        {
+          "type": "panel",
+          "settings": {
+            "badge": "200+ STYLES",
+            "heading": "For Her",
+            "desc": "Chic, statement-making prints to define her style this season",
+            "cta": "SHOP NOW"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "badge": "180+ STYLES",
+            "heading": "For Him",
+            "desc": "Rich espresso tones designed to elevate his everyday wardrobe",
+            "cta": "SHOP NOW"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

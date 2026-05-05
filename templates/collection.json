@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "collection_page": {
+      "type": "collection-page",
+      "settings": {
+        "products_per_page": 24,
+        "show_filter_count": true,
+        "sticky_sidebar": true
+      }
+    }
+  },
+  "order": ["collection_page"]
+}

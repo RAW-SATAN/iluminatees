@@ -1,0 +1,104 @@
+<div
+  class="col-drops"
+  id="ColDrops-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  style="--col-drops-bg: {{ section.settings.bg_color }};"
+>
+
+  <div class="col-drops__head">
+    <p class="col-drops__eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="col-drops__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="col-drops__slider">
+    {%- for block in section.blocks -%}
+      <div
+        class="col-drops__slide{% if forloop.first %} is-active{% endif %}"
+        data-index="{{ forloop.index0 }}"
+        {{ block.shopify_attributes }}
+        style="--slide-accent: {{ block.settings.accent_color }}; --slide-bg: {{ block.settings.slide_bg }};"
+      >
+        <div class="col-drops__slide-img-wrap">
+          {%- if block.settings.image != blank -%}
+            <img
+              src="{{ block.settings.image | image_url: width: 800 }}"
+              alt="{{ block.settings.brand_name | escape }}"
+              class="col-drops__slide-img"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="col-drops__slide-placeholder">{{ 'collection-1' | placeholder_svg_tag }}</div>
+          {%- endif -%}
+        </div>
+
+        <div class="col-drops__slide-content">
+          <div class="col-drops__slide-brand-row">
+            <div class="col-drops__slide-icon">✦</div>
+            <span class="col-drops__slide-brand">{{ block.settings.brand_name }}</span>
+          </div>
+          <p class="col-drops__slide-tagline">{{ block.settings.tagline }}</p>
+          <p class="col-drops__slide-desc">{{ block.settings.desc }}</p>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="col-drops__slide-cta">{{ block.settings.cta_label }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="col-drops__nav">
+    <button class="col-drops__arrow col-drops__arrow--prev" aria-label="Previous">&#8249;</button>
+    <div class="col-drops__dots">
+      {%- for block in section.blocks -%}
+        <button
+          class="col-drops__dot{% if forloop.first %} is-active{% endif %}"
+          data-index="{{ forloop.index0 }}"
+          aria-label="Slide {{ forloop.index }}"
+        ></button>
+      {%- endfor -%}
+    </div>
+    <button class="col-drops__arrow col-drops__arrow--next" aria-label="Next">&#8250;</button>
+  </div>
+
+  <button class="col-drops__pause" aria-label="Pause autoplay">⏸</button>
+
+</div>
+
+{% schema %}
+{
+  "name": "Collection Drops",
+  "tag": "section",
+  "class": "section-col-drops",
+  "settings": [
+    { "type": "text",  "id": "eyebrow", "label": "Eyebrow", "default": "ON OUR RADAR" },
+    { "type": "text",  "id": "title",   "label": "Heading", "default": "NEW COLLECTION DROPS" },
+    { "type": "color", "id": "bg_color","label": "Section background", "default": "#f5f0d0" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image",       "label": "Image" },
+        { "type": "text",         "id": "brand_name",  "label": "Brand name",  "default": "TISSOT" },
+        { "type": "text",         "id": "tagline",     "label": "Tagline",     "default": "SWISS WATCHES SINCE 1853" },
+        { "type": "textarea",     "id": "desc",        "label": "Description", "default": "Introducing the Gentleman Collection, a refined selection of timepieces designed for modern, everyday elegance" },
+        { "type": "text",         "id": "cta_label",   "label": "CTA label",   "default": "Shop Now" },
+        { "type": "url",          "id": "link",        "label": "Link" },
+        { "type": "color",        "id": "accent_color","label": "Accent color","default": "#111111" },
+        { "type": "color",        "id": "slide_bg",    "label": "Card background", "default": "#16130c" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Drops",
+      "blocks": [
+        { "type": "slide", "settings": { "brand_name": "TISSOT", "tagline": "SWISS WATCHES SINCE 1853", "cta_label": "Shop Now" } },
+        { "type": "slide", "settings": { "brand_name": "VERSACE", "tagline": "ITALIAN LUXURY SINCE 1978", "cta_label": "Discover" } },
+        { "type": "slide", "settings": { "brand_name": "ZEGNA", "tagline": "THE ART OF FABRIC", "cta_label": "Explore" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

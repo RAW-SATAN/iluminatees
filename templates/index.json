@@ -1,0 +1,133 @@
+{
+  "sections": {
+    "hero_banner": {
+      "type": "hero-banner",
+      "blocks": {
+        "panel_1": { "type": "panel", "settings": { "tag": "POLO ESSENTIALS", "sub": "EXPLORE FITS" } },
+        "panel_2": { "type": "panel", "settings": { "tag": "BAGS IN FOCUS",   "sub": "DISCOVER STYLES" } }
+      },
+      "block_order": ["panel_1", "panel_2"],
+      "settings": {
+        "announcement_text": "DROP ALERT: EXPLORE NEW PICKS FOR HIM",
+        "announcement_link_label": "SHOP THE EDIT"
+      }
+    },
+    "season_drops": {
+      "type": "season-drops",
+      "blocks": {
+        "b1": { "type": "brand", "settings": { "brand_name": "BALLY" } },
+        "b2": { "type": "brand", "settings": { "brand_name": "BOSS" } },
+        "b3": { "type": "brand", "settings": { "brand_name": "FARM RIO" } },
+        "b4": { "type": "brand", "settings": { "brand_name": "EMPORIO" } },
+        "b5": { "type": "brand", "settings": { "brand_name": "VERSACE" } }
+      },
+      "block_order": ["b1", "b2", "b3", "b4", "b5"],
+      "settings": { "eyebrow": "JUST IN FOR SUMMER", "title": "SPRING–SUMMER '26 DROPS" }
+    },
+    "shop_by_cat": {
+      "type": "shop-by-category",
+      "blocks": {
+        "c1": { "type": "category", "settings": { "label": "SHIRTS" } },
+        "c2": { "type": "category", "settings": { "label": "JEANS" } },
+        "c3": { "type": "category", "settings": { "label": "EYEWEAR" } },
+        "c4": { "type": "category", "settings": { "label": "FOOTWEAR" } },
+        "c5": { "type": "category", "settings": { "label": "HOME" } },
+        "c6": { "type": "category", "settings": { "label": "MORE ▶", "accent": true } },
+        "gc": { "type": "gift_card_banner", "settings": { "title": "GIFT CARDS", "desc": "Still deciding on a present? Let them choose with gift cards.", "cta": "SHOP NOW" } }
+      },
+      "block_order": ["c1","c2","c3","c4","c5","c6","gc"],
+      "settings": { "eyebrow": "HANDPICKED FOR YOU", "title": "SHOP BY CATEGORY" }
+    },
+    "new_arrivals": {
+      "type": "new-arrivals",
+      "settings": { "eyebrow": "THIS IS JUST IN", "title": "NEW ARRIVALS", "products_to_show": 6 }
+    },
+    "col_drops": {
+      "type": "collection-drops",
+      "blocks": {
+        "s1": { "type": "slide", "settings": { "brand_name": "TISSOT",  "tagline": "SWISS WATCHES SINCE 1853", "desc": "Introducing the Gentleman Collection, a refined selection of timepieces designed for modern, everyday elegance", "cta_label": "Shop Now" } },
+        "s2": { "type": "slide", "settings": { "brand_name": "VERSACE", "tagline": "ITALIAN LUXURY SINCE 1978", "desc": "Medusa-embossed leather bags and signature baroque prints.", "cta_label": "Discover" } },
+        "s3": { "type": "slide", "settings": { "brand_name": "ZEGNA",   "tagline": "THE ART OF FABRIC", "desc": "Oasi Cashmere — nature's finest fibre, woven into garments that define effortless Italian masculinity.", "cta_label": "Explore" } }
+      },
+      "block_order": ["s1","s2","s3"],
+      "settings": { "eyebrow": "ON OUR RADAR", "title": "NEW COLLECTION DROPS", "bg_color": "#f5f0d0" }
+    },
+    "promo_banner": {
+      "type": "promo-banner",
+      "settings": {
+        "title": "MOTHER'S DAY SPECIAL",
+        "desc_prefix": "Use code",
+        "code": "LUXE15",
+        "desc_suffix": "for an additional 15% off on gifts & more",
+        "cta_label": "Shop Now"
+      }
+    },
+    "luxe_loves": {
+      "type": "luxe-loves",
+      "blocks": {
+        "ll1": { "type": "item", "settings": { "brand": "JIMMY CHOO",       "desc": "Statement heels" } },
+        "ll2": { "type": "item", "settings": { "brand": "FERRAGAMO",        "desc": "Buckle up" } },
+        "ll3": { "type": "item", "settings": { "brand": "CASABLANCA",       "desc": "Beach day out" } },
+        "ll4": { "type": "item", "settings": { "brand": "STELLA McCARTNEY", "desc": "Signature shoulder bags" } },
+        "ll5": { "type": "item", "settings": { "brand": "MASERATI",         "desc": "Everyday formal watches" } },
+        "ll6": { "type": "item", "settings": { "brand": "PRADA",            "desc": "Sunny day statements" } }
+      },
+      "block_order": ["ll1","ll2","ll3","ll4","ll5","ll6"],
+      "settings": { "eyebrow": "TRENDING NOW", "title": "LUXE LOVES", "bg_color": "#f5f5c8" }
+    },
+    "brands_love": {
+      "type": "brands-we-love",
+      "blocks": {
+        "bw1": { "type": "slide", "settings": { "brand_name": "KATE SPADE", "offer_text": "KATE SPADE — UP TO 45% + ADD. 15% OFF", "foot_text": "Use code 'LUXE15' & grab your favourite bags, footwear, accessories & more", "cta_label": "Shop now" } },
+        "bw2": { "type": "slide", "settings": { "brand_name": "FERRAGAMO",  "offer_text": "FERRAGAMO — UP TO 40% OFF", "foot_text": "Use code 'LUXE15' & shop the finest Italian leather goods", "cta_label": "Shop now" } }
+      },
+      "block_order": ["bw1","bw2"],
+      "settings": { "title_prefix": "BRANDS WE", "title_suffix": "VE" }
+    },
+    "excl_brands": {
+      "type": "exclusive-brands",
+      "blocks": {
+        "eb1": { "type": "brand", "settings": { "brand_name": "FERRAGAMO" } },
+        "eb2": { "type": "brand", "settings": { "brand_name": "TORY BURCH" } },
+        "eb3": { "type": "brand", "settings": { "brand_name": "MOSCHINO" } },
+        "eb4": { "type": "brand", "settings": { "brand_name": "BENEDETTA BRUZZICHES" } },
+        "eb5": { "type": "brand", "settings": { "brand_name": "KATE SPADE" } }
+      },
+      "block_order": ["eb1","eb2","eb3","eb4","eb5"],
+      "settings": { "eyebrow": "ONLY ON", "title": "BANANI", "bg_color": "#22b5c8" }
+    },
+    "editor_picks": {
+      "type": "editor-picks",
+      "blocks": {
+        "ep1": { "type": "pick", "settings": { "title": "SHIRT CHECK",         "desc": "Everyday, half-sleeve styles" } },
+        "ep2": { "type": "pick", "settings": { "title": "PLAN YOUR TRAVEL",    "desc": "Luggage & backpack picks" } },
+        "ep3": { "type": "pick", "settings": { "title": "SWIM SEASON",         "desc": "Poolside & beach essentials" } },
+        "ep4": { "type": "pick", "settings": { "title": "FOR YOUR LITTLE ONES","desc": "Must-have kidswear styles" } }
+      },
+      "block_order": ["ep1","ep2","ep3","ep4"],
+      "settings": { "eyebrow": "TRENDS TO WATCH", "title": "EDITOR'S PICKS", "bg_color": "#22b5c8" }
+    },
+    "curated": {
+      "type": "curated-for-you",
+      "blocks": {
+        "p1": { "type": "panel", "settings": { "badge": "200+ STYLES", "heading": "For Her", "desc": "Chic, statement-making prints to define her style this season", "cta": "SHOP NOW" } },
+        "p2": { "type": "panel", "settings": { "badge": "180+ STYLES", "heading": "For Him", "desc": "Rich espresso tones designed to elevate his everyday wardrobe",   "cta": "SHOP NOW" } }
+      },
+      "block_order": ["p1","p2"],
+      "settings": { "title": "CURATED FOR YOU", "subtitle": "STYLES TO INSPIRE YOUR OUTFITS" }
+    }
+  },
+  "order": [
+    "hero_banner",
+    "season_drops",
+    "shop_by_cat",
+    "new_arrivals",
+    "col_drops",
+    "promo_banner",
+    "luxe_loves",
+    "brands_love",
+    "excl_brands",
+    "curated",
+    "editor_picks"
+  ]
+}

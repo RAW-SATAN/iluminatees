@@ -1,0 +1,19 @@
+{
+  "general": {
+    "password_page": { "login_form_heading": "Enter store using password" }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out":    "Sold out",
+      "unavailable": "Unavailable"
+    }
+  },
+  "sections": {
+    "hero_banner":      { "title": "Hero Banner" },
+    "season_drops":     { "title": "Season Drops" },
+    "shop_by_category": { "title": "Shop By Category" },
+    "new_arrivals":     { "title": "New Arrivals" },
+    "collection_drops": { "title": "Collection Drops" }
+  }
+}

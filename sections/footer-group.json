@@ -1,0 +1,70 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "trust_bar": {
+      "type": "trust-bar",
+      "blocks": {
+        "u1": { "type": "usp", "settings": { "icon_preset": "authentic", "label": "100% AUTHENTIC" } },
+        "u2": { "type": "usp", "settings": { "icon_preset": "exchange",  "label": "EASY EXCHANGE & RETURNS" } },
+        "u3": { "type": "usp", "settings": { "icon_preset": "quality",   "label": "ASSURED QUALITY" } },
+        "u4": { "type": "usp", "settings": { "icon_preset": "price",     "label": "FAIR PRICE" } },
+        "u5": { "type": "usp", "settings": { "icon_preset": "cod",       "label": "CASH ON DELIVERY" } },
+        "u6": { "type": "usp", "settings": { "icon_preset": "curated",   "label": "CURATED FOR YOU" } }
+      },
+      "block_order": ["u1","u2","u3","u4","u5","u6"]
+    },
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "col1": {
+          "type": "link_column",
+          "settings": {
+            "heading": "Company",
+            "links": "Who We Are\nJoin Our Team\nTerms & Conditions\nWe Respect Your Privacy\nFees & Payments\nReturns & Refunds Policy\nPromotions Terms & Conditions",
+            "hrefs": "/pages/about\n/pages/careers\n/policies/terms-of-service\n/policies/privacy-policy\n/pages/fees\n/policies/refund-policy\n/pages/promotions-terms"
+          }
+        },
+        "col2": {
+          "type": "link_column",
+          "settings": {
+            "heading": "Help",
+            "links": "Track Your Order\nFrequently Asked Questions\nReturns\nCancellations\nPayments\nCustomer Care\nHow Do I Redeem My Coupon",
+            "hrefs": "/pages/track-order\n/pages/faq\n/policies/refund-policy\n/pages/cancellations\n/pages/payments\n/pages/contact\n/pages/coupon"
+          }
+        },
+        "col3": {
+          "type": "link_column",
+          "settings": {
+            "heading": "Shop by",
+            "links": "Men\nWomen\nKids\nHome\nBeauty\nThe Edit\nNew Arrival",
+            "hrefs": "/collections/men\n/collections/women\n/collections/kids\n/collections/home\n/collections/beauty\n/collections/the-edit\n/collections/new-arrivals"
+          }
+        },
+        "col4": {
+          "type": "link_column",
+          "settings": {
+            "heading": "Follow us",
+            "links": "Facebook\nInstagram\nTwitter\nPinterest",
+            "hrefs": "https://facebook.com\nhttps://instagram.com\nhttps://twitter.com\nhttps://pinterest.com"
+          }
+        },
+        "p1": { "type": "payment_icon", "settings": { "label": "Net Banking" } },
+        "p2": { "type": "payment_icon", "settings": { "label": "Verified by Visa" } },
+        "p3": { "type": "payment_icon", "settings": { "label": "Mastercard" } },
+        "p4": { "type": "payment_icon", "settings": { "label": "Amex" } },
+        "p5": { "type": "payment_icon", "settings": { "label": "Cash on Delivery" } },
+        "p6": { "type": "payment_icon", "settings": { "label": "Jio Money" } }
+      },
+      "block_order": ["col1","col2","col3","col4","p1","p2","p3","p4","p5","p6"],
+      "settings": {
+        "seo_text": "Shop from our luxury collection of fashion wear, beauty & home decor products online. We offer authentic luxury products. Shop Now! Assured Quality. COD.",
+        "payment_title": "Payment methods",
+        "secure_label": "Secure system",
+        "secure_sub": "256 BIT SSL ENCRYPTION",
+        "copyright": "© 2026 Banani. All rights reserved."
+      }
+    }
+  },
+  "order": ["trust_bar", "footer"]
+}

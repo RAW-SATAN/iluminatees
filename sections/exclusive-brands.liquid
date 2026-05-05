@@ -1,0 +1,73 @@
+<div class="excl-brands">
+
+  <div class="excl-brands__head">
+    <p class="excl-brands__eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="excl-brands__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="excl-brands__track-wrap">
+    <div class="excl-brands__track" id="ExclBrandsTrack-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div class="excl-brands__card" {{ block.shopify_attributes }}>
+          <div class="excl-brands__card-img-wrap">
+            {%- if block.settings.image != blank -%}
+              <img
+                src="{{ block.settings.image | image_url: width: 600 }}"
+                alt="{{ block.settings.brand_name | escape }}"
+                class="excl-brands__card-img"
+                loading="lazy"
+              >
+            {%- else -%}
+              <div class="excl-brands__card-placeholder">{{ 'collection-1' | placeholder_svg_tag }}</div>
+            {%- endif -%}
+          </div>
+          <p class="excl-brands__card-name">{{ block.settings.brand_name }}</p>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="excl-brands__card-link" aria-label="{{ block.settings.brand_name }}"></a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <button class="excl-brands__arrow excl-brands__arrow--prev" aria-label="Previous">&#8249;</button>
+    <button class="excl-brands__arrow excl-brands__arrow--next" aria-label="Next">&#8250;</button>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Exclusive Brands",
+  "tag": "section",
+  "class": "section-excl-brands",
+  "settings": [
+    { "type": "text",         "id": "eyebrow",  "label": "Eyebrow text", "default": "ONLY ON" },
+    { "type": "text",         "id": "title",    "label": "Store name",   "default": "BANANI" },
+    { "type": "image_picker", "id": "bg_image", "label": "Background image (e.g. water texture)" },
+    { "type": "color",        "id": "bg_color", "label": "Background color (fallback)", "default": "#22b5c8" }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Brand",
+      "settings": [
+        { "type": "image_picker", "id": "image",      "label": "Image" },
+        { "type": "text",         "id": "brand_name", "label": "Brand name", "default": "FERRAGAMO" },
+        { "type": "url",          "id": "link",       "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Exclusive Brands",
+      "blocks": [
+        { "type": "brand", "settings": { "brand_name": "FERRAGAMO" } },
+        { "type": "brand", "settings": { "brand_name": "TORY BURCH" } },
+        { "type": "brand", "settings": { "brand_name": "MOSCHINO" } },
+        { "type": "brand", "settings": { "brand_name": "BENEDETTA BRUZZICHES" } },
+        { "type": "brand", "settings": { "brand_name": "KATE SPADE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

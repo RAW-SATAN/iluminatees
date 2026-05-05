@@ -1,0 +1,105 @@
+<div class="shop-by-cat">
+
+  <div class="shop-by-cat__head">
+    <div class="shop-by-cat__head-row">
+      <span class="shop-by-cat__palm">🌴</span>
+      <p class="shop-by-cat__eyebrow">{{ section.settings.eyebrow }}</p>
+      <span class="shop-by-cat__palm">🌴</span>
+    </div>
+    <h2 class="shop-by-cat__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="shop-by-cat__grid">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'category' -%}
+        <a
+          href="{{ block.settings.link | default: '#' }}"
+          class="shop-by-cat__item"
+          {{ block.shopify_attributes }}
+        >
+          <div class="shop-by-cat__img-wrap">
+            {%- if block.settings.image != blank -%}
+              <img
+                src="{{ block.settings.image | image_url: width: 400 }}"
+                alt="{{ block.settings.label | escape }}"
+                class="shop-by-cat__img"
+                loading="lazy"
+              >
+            {%- else -%}
+              <div class="shop-by-cat__img-placeholder">{{ 'image' | placeholder_svg_tag }}</div>
+            {%- endif -%}
+          </div>
+          <span class="shop-by-cat__label{% if block.settings.accent %} shop-by-cat__label--accent{% endif %}">
+            {{ block.settings.label }}
+          </span>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'gift_card_banner' -%}
+      <div class="gift-banner" {{ block.shopify_attributes }}>
+        <div class="gift-banner__content">
+          <h3 class="gift-banner__title">{{ block.settings.title }}</h3>
+          <div class="gift-banner__divider"></div>
+          <p class="gift-banner__desc">{{ block.settings.desc }}</p>
+          <a href="{{ block.settings.link | default: '/products/gift-card' }}" class="gift-banner__btn">
+            {{ block.settings.cta }} ▶
+          </a>
+        </div>
+        <div class="gift-banner__icon" aria-hidden="true">🎁</div>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "Shop By Category",
+  "tag": "section",
+  "class": "section-shop-by-cat",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow",  "default": "HANDPICKED FOR YOU" },
+    { "type": "text", "id": "title",   "label": "Heading",  "default": "SHOP BY CATEGORY" }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "image_picker", "id": "image",  "label": "Image" },
+        { "type": "text",         "id": "label",  "label": "Label",       "default": "SHIRTS" },
+        { "type": "url",          "id": "link",   "label": "Link" },
+        { "type": "checkbox",     "id": "accent", "label": "Accent color (red)", "default": false }
+      ]
+    },
+    {
+      "type": "gift_card_banner",
+      "name": "Gift Card Banner",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title",       "default": "GIFT CARDS" },
+        { "type": "text", "id": "desc",  "label": "Description", "default": "Still deciding on a present? Let them choose with gift cards." },
+        { "type": "text", "id": "cta",   "label": "CTA label",   "default": "SHOP NOW" },
+        { "type": "url",  "id": "link",  "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop By Category",
+      "blocks": [
+        { "type": "category", "settings": { "label": "SHIRTS" } },
+        { "type": "category", "settings": { "label": "JEANS" } },
+        { "type": "category", "settings": { "label": "EYEWEAR" } },
+        { "type": "category", "settings": { "label": "FOOTWEAR" } },
+        { "type": "category", "settings": { "label": "HOME" } },
+        { "type": "category", "settings": { "label": "MORE ▶", "accent": true } },
+        { "type": "gift_card_banner", "settings": { "title": "GIFT CARDS" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,400 @@
+{% comment %} Product Detail Page {% endcomment %}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign product_images  = product.images -%}
+
+<div class="pdp" data-product-id="{{ product.id }}" data-section-id="{{ section.id }}">
+
+  {%- comment -%} Breadcrumb {%- endcomment -%}
+  <nav class="breadcrumb" aria-label="breadcrumb">
+    <a href="/" class="breadcrumb__link">Home</a>
+    {%- for collection in product.collections limit: 3 -%}
+      <span class="breadcrumb__sep">/</span>
+      <a href="{{ collection.url }}" class="breadcrumb__link">{{ collection.title }}</a>
+    {%- endfor -%}
+    <span class="breadcrumb__sep">/</span>
+    <span class="breadcrumb__current">{{ product.title }}</span>
+  </nav>
+
+  <div class="pdp__layout">
+
+    {%- comment -%}────────── LEFT: Images ──────────{%- endcomment -%}
+    <div class="pdp__gallery">
+
+      {%- comment -%} Thumbnail strip {%- endcomment -%}
+      <div class="pdp__thumbs" id="PdpThumbs-{{ section.id }}">
+        <button class="pdp__thumbs-arrow pdp__thumbs-arrow--up" aria-label="Scroll up">&#8963;</button>
+        <div class="pdp__thumbs-track">
+          {%- for image in product_images -%}
+            <button
+              class="pdp__thumb{% if forloop.first %} is-active{% endif %}"
+              data-index="{{ forloop.index0 }}"
+              aria-label="Image {{ forloop.index }}"
+            >
+              <img
+                src="{{ image | image_url: width: 120 }}"
+                alt="{{ image.alt | default: product.title | escape }}"
+                width="80" height="100"
+                loading="lazy"
+              >
+            </button>
+          {%- endfor -%}
+        </div>
+        <button class="pdp__thumbs-arrow pdp__thumbs-arrow--down" aria-label="Scroll down">&#8964;</button>
+      </div>
+
+      {%- comment -%} Main image {%- endcomment -%}
+      <div class="pdp__main-img-wrap">
+        {%- if product.tags contains 'BESTSELLER' or product.tags contains 'bestseller' -%}
+          <span class="pdp__badge pdp__badge--bestseller">BESTSELLER</span>
+        {%- endif -%}
+        <button class="pdp__share-btn" aria-label="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+
+        <div class="pdp__main-imgs" id="PdpMainImgs-{{ section.id }}">
+          {%- for image in product_images -%}
+            <div class="pdp__main-img-slide{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}">
+              <img
+                src="{{ image | image_url: width: 900 }}"
+                alt="{{ image.alt | default: product.title | escape }}"
+                class="pdp__main-img"
+                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                width="{{ image.width }}"
+                height="{{ image.height }}"
+              >
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+
+      {%- comment -%} Tabs: Shopping Assistant / Returns / Our Promise {%- endcomment -%}
+      <div class="pdp__tabs">
+        <div class="pdp__tabs-nav">
+          <button class="pdp__tab-btn is-active" data-tab="assistant">
+            SHOPPING ASSISTANT <span class="pdp__tab-new">NEW</span>
+          </button>
+          <button class="pdp__tab-btn" data-tab="returns">RETURNS</button>
+          <button class="pdp__tab-btn" data-tab="promise">OUR PROMISE</button>
+        </div>
+
+        <div class="pdp__tab-panel is-active" data-panel="assistant">
+          <p class="pdp__tab-text">Have doubts about this product? Our experienced shopping assistants are here to help you with all your queries. Happy shopping!</p>
+          <div class="pdp__helpline">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="pdp__helpline-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.44 2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <div>
+              <p class="pdp__helpline-label">Helpline number</p>
+              <p class="pdp__helpline-hours">10 AM - 7 PM</p>
+            </div>
+            <span class="pdp__helpline-num">{{ section.settings.helpline_number | default: '9920705705' }}</span>
+          </div>
+          <a href="{{ section.settings.faq_url | default: '/pages/faq' }}" class="pdp__service-link" target="_blank">
+            Service FAQs ↗
+          </a>
+        </div>
+
+        <div class="pdp__tab-panel" data-panel="returns">
+          <p class="pdp__tab-text">{{ section.settings.returns_text | default: 'Easy 30-day returns & exchanges on all orders. No questions asked.' }}</p>
+        </div>
+
+        <div class="pdp__tab-panel" data-panel="promise">
+          <p class="pdp__tab-text">{{ section.settings.promise_text | default: '100% authentic products sourced directly from brands. Every product goes through a quality check before shipping.' }}</p>
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%}────────── RIGHT: Info ──────────{%- endcomment -%}
+    <div class="pdp__info">
+
+      <p class="pdp__vendor">{{ product.vendor | upcase }}</p>
+      <h1 class="pdp__title">{{ product.title }}</h1>
+
+      <div class="pdp__price-row">
+        <span class="pdp__price-label">MRP</span>
+        <span class="pdp__price" id="PdpPrice-{{ section.id }}">{{ current_variant.price | money }}</span>
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <span class="pdp__compare-price">{{ current_variant.compare_at_price | money }}</span>
+          <span class="pdp__discount-pct">
+            ({{ current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price }}% off)
+          </span>
+        {%- endif -%}
+      </div>
+      <p class="pdp__tax-note">Price inclusive of all taxes</p>
+
+      {%- comment -%} Promo code card {%- endcomment -%}
+      {%- if section.settings.promo_code != blank -%}
+        <div class="pdp__promo-card">
+          <div class="pdp__promo-code-wrap">
+            <p class="pdp__promo-code-label">Use Code</p>
+            <p class="pdp__promo-code">{{ section.settings.promo_code }}</p>
+          </div>
+          <div class="pdp__promo-detail">
+            <p class="pdp__promo-headline">{{ section.settings.promo_headline }}</p>
+            <p class="pdp__promo-sub">{{ section.settings.promo_sub }}</p>
+            {%- if section.settings.promo_link != blank -%}
+              <a href="{{ section.settings.promo_link }}" class="pdp__promo-link">view All Products ↗</a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Color selector {%- endcomment -%}
+      {%- assign color_option = product.options_by_name['Color'] | default: product.options_by_name['Colour'] -%}
+      {%- if color_option != blank -%}
+        <div class="pdp__option-group">
+          <p class="pdp__option-label">Select Color</p>
+          <div class="pdp__colors" id="PdpColors-{{ section.id }}">
+            {%- for variant in product.variants -%}
+              {%- assign color_val = variant.option1 -%}
+              {%- unless forloop.index > 1 and product.variants[forloop.index0 | minus: 1].option1 == color_val -%}
+                <label class="pdp__color-swatch" title="{{ color_val }}">
+                  <input type="radio" name="color" value="{{ color_val }}" class="pdp__color-radio"
+                    {% if variant == current_variant %}checked{% endif %}>
+                  <span
+                    class="pdp__color-dot"
+                    style="background:{{ color_val | downcase | replace: ' ', '' | replace: 'blanc-creme', '#f5f0e8' | replace: 'encre', '#1a2a4a' | replace: 'white', '#ffffff' | replace: 'black', '#111111' | replace: 'navy', '#1a2a4a' | replace: 'beige', '#e8dcc8' }}"
+                  ></span>
+                  <span class="pdp__color-name">{{ color_val }}</span>
+                </label>
+              {%- endunless -%}
+            {%- endfor -%}
+            {%- if product.variants.size > 4 -%}
+              <button class="pdp__more-colors">+{{ product.variants.size | minus: 4 }} More</button>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Size selector {%- endcomment -%}
+      {%- assign size_option = product.options_by_name['Size'] | default: product.options_by_name['size'] -%}
+      {%- if size_option != blank or product.options.size > 0 -%}
+        <div class="pdp__option-group">
+          <div class="pdp__size-header">
+            <p class="pdp__option-label">
+              Select Size
+              {%- if section.settings.show_size_unit -%}
+                <span class="pdp__size-unit">({{ section.settings.size_unit | default: 'UNI' }})</span>
+              {%- endif -%}
+            </p>
+            <a href="{{ section.settings.size_chart_url | default: '#' }}" class="pdp__size-chart">
+              <svg viewBox="0 0 16 16" fill="none" class="pdp__size-chart-icon"><rect x="1" y="4" width="14" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 4v3M7 4v2M10 4v3M13 4v2" stroke="currentColor" stroke-width="1.2"/></svg>
+              Size Chart
+            </a>
+          </div>
+
+          <div class="pdp__sizes" id="PdpSizes-{{ section.id }}">
+            {%- for variant in product.variants -%}
+              <label class="pdp__size-btn{% unless variant.available %} is-sold-out{% endunless %}{% if variant == current_variant %} is-selected{% endif %}">
+                <input
+                  type="radio"
+                  name="size"
+                  value="{{ variant.id }}"
+                  class="pdp__size-radio"
+                  data-variant-id="{{ variant.id }}"
+                  data-price="{{ variant.price | money }}"
+                  data-compare="{{ variant.compare_at_price | money }}"
+                  data-available="{{ variant.available }}"
+                  {% if variant == current_variant %}checked{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}
+                >
+                <span class="pdp__size-label">{{ variant.title | split: ' / ' | last }}</span>
+                {%- if variant.available -%}
+                  {%- assign qty = variant.inventory_quantity -%}
+                  {%- if qty > 0 and qty <= 10 -%}
+                    <span class="pdp__size-stock">{{ qty }} left</span>
+                  {%- endif -%}
+                {%- else -%}
+                  <span class="pdp__size-stock pdp__size-stock--out">Out</span>
+                {%- endif -%}
+              </label>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Delivery estimate {%- endcomment -%}
+      <div class="pdp__delivery-note" id="PdpDelivery-{{ section.id }}">
+        <svg viewBox="0 0 20 20" fill="none" class="pdp__delivery-icon"><path d="M10 2C6.686 2 4 4.686 4 8c0 5 6 10 6 10s6-5 6-10c0-3.314-2.686-6-6-6z" stroke="currentColor" stroke-width="1.2"/><circle cx="10" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span>Select your size to know your estimated delivery date.</span>
+      </div>
+
+      {%- comment -%} CTA buttons {%- endcomment -%}
+      <div class="pdp__ctas">
+        <button
+          class="pdp__add-to-cart"
+          id="PdpAddToCart-{{ section.id }}"
+          data-variant-id="{{ current_variant.id }}"
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="pdp__cart-icon"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          {%- if current_variant.available -%}ADD TO CART{%- else -%}SOLD OUT{%- endif -%}
+        </button>
+        <button class="pdp__wishlist" id="PdpWishlist-{{ section.id }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          WISHLIST
+        </button>
+      </div>
+
+      {%- comment -%} Product details table {%- endcomment -%}
+      <div class="pdp__details" id="PdpDetails-{{ section.id }}">
+        <h3 class="pdp__details-title">Product Details</h3>
+        <div class="pdp__details-grid">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'detail_row' -%}
+              <div class="pdp__detail-key" {{ block.shopify_attributes }}>{{ block.settings.key }}</div>
+              <div class="pdp__detail-val">{{ block.settings.value }}</div>
+            {%- endif -%}
+          {%- endfor -%}
+          {%- comment -%} Metafield-driven details {%- endcomment -%}
+          {%- if product.metafields.details.style_type != blank -%}
+            <div class="pdp__detail-key">Style Type</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.style_type }}</div>
+          {%- endif -%}
+          {%- if product.metafields.details.sleeve != blank -%}
+            <div class="pdp__detail-key">Sleeve</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.sleeve }}</div>
+          {%- endif -%}
+          {%- if product.metafields.details.length != blank -%}
+            <div class="pdp__detail-key">Length</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.length }}</div>
+          {%- endif -%}
+          {%- if product.metafields.details.package_contains != blank -%}
+            <div class="pdp__detail-key">Package Contains</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.package_contains }}</div>
+          {%- endif -%}
+          {%- if product.metafields.details.transparency != blank -%}
+            <div class="pdp__detail-key">Transparency</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.transparency }}</div>
+          {%- endif -%}
+          {%- if product.metafields.details.wash_care != blank -%}
+            <div class="pdp__detail-key">Wash Care</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.wash_care }}</div>
+          {%- endif -%}
+          {%- if product.metafields.details.primary_color != blank -%}
+            <div class="pdp__detail-key">Primary Color</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.primary_color }}</div>
+          {%- endif -%}
+          {%- if product.metafields.details.model_size != blank -%}
+            <div class="pdp__detail-key">Size worn by Model</div>
+            <div class="pdp__detail-val">{{ product.metafields.details.model_size }}</div>
+          {%- endif -%}
+        </div>
+        <button class="pdp__more-details" id="PdpMoreDetails-{{ section.id }}">+ MORE DETAILS</button>
+      </div>
+
+    </div>
+  </div>
+
+  {%- comment -%}──────── Shop More / Similar ────────{%- endcomment -%}
+
+  {%- if section.settings.show_shop_more -%}
+    <div class="pdp__shop-more">
+      <p class="pdp__shop-more-label">Shop More {{ product.type }}</p>
+      <div class="pdp__shop-more-pills">
+        <a href="{{ product.type | handleize | prepend: '/collections/' }}" class="pdp__shop-pill">
+          All {{ product.type }} ›
+        </a>
+        {%- for tag in product.tags -%}
+          {%- if tag contains 'Style:' -%}
+            <a href="/collections/all?filter.p.tag={{ tag | url_encode }}" class="pdp__shop-pill">{{ tag }} ›</a>
+          {%- endif -%}
+        {%- endfor -%}
+        <a href="/collections/all?filter.p.vendor={{ product.vendor | url_encode }}" class="pdp__shop-pill">
+          Brand : {{ product.vendor }} ›
+        </a>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.similar_collection != blank -%}
+    {%- assign sim_col = collections[section.settings.similar_collection] -%}
+    <div class="pdp__similar">
+      <h2 class="pdp__similar-title">{{ section.settings.similar_title | default: 'Similar Styles' }}</h2>
+      <div class="pdp__similar-wrap">
+        <button class="pdp__similar-arrow pdp__similar-arrow--prev">&#8249;</button>
+        <div class="pdp__similar-track" id="PdpSimilarTrack-{{ section.id }}">
+          {%- for sim in sim_col.products limit: 8 -%}
+            {%- unless sim.id == product.id -%}
+              <div class="prod-card prod-card--sim">
+                <div class="prod-card__img-wrap">
+                  {%- if sim.featured_image -%}
+                    <img src="{{ sim.featured_image | image_url: width: 500 }}" alt="{{ sim.title | escape }}" class="prod-card__img" loading="lazy">
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'prod-card__placeholder' }}
+                  {%- endif -%}
+                  {%- if sim.tags contains 'BESTSELLER' -%}
+                    <span class="prod-card__badge prod-card__badge--bestseller">BESTSELLER</span>
+                  {%- elsif sim.tags contains 'EXCLUSIVE' -%}
+                    <span class="prod-card__badge prod-card__badge--exclusive">EXCLUSIVE</span>
+                  {%- endif -%}
+                </div>
+                <div class="prod-card__info">
+                  <p class="prod-card__brand">{{ sim.vendor | upcase }}</p>
+                  <a href="{{ sim.url }}" class="prod-card__name">{{ sim.title }}</a>
+                  <div class="prod-card__pricing">
+                    {%- if sim.compare_at_price > sim.price -%}
+                      <span class="prod-card__price">{{ sim.price | money }}</span>
+                      <span class="prod-card__compare">{{ sim.compare_at_price | money }}</span>
+                      <span class="prod-card__discount">({{ sim.compare_at_price | minus: sim.price | times: 100 | divided_by: sim.compare_at_price }}% off)</span>
+                    {%- else -%}
+                      <span class="prod-card__price">{{ sim.price | money }}</span>
+                    {%- endif -%}
+                  </div>
+                </div>
+              </div>
+            {%- endunless -%}
+          {%- endfor -%}
+        </div>
+        <button class="pdp__similar-arrow pdp__similar-arrow--next">&#8250;</button>
+      </div>
+    </div>
+  {%- endif -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "Product Page",
+  "tag": "section",
+  "class": "section-product-page",
+  "settings": [
+    { "type": "text",     "id": "helpline_number", "label": "Helpline number",        "default": "9920705705" },
+    { "type": "url",      "id": "faq_url",         "label": "Service FAQ link" },
+    { "type": "textarea", "id": "returns_text",    "label": "Returns tab text",       "default": "Easy 30-day returns & exchanges on all orders. No questions asked." },
+    { "type": "textarea", "id": "promise_text",    "label": "Our Promise tab text",   "default": "100% authentic products sourced directly from brands. Every product goes through a quality check before shipping." },
+    { "type": "text",     "id": "promo_code",      "label": "Promo code",             "default": "NEWPREMIUM" },
+    { "type": "text",     "id": "promo_headline",  "label": "Promo headline",         "default": "Get it for ₹27999" },
+    { "type": "text",     "id": "promo_sub",       "label": "Promo sub-text",         "default": "Get 20% off on premium brands on your first purchase" },
+    { "type": "url",      "id": "promo_link",      "label": "Promo 'view all' link" },
+    { "type": "checkbox", "id": "show_size_unit",  "label": "Show size unit",         "default": true },
+    { "type": "text",     "id": "size_unit",       "label": "Size unit label",        "default": "UNI" },
+    { "type": "url",      "id": "size_chart_url",  "label": "Size chart link" },
+    { "type": "checkbox", "id": "show_shop_more",  "label": "Show Shop More section", "default": true },
+    { "type": "collection","id": "similar_collection","label": "Similar styles collection" },
+    { "type": "text",     "id": "similar_title",   "label": "Similar styles heading", "default": "Similar Styles" }
+  ],
+  "blocks": [
+    {
+      "type": "detail_row",
+      "name": "Product Detail Row",
+      "settings": [
+        { "type": "text", "id": "key",   "label": "Label", "default": "Style Type" },
+        { "type": "text", "id": "value", "label": "Value", "default": "Polo" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Page",
+      "blocks": [
+        { "type": "detail_row", "settings": { "key": "Style Type",        "value": "Polo" } },
+        { "type": "detail_row", "settings": { "key": "Sleeve",            "value": "Short" } },
+        { "type": "detail_row", "settings": { "key": "Length",            "value": "Medium" } },
+        { "type": "detail_row", "settings": { "key": "Package Contains",  "value": "1 T-shirt" } },
+        { "type": "detail_row", "settings": { "key": "Transparency",      "value": "Opaque" } },
+        { "type": "detail_row", "settings": { "key": "Wash Care",         "value": "Machine wash" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

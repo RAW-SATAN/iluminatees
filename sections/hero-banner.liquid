@@ -1,0 +1,96 @@
+<div class="hero-banner">
+
+  {%- if section.settings.announcement_text != blank -%}
+    <div class="hero-banner__strip">
+      <span class="hero-banner__strip-text">✦ {{ section.settings.announcement_text }}</span>
+      {%- if section.settings.announcement_link_label != blank -%}
+        <a href="{{ section.settings.announcement_link }}" class="hero-banner__strip-cta">
+          {{ section.settings.announcement_link_label }} →
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="hero-banner__panels">
+    {%- for block in section.blocks -%}
+      <div class="hero-banner__panel" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 1200 }}"
+            alt="{{ block.settings.image.alt | escape }}"
+            class="hero-banner__panel-img"
+            loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+            width="{{ block.settings.image.width }}"
+            height="{{ block.settings.image.height }}"
+          >
+        {%- else -%}
+          <div class="hero-banner__panel-placeholder">{{ 'image' | placeholder_svg_tag }}</div>
+        {%- endif -%}
+
+        <div class="hero-banner__panel-overlay"></div>
+
+        <div class="hero-banner__panel-content">
+          <div class="hero-banner__panel-tag">{{ block.settings.tag }}</div>
+          <div class="hero-banner__panel-divider"></div>
+          <div class="hero-banner__panel-sub">{{ block.settings.sub }}</div>
+        </div>
+
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="hero-banner__panel-link" aria-label="{{ block.settings.tag }}"></a>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+
+    <button class="hero-banner__arrow" aria-label="Next">&#8250;</button>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "tag": "section",
+  "class": "section-hero-banner",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Announcement text",
+      "default": "DROP ALERT: EXPLORE NEW PICKS FOR HIM"
+    },
+    {
+      "type": "text",
+      "id": "announcement_link_label",
+      "label": "Announcement CTA label",
+      "default": "SHOP THE EDIT"
+    },
+    {
+      "type": "url",
+      "id": "announcement_link",
+      "label": "Announcement CTA link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "panel",
+      "name": "Panel",
+      "settings": [
+        { "type": "image_picker", "id": "image",  "label": "Image" },
+        { "type": "text",         "id": "tag",    "label": "Tag line",  "default": "POLO ESSENTIALS" },
+        { "type": "text",         "id": "sub",    "label": "Sub label", "default": "EXPLORE FITS" },
+        { "type": "url",          "id": "link",   "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner",
+      "blocks": [
+        { "type": "panel", "settings": { "tag": "POLO ESSENTIALS", "sub": "EXPLORE FITS" } },
+        { "type": "panel", "settings": { "tag": "BAGS IN FOCUS",   "sub": "DISCOVER STYLES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
