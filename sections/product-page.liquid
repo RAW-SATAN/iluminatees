@@ -8,12 +8,12 @@
   {%- comment -%} Breadcrumb {%- endcomment -%}
   <nav class="breadcrumb" aria-label="breadcrumb">
     <a href="/" class="breadcrumb__link">Home</a>
-    {%- for collection in product.collections limit: 3 -%}
+    {%- for collection in product.collections limit: 2 -%}
       <span class="breadcrumb__sep">/</span>
       <a href="{{ collection.url }}" class="breadcrumb__link">{{ collection.title }}</a>
     {%- endfor -%}
     <span class="breadcrumb__sep">/</span>
-    <span class="breadcrumb__current">{{ product.title }}</span>
+    <span class="breadcrumb__current">{{ product.title | truncate: 40 }}</span>
   </nav>
 
   <div class="pdp__layout">
@@ -21,12 +21,36 @@
     {%- comment -%}────────── LEFT: Images ──────────{%- endcomment -%}
     <div class="pdp__gallery">
 
-      {%- comment -%} Thumb + Main image row {%- endcomment -%}
-      <div class="pdp__gallery-top">
+      {%- comment -%} Main image {%- endcomment -%}
+      <div class="pdp__main-img-wrap pdp__main-img-wrap--zoom" id="PdpMainImgWrap-{{ section.id }}">
+        {%- if product.tags contains 'BESTSELLER' or product.tags contains 'bestseller' -%}
+          <span class="pdp__badge pdp__badge--bestseller">BESTSELLER</span>
+        {%- endif -%}
+        <button class="pdp__share-btn" aria-label="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <div class="pdp__main-imgs" id="PdpMainImgs-{{ section.id }}">
+          {%- for image in product_images -%}
+            <div class="pdp__main-img-slide{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}">
+              <img
+                src="{{ image | image_url: width: 900 }}"
+                alt="{{ image.alt | default: product.title | escape }}"
+                class="pdp__main-img"
+                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                width="{{ image.width }}" height="{{ image.height }}"
+              >
+            </div>
+          {%- else -%}
+            <div class="pdp__main-img-slide is-active">
+              {{ 'product-1' | placeholder_svg_tag: 'pdp__main-img-placeholder' }}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
 
-        {%- comment -%} Thumbnail strip {%- endcomment -%}
+      {%- comment -%} Thumbnails — horizontal row below main image {%- endcomment -%}
+      {%- if product_images.size > 1 -%}
         <div class="pdp__thumbs" id="PdpThumbs-{{ section.id }}">
-          <button class="pdp__thumbs-arrow pdp__thumbs-arrow--up" aria-label="Scroll up">&#8963;</button>
           <div class="pdp__thumbs-track">
             {%- for image in product_images -%}
               <button
@@ -37,91 +61,15 @@
                 <img
                   src="{{ image | image_url: width: 120 }}"
                   alt="{{ image.alt | default: product.title | escape }}"
-                  width="80" height="100"
                   loading="lazy"
                 >
               </button>
-            {%- else -%}
-              {{ 'product-1' | placeholder_svg_tag: 'pdp__thumb-placeholder' }}
-            {%- endfor -%}
-          </div>
-          <button class="pdp__thumbs-arrow pdp__thumbs-arrow--down" aria-label="Scroll down">&#8964;</button>
-        </div>
-
-        {%- comment -%} Main image with zoom {%- endcomment -%}
-        <div class="pdp__main-img-wrap pdp__main-img-wrap--zoom" id="PdpMainImgWrap-{{ section.id }}">
-          {%- if product.tags contains 'BESTSELLER' or product.tags contains 'bestseller' -%}
-            <span class="pdp__badge pdp__badge--bestseller">BESTSELLER</span>
-          {%- endif -%}
-          <button class="pdp__share-btn" aria-label="Share">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          </button>
-
-          <div class="pdp__main-imgs" id="PdpMainImgs-{{ section.id }}">
-            {%- for image in product_images -%}
-              <div class="pdp__main-img-slide{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}">
-                <img
-                  src="{{ image | image_url: width: 900 }}"
-                  alt="{{ image.alt | default: product.title | escape }}"
-                  class="pdp__main-img"
-                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                  width="{{ image.width }}"
-                  height="{{ image.height }}"
-                >
-              </div>
-            {%- else -%}
-              <div class="pdp__main-img-slide is-active">
-                {{ 'product-1' | placeholder_svg_tag: 'pdp__main-img-placeholder' }}
-              </div>
             {%- endfor -%}
           </div>
         </div>
+      {%- endif -%}
 
-      </div>{%- comment -%} /pdp__gallery-top {%- endcomment -%}
-
-      {%- comment -%} Tabs: Description / Shopping Assistant / Returns / Our Promise {%- endcomment -%}
-      <div class="pdp__tabs">
-        <div class="pdp__tabs-nav">
-          <button class="pdp__tab-btn is-active" data-tab="description">DESCRIPTION</button>
-          <button class="pdp__tab-btn" data-tab="assistant">
-            SHOPPING ASSISTANT <span class="pdp__tab-new">NEW</span>
-          </button>
-          <button class="pdp__tab-btn" data-tab="returns">RETURNS</button>
-          <button class="pdp__tab-btn" data-tab="promise">OUR PROMISE</button>
-        </div>
-
-        <div class="pdp__tab-panel is-active" data-panel="description">
-          {%- if product.description != blank -%}
-            <div class="pdp__tab-text">{{ product.description }}</div>
-          {%- else -%}
-            <p class="pdp__tab-text">{{ section.settings.default_description | default: 'Premium quality product crafted with attention to detail. Perfect for everyday wear and special occasions.' }}</p>
-          {%- endif -%}
-        </div>
-
-        <div class="pdp__tab-panel" data-panel="assistant">
-          <p class="pdp__tab-text">Have doubts about this product? Our experienced shopping assistants are here to help you with all your queries. Happy shopping!</p>
-          <div class="pdp__helpline">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="pdp__helpline-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.44 2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            <div>
-              <p class="pdp__helpline-label">Helpline number</p>
-              <p class="pdp__helpline-hours">10 AM - 7 PM</p>
-            </div>
-            <span class="pdp__helpline-num">{{ section.settings.helpline_number | default: '9920705705' }}</span>
-          </div>
-          <a href="{{ section.settings.faq_url | default: '/pages/faq' }}" class="pdp__service-link" target="_blank">
-            Service FAQs ↗
-          </a>
-        </div>
-
-        <div class="pdp__tab-panel" data-panel="returns">
-          <p class="pdp__tab-text">{{ section.settings.returns_text | default: 'Easy 30-day returns & exchanges on all orders. No questions asked.' }}</p>
-        </div>
-
-        <div class="pdp__tab-panel" data-panel="promise">
-          <p class="pdp__tab-text">{{ section.settings.promise_text | default: '100% authentic products sourced directly from brands. Every product goes through a quality check before shipping.' }}</p>
-        </div>
-      </div>
-    </div>
+    </div>{%- comment -%} /pdp__gallery {%- endcomment -%}
 
     {%- comment -%}────────── RIGHT: Info ──────────{%- endcomment -%}
     <div class="pdp__info">
@@ -141,7 +89,7 @@
       </div>
       <p class="pdp__tax-note">Price inclusive of all taxes</p>
 
-      {%- comment -%} Countdown timer {%- endcomment -%}
+      {%- comment -%} Countdown {%- endcomment -%}
       <div class="pdp__countdown" id="PdpCountdown-{{ section.id }}">
         <svg viewBox="0 0 20 20" fill="none" class="pdp__countdown-icon"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <span class="pdp__countdown-label">{{ section.settings.countdown_label | default: 'Deal ends in' }}:</span>
@@ -179,24 +127,19 @@
                 <label class="pdp__color-swatch" title="{{ color_val }}">
                   <input type="radio" name="color" value="{{ color_val }}" class="pdp__color-radio"
                     {% if variant == current_variant %}checked{% endif %}>
-                  <span
-                    class="pdp__color-dot"
-                    style="background:{{ color_val | downcase | replace: ' ', '' | replace: 'blanc-creme', '#f5f0e8' | replace: 'encre', '#1a2a4a' | replace: 'white', '#ffffff' | replace: 'black', '#111111' | replace: 'navy', '#1a2a4a' | replace: 'beige', '#e8dcc8' }}"
-                  ></span>
+                  <span class="pdp__color-dot"
+                    style="background:{{ color_val | downcase | replace: ' ', '' | replace: 'white', '#ffffff' | replace: 'black', '#111111' | replace: 'navy', '#1a2a4a' | replace: 'beige', '#e8dcc8' | replace: 'red', '#e31837' | replace: 'green', '#003d35' }}">
+                  </span>
                   <span class="pdp__color-name">{{ color_val }}</span>
                 </label>
               {%- endunless -%}
             {%- endfor -%}
-            {%- if product.variants.size > 4 -%}
-              <button class="pdp__more-colors">+{{ product.variants.size | minus: 4 }} More</button>
-            {%- endif -%}
           </div>
         </div>
       {%- endif -%}
 
       {%- comment -%} Size selector {%- endcomment -%}
-      {%- assign size_option = product.options_by_name['Size'] | default: product.options_by_name['size'] -%}
-      {%- if size_option != blank or product.options.size > 0 -%}
+      {%- if product.options.size > 0 -%}
         <div class="pdp__option-group">
           <div class="pdp__size-header">
             <p class="pdp__option-label">
@@ -210,15 +153,10 @@
               Size Chart
             </a>
           </div>
-
           <div class="pdp__sizes" id="PdpSizes-{{ section.id }}">
             {%- for variant in product.variants -%}
               <label class="pdp__size-btn{% unless variant.available %} is-sold-out{% endunless %}{% if variant == current_variant %} is-selected{% endif %}">
-                <input
-                  type="radio"
-                  name="size"
-                  value="{{ variant.id }}"
-                  class="pdp__size-radio"
+                <input type="radio" name="size" value="{{ variant.id }}" class="pdp__size-radio"
                   data-variant-id="{{ variant.id }}"
                   data-price="{{ variant.price | money }}"
                   data-compare="{{ variant.compare_at_price | money }}"
@@ -241,20 +179,17 @@
         </div>
       {%- endif -%}
 
-      {%- comment -%} Delivery estimate {%- endcomment -%}
-      <div class="pdp__delivery-note" id="PdpDelivery-{{ section.id }}">
+      {%- comment -%} Delivery note {%- endcomment -%}
+      <div class="pdp__delivery-note">
         <svg viewBox="0 0 20 20" fill="none" class="pdp__delivery-icon"><path d="M10 2C6.686 2 4 4.686 4 8c0 5 6 10 6 10s6-5 6-10c0-3.314-2.686-6-6-6z" stroke="currentColor" stroke-width="1.2"/><circle cx="10" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
         <span>Select your size to know your estimated delivery date.</span>
       </div>
 
       {%- comment -%} CTA buttons {%- endcomment -%}
       <div class="pdp__ctas">
-        <button
-          class="pdp__add-to-cart"
-          id="PdpAddToCart-{{ section.id }}"
+        <button class="pdp__add-to-cart" id="PdpAddToCart-{{ section.id }}"
           data-variant-id="{{ current_variant.id }}"
-          {% unless current_variant.available %}disabled{% endunless %}
-        >
+          {% unless current_variant.available %}disabled{% endunless %}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="pdp__cart-icon"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
           {%- if current_variant.available -%}ADD TO CART{%- else -%}SOLD OUT{%- endif -%}
         </button>
@@ -263,19 +198,15 @@
           WISHLIST
         </button>
       </div>
-      <button
-        class="pdp__buy-now"
-        id="PdpBuyNow-{{ section.id }}"
+      <button class="pdp__buy-now" id="PdpBuyNow-{{ section.id }}"
         data-variant-id="{{ current_variant.id }}"
-        {% unless current_variant.available %}disabled{% endunless %}
-      >
+        {% unless current_variant.available %}disabled{% endunless %}>
         ⚡ BUY NOW
       </button>
 
       {%- comment -%} Frequently Bought Together {%- endcomment -%}
       {%- if section.settings.fbt_collection != blank -%}
         {%- assign fbt_col = collections[section.settings.fbt_collection] -%}
-        {%- assign fbt_products = fbt_col.products | where: 'id', product.id | map: 'id' -%}
         <div class="pdp__fbt">
           <h3 class="pdp__fbt-title">Frequently Bought Together</h3>
           <div class="pdp__fbt-items">
@@ -286,7 +217,7 @@
                 {{ 'product-1' | placeholder_svg_tag: 'pdp__fbt-img' }}
               {%- endif -%}
               <span class="pdp__fbt-check">✓</span>
-              <p class="pdp__fbt-name">{{ product.title | truncate: 30 }}</p>
+              <p class="pdp__fbt-name">{{ product.title | truncate: 28 }}</p>
               <p class="pdp__fbt-price">{{ current_variant.price | money }}</p>
             </div>
             {%- assign fbt_shown = 0 -%}
@@ -300,7 +231,7 @@
                     {{ 'product-2' | placeholder_svg_tag: 'pdp__fbt-img' }}
                   {%- endif -%}
                   <span class="pdp__fbt-check">✓</span>
-                  <p class="pdp__fbt-name">{{ rel.title | truncate: 30 }}</p>
+                  <p class="pdp__fbt-name">{{ rel.title | truncate: 28 }}</p>
                   <p class="pdp__fbt-price">{{ rel.price | money }}</p>
                 </div>
                 {%- assign fbt_shown = fbt_shown | plus: 1 -%}
@@ -308,7 +239,7 @@
             {%- endfor -%}
           </div>
           <div class="pdp__fbt-footer">
-            <p class="pdp__fbt-total-label">Bundle Price: <strong id="PdpFbtTotal-{{ section.id }}" data-base="{{ current_variant.price }}">{{ current_variant.price | money }}</strong></p>
+            <p class="pdp__fbt-total-label">Bundle Price: <strong>{{ current_variant.price | money }}</strong></p>
             <button class="pdp__fbt-btn">Add All to Cart</button>
           </div>
         </div>
@@ -330,12 +261,6 @@
           {%- if product.metafields.details.sleeve != blank -%}
             <div class="pdp__detail-key">Sleeve</div><div class="pdp__detail-val">{{ product.metafields.details.sleeve }}</div>
           {%- endif -%}
-          {%- if product.metafields.details.length != blank -%}
-            <div class="pdp__detail-key">Length</div><div class="pdp__detail-val">{{ product.metafields.details.length }}</div>
-          {%- endif -%}
-          {%- if product.metafields.details.package_contains != blank -%}
-            <div class="pdp__detail-key">Package Contains</div><div class="pdp__detail-val">{{ product.metafields.details.package_contains }}</div>
-          {%- endif -%}
           {%- if product.metafields.details.wash_care != blank -%}
             <div class="pdp__detail-key">Wash Care</div><div class="pdp__detail-val">{{ product.metafields.details.wash_care }}</div>
           {%- endif -%}
@@ -343,6 +268,47 @@
         <button class="pdp__more-details" id="PdpMoreDetails-{{ section.id }}">+ MORE DETAILS</button>
       </div>
 
+    </div>{%- comment -%} /pdp__info {%- endcomment -%}
+  </div>{%- comment -%} /pdp__layout {%- endcomment -%}
+
+  {%- comment -%}──── Tabs: full width below buybox ────{%- endcomment -%}
+  <div class="pdp__tabs-section">
+    <div class="pdp__tabs">
+      <div class="pdp__tabs-nav">
+        <button class="pdp__tab-btn is-active" data-tab="description">DESCRIPTION</button>
+        <button class="pdp__tab-btn" data-tab="assistant">SHOPPING ASSISTANT <span class="pdp__tab-new">NEW</span></button>
+        <button class="pdp__tab-btn" data-tab="returns">RETURNS</button>
+        <button class="pdp__tab-btn" data-tab="promise">OUR PROMISE</button>
+      </div>
+
+      <div class="pdp__tab-panel is-active" data-panel="description">
+        {%- if product.description != blank -%}
+          <div class="pdp__tab-text pdp__description">{{ product.description }}</div>
+        {%- else -%}
+          <p class="pdp__tab-text">{{ section.settings.default_description | default: 'Premium quality product crafted with attention to detail. Perfect for everyday wear and special occasions.' }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="pdp__tab-panel" data-panel="assistant">
+        <p class="pdp__tab-text">Have doubts about this product? Our experienced shopping assistants are here to help you with all your queries. Happy shopping!</p>
+        <div class="pdp__helpline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="pdp__helpline-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.44 2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <div>
+            <p class="pdp__helpline-label">Helpline number</p>
+            <p class="pdp__helpline-hours">10 AM - 7 PM</p>
+          </div>
+          <span class="pdp__helpline-num">{{ section.settings.helpline_number | default: '9920705705' }}</span>
+        </div>
+        <a href="{{ section.settings.faq_url | default: '/pages/faq' }}" class="pdp__service-link" target="_blank">Service FAQs ↗</a>
+      </div>
+
+      <div class="pdp__tab-panel" data-panel="returns">
+        <p class="pdp__tab-text">{{ section.settings.returns_text | default: 'Easy 30-day returns & exchanges on all orders. No questions asked.' }}</p>
+      </div>
+
+      <div class="pdp__tab-panel" data-panel="promise">
+        <p class="pdp__tab-text">{{ section.settings.promise_text | default: '100% authentic products sourced directly from brands. Every product goes through a quality check before shipping.' }}</p>
+      </div>
     </div>
   </div>
 
@@ -380,8 +346,6 @@
                   {%- endif -%}
                   {%- if sim.tags contains 'BESTSELLER' -%}
                     <span class="prod-card__badge prod-card__badge--bestseller">BESTSELLER</span>
-                  {%- elsif sim.tags contains 'EXCLUSIVE' -%}
-                    <span class="prod-card__badge prod-card__badge--exclusive">EXCLUSIVE</span>
                   {%- endif -%}
                 </div>
                 <div class="prod-card__info">
@@ -408,7 +372,7 @@
 
 </div>
 
-{%- comment -%} ── Social Proof Popup ── {%- endcomment -%}
+{%- comment -%} Social Proof Popup {%- endcomment -%}
 <div class="sp-popup" id="SpPopup" aria-hidden="true">
   <div class="sp-popup__avatar" id="SpPopupAvatar">R</div>
   <div class="sp-popup__text">
@@ -418,7 +382,7 @@
   <button class="sp-popup__close" id="SpPopupClose" aria-label="Close">✕</button>
 </div>
 
-{%- comment -%} ── Exit Intent Popup ── {%- endcomment -%}
+{%- comment -%} Exit Intent Popup {%- endcomment -%}
 <div class="exit-popup" id="ExitPopup" aria-hidden="true">
   <div class="exit-popup__overlay" id="ExitPopupOverlay"></div>
   <div class="exit-popup__box">
@@ -450,7 +414,6 @@
     { "type": "text",       "id": "promo_sub",          "label": "Promo sub-text",            "default": "Get 20% off on premium brands on your first purchase" },
     { "type": "url",        "id": "promo_link",         "label": "Promo 'view all' link" },
     { "type": "text",       "id": "countdown_label",    "label": "Countdown label",           "default": "Deal ends in" },
-    { "type": "number",     "id": "countdown_hours",    "label": "Countdown hours",           "default": 2 },
     { "type": "checkbox",   "id": "show_size_unit",     "label": "Show size unit",            "default": true },
     { "type": "text",       "id": "size_unit",          "label": "Size unit label",           "default": "UNI" },
     { "type": "url",        "id": "size_chart_url",     "label": "Size chart link" },
