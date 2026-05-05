@@ -146,7 +146,8 @@
           <div class="pdp__colors" id="PdpColors-{{ section.id }}">
             {%- for variant in product.variants -%}
               {%- assign color_val = variant.option1 -%}
-              {%- unless forloop.index > 1 and product.variants[forloop.index0 | minus: 1].option1 == color_val -%}
+              {%- assign prev_idx = forloop.index0 | minus: 1 -%}
+              {%- unless forloop.index > 1 and product.variants[prev_idx].option1 == color_val -%}
                 <label class="pdp__color-swatch" title="{{ color_val }}">
                   <input type="radio" name="color" value="{{ color_val }}" class="pdp__color-radio"
                     {% if variant == current_variant %}checked{% endif %}>
