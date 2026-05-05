@@ -1061,6 +1061,16 @@ body { font-family: var(--font-body); color: var(--text); background: var(--bg);
 .pdp__wishlist svg { width: 18px; height: 18px; }
 .pdp__wishlist:hover { background: #f7f7f7; }
 
+/* buy now */
+.pdp__buy-now {
+  width: 100%; padding: 15px; margin-bottom: 20px;
+  background: #003d35; color: #fff; border: none; border-radius: 2px;
+  font-size: 13px; font-weight: 700; letter-spacing: .14em;
+  cursor: pointer; transition: background var(--trans);
+}
+.pdp__buy-now:hover   { background: #002b25; }
+.pdp__buy-now:disabled{ opacity: .4; cursor: not-allowed; }
+
 /* product details table */
 .pdp__details { border-top: 1px solid #eee; padding-top: 20px; }
 .pdp__details-title { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 16px; }

@@ -79,17 +79,26 @@
 
       </div>{%- comment -%} /pdp__gallery-top {%- endcomment -%}
 
-      {%- comment -%} Tabs: Shopping Assistant / Returns / Our Promise {%- endcomment -%}
+      {%- comment -%} Tabs: Description / Shopping Assistant / Returns / Our Promise {%- endcomment -%}
       <div class="pdp__tabs">
         <div class="pdp__tabs-nav">
-          <button class="pdp__tab-btn is-active" data-tab="assistant">
+          <button class="pdp__tab-btn is-active" data-tab="description">DESCRIPTION</button>
+          <button class="pdp__tab-btn" data-tab="assistant">
             SHOPPING ASSISTANT <span class="pdp__tab-new">NEW</span>
           </button>
           <button class="pdp__tab-btn" data-tab="returns">RETURNS</button>
           <button class="pdp__tab-btn" data-tab="promise">OUR PROMISE</button>
         </div>
 
-        <div class="pdp__tab-panel is-active" data-panel="assistant">
+        <div class="pdp__tab-panel is-active" data-panel="description">
+          {%- if product.description != blank -%}
+            <div class="pdp__tab-text">{{ product.description }}</div>
+          {%- else -%}
+            <p class="pdp__tab-text">{{ section.settings.default_description | default: 'Premium quality product crafted with attention to detail. Perfect for everyday wear and special occasions.' }}</p>
+          {%- endif -%}
+        </div>
+
+        <div class="pdp__tab-panel" data-panel="assistant">
           <p class="pdp__tab-text">Have doubts about this product? Our experienced shopping assistants are here to help you with all your queries. Happy shopping!</p>
           <div class="pdp__helpline">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="pdp__helpline-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.44 2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -254,6 +263,14 @@
           WISHLIST
         </button>
       </div>
+      <button
+        class="pdp__buy-now"
+        id="PdpBuyNow-{{ section.id }}"
+        data-variant-id="{{ current_variant.id }}"
+        {% unless current_variant.available %}disabled{% endunless %}
+      >
+        ⚡ BUY NOW
+      </button>
 
       {%- comment -%} Frequently Bought Together {%- endcomment -%}
       {%- if section.settings.fbt_collection != blank -%}
@@ -423,6 +440,7 @@
   "tag": "section",
   "class": "section-product-page",
   "settings": [
+    { "type": "textarea",   "id": "default_description","label": "Default description (if product has none)", "default": "Premium quality product crafted with attention to detail." },
     { "type": "text",       "id": "helpline_number",   "label": "Helpline number",           "default": "9920705705" },
     { "type": "url",        "id": "faq_url",            "label": "Service FAQ link" },
     { "type": "textarea",   "id": "returns_text",       "label": "Returns tab text",          "default": "Easy 30-day returns & exchanges on all orders. No questions asked." },

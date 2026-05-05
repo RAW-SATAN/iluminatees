@@ -221,6 +221,7 @@
     var sid      = sizesEl.id.replace('PdpSizes-', '');
     var priceEl  = document.getElementById('PdpPrice-' + sid);
     var atcBtn   = document.getElementById('PdpAddToCart-' + sid);
+    var bnBtn    = document.getElementById('PdpBuyNow-' + sid);
     var radios   = sizesEl.querySelectorAll('.pdp__size-radio');
 
     radios.forEach(function (radio) {
@@ -228,11 +229,16 @@
         sizesEl.querySelectorAll('.pdp__size-btn').forEach(function (b) { b.classList.remove('is-selected'); });
         radio.closest('.pdp__size-btn').classList.add('is-selected');
         if (priceEl && radio.dataset.price) priceEl.textContent = radio.dataset.price;
+        var avail = radio.dataset.available === 'true';
         if (atcBtn) {
-          var avail = radio.dataset.available === 'true';
           atcBtn.disabled = !avail;
           atcBtn.textContent = avail ? 'ADD TO CART' : 'SOLD OUT';
           atcBtn.dataset.variantId = radio.dataset.variantId;
+        }
+        if (bnBtn) {
+          bnBtn.disabled = !avail;
+          bnBtn.textContent = avail ? '⚡ BUY NOW' : 'SOLD OUT';
+          bnBtn.dataset.variantId = radio.dataset.variantId;
         }
       });
     });
@@ -301,6 +307,26 @@
     });
   });
 
+
+  /* ── Buy Now ────────────────────────────────────────────── */
+  document.querySelectorAll('[id^="PdpBuyNow-"]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var variantId = btn.dataset.variantId;
+      if (!variantId) return;
+      btn.textContent = 'REDIRECTING...';
+      btn.disabled = true;
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: variantId, quantity: 1 })
+      })
+      .then(function () { window.location.href = '/checkout'; })
+      .catch(function () {
+        btn.textContent = '⚡ BUY NOW';
+        btn.disabled = false;
+      });
+    });
+  });
 
   /* ── Image zoom on hover ────────────────────────────────── */
   document.querySelectorAll('.pdp__main-img-wrap--zoom').forEach(function (wrap) {
