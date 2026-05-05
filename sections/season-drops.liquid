@@ -11,7 +11,7 @@
 
     <div class="season-drops__track" id="SeasonDropsTrack-{{ section.id }}">
       {%- for block in section.blocks -%}
-        <div class="season-drops__card" {{ block.shopify_attributes }}>
+        <div class="season-drops__card" {{ block.shopify_attributes }} style="aspect-ratio:{{ section.settings.image_ratio | default: '3/4' }}">
           {%- if block.settings.image != blank -%}
             <img
               src="{{ block.settings.image | image_url: width: 600 }}"
@@ -41,13 +41,16 @@
   "tag": "section",
   "class": "section-season-drops",
   "settings": [
-    {
-      "type": "text", "id": "eyebrow",
-      "label": "Eyebrow text", "default": "JUST IN FOR SUMMER"
-    },
-    {
-      "type": "text", "id": "title",
-      "label": "Heading", "default": "SPRING–SUMMER '26 DROPS"
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "JUST IN FOR SUMMER" },
+    { "type": "text", "id": "title",   "label": "Heading",      "default": "SPRING–SUMMER '26 DROPS" },
+    { "type": "select", "id": "image_ratio", "label": "Card image aspect ratio",
+      "options": [
+        { "value": "1/1",  "label": "Square (1:1)" },
+        { "value": "3/4",  "label": "Portrait (3:4) — recommended" },
+        { "value": "4/5",  "label": "Portrait (4:5)" },
+        { "value": "4/3",  "label": "Landscape (4:3)" }
+      ],
+      "default": "3/4"
     }
   ],
   "blocks": [

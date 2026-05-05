@@ -151,7 +151,7 @@
       <div class="col-page__grid" id="ColProductGrid" data-cols="3">
         {%- for product in collection.products -%}
           <div class="prod-card">
-            <div class="prod-card__img-wrap">
+            <div class="prod-card__img-wrap" style="aspect-ratio:{{ section.settings.image_ratio | default: '3/4' }}">
               {%- if product.featured_image != blank -%}
                 <img
                   src="{{ product.featured_image | image_url: width: 600 }}"
@@ -220,8 +220,18 @@
   "class": "section-collection-page",
   "settings": [
     { "type": "range",    "id": "products_per_page", "label": "Products per page", "min": 12, "max": 48, "step": 4, "default": 24 },
-    { "type": "checkbox", "id": "show_filter_count",  "label": "Show filter counts", "default": true },
-    { "type": "checkbox", "id": "sticky_sidebar",     "label": "Sticky filter sidebar", "default": true }
+    { "type": "checkbox", "id": "show_filter_count",  "label": "Show filter counts",      "default": true },
+    { "type": "checkbox", "id": "sticky_sidebar",     "label": "Sticky filter sidebar",   "default": true },
+    { "type": "select",   "id": "image_ratio",        "label": "Product image ratio",
+      "options": [
+        { "value": "1/1",  "label": "Square (1:1)" },
+        { "value": "3/4",  "label": "Portrait (3:4) — recommended" },
+        { "value": "4/5",  "label": "Portrait (4:5)" },
+        { "value": "4/3",  "label": "Landscape (4:3)" },
+        { "value": "16/9", "label": "Wide (16:9)" }
+      ],
+      "default": "3/4"
+    }
   ],
   "presets": [{ "name": "Collection Page" }]
 }

@@ -22,7 +22,7 @@
     <div class="pdp__gallery">
 
       {%- comment -%} Main image {%- endcomment -%}
-      <div class="pdp__main-img-wrap pdp__main-img-wrap--zoom" id="PdpMainImgWrap-{{ section.id }}">
+      <div class="pdp__main-img-wrap pdp__main-img-wrap--zoom" id="PdpMainImgWrap-{{ section.id }}" style="--pdp-ratio:{{ section.settings.image_ratio | default: '3/4' }}">
         {%- if product.tags contains 'BESTSELLER' or product.tags contains 'bestseller' -%}
           <span class="pdp__badge pdp__badge--bestseller">BESTSELLER</span>
         {%- endif -%}
@@ -419,6 +419,15 @@
     { "type": "url",        "id": "size_chart_url",     "label": "Size chart link" },
     { "type": "collection", "id": "fbt_collection",     "label": "Frequently Bought Together collection" },
     { "type": "checkbox",   "id": "show_shop_more",     "label": "Show Shop More section",    "default": true },
+    { "type": "select", "id": "image_ratio", "label": "Product image ratio",
+      "options": [
+        { "value": "3/4",  "label": "Portrait (3:4) — recommended" },
+        { "value": "4/5",  "label": "Portrait (4:5)" },
+        { "value": "1/1",  "label": "Square (1:1)" },
+        { "value": "4/3",  "label": "Landscape (4:3)" }
+      ],
+      "default": "3/4"
+    },
     { "type": "collection", "id": "similar_collection", "label": "Similar styles collection" },
     { "type": "text",       "id": "similar_title",      "label": "Similar styles heading",    "default": "Similar Styles" }
   ],

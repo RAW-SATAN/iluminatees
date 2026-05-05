@@ -14,7 +14,7 @@
         {%- for product in arrivals_collection.products limit: section.settings.products_to_show -%}
           <div class="new-arrivals__card">
             <a href="{{ product.url }}" class="new-arrivals__card-link">
-              <div class="new-arrivals__card-img-wrap">
+              <div class="new-arrivals__card-img-wrap" style="aspect-ratio:{{ section.settings.image_ratio | default: '3/4' }}">
                 {%- if product.featured_image != blank -%}
                   <img
                     src="{{ product.featured_image | image_url: width: 480 }}"
@@ -67,7 +67,17 @@
     { "type": "text",            "id": "title",            "label": "Heading",          "default": "NEW ARRIVALS" },
     { "type": "collection",      "id": "collection",       "label": "Collection" },
     { "type": "range",           "id": "products_to_show", "label": "Products to show",
-      "min": 4, "max": 12, "step": 1, "default": 6 }
+      "min": 4, "max": 12, "step": 1, "default": 6 },
+    { "type": "select", "id": "image_ratio", "label": "Image aspect ratio",
+      "options": [
+        { "value": "1/1",  "label": "Square (1:1)" },
+        { "value": "3/4",  "label": "Portrait (3:4) — recommended" },
+        { "value": "4/5",  "label": "Portrait (4:5)" },
+        { "value": "4/3",  "label": "Landscape (4:3)" },
+        { "value": "16/9", "label": "Wide (16:9)" }
+      ],
+      "default": "3/4"
+    }
   ],
   "presets": [
     { "name": "New Arrivals" }
