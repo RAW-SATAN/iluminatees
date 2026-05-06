@@ -3,17 +3,24 @@
     "name": "theme_info",
     "theme_name": "Banani",
     "theme_version": "1.0.0",
-    "theme_author": "Banani Studio",
-    "theme_documentation_url": "",
-    "theme_support_url": ""
+    "theme_author": "drpshippr ecom pvt ltd",
+    "theme_documentation_url": "https://drpshippr.com/banani-docs",
+    "theme_support_url": "https://drpshippr.com/support"
   },
   {
     "name": "Colors",
     "settings": [
-      { "type": "color", "id": "color_primary",    "label": "Primary",    "default": "#cc0000" },
-      { "type": "color", "id": "color_background",  "label": "Background", "default": "#ffffff" },
-      { "type": "color", "id": "color_text",        "label": "Text",       "default": "#111111" },
-      { "type": "color", "id": "color_text_muted",  "label": "Muted text", "default": "#888888" }
+      { "type": "color", "id": "color_primary",       "label": "Primary / accent",      "default": "#e31837" },
+      { "type": "color", "id": "color_secondary",     "label": "Secondary / dark",      "default": "#003d35" },
+      { "type": "color", "id": "color_background",    "label": "Page background",       "default": "#ffffff" },
+      { "type": "color", "id": "color_surface",       "label": "Card / surface",        "default": "#f8f8f8" },
+      { "type": "color", "id": "color_text",          "label": "Body text",             "default": "#111111" },
+      { "type": "color", "id": "color_text_muted",    "label": "Muted / secondary text","default": "#888888" },
+      { "type": "color", "id": "color_border",        "label": "Border",                "default": "#e5e5e5" },
+      { "type": "color", "id": "color_footer_bg",     "label": "Footer background",     "default": "#003d35" },
+      { "type": "color", "id": "color_footer_text",   "label": "Footer text",           "default": "#ffffff" },
+      { "type": "color", "id": "color_header_bg",     "label": "Header background",     "default": "#ffffff" },
+      { "type": "color", "id": "color_header_text",   "label": "Header text",           "default": "#111111" }
     ]
   },
   {
@@ -26,6 +33,270 @@
       {
         "type": "font_picker", "id": "body_font",
         "label": "Body font", "default": "space_grotesk_n4"
+      },
+      {
+        "type": "range", "id": "body_font_size",
+        "label": "Base font size (px)", "min": 12, "max": 20, "step": 1, "default": 15
+      },
+      {
+        "type": "select", "id": "heading_uppercase",
+        "label": "Heading case",
+        "options": [
+          { "value": "uppercase", "label": "ALL CAPS" },
+          { "value": "capitalize", "label": "Title Case" },
+          { "value": "none", "label": "As typed" }
+        ],
+        "default": "uppercase"
+      }
+    ]
+  },
+  {
+    "name": "Buttons",
+    "settings": [
+      {
+        "type": "select", "id": "btn_style",
+        "label": "Button style",
+        "options": [
+          { "value": "solid",   "label": "Solid" },
+          { "value": "outline", "label": "Outline" },
+          { "value": "ghost",   "label": "Ghost" }
+        ],
+        "default": "solid"
+      },
+      {
+        "type": "select", "id": "btn_radius",
+        "label": "Button corner radius",
+        "options": [
+          { "value": "0px",   "label": "Sharp" },
+          { "value": "4px",   "label": "Slightly rounded" },
+          { "value": "8px",   "label": "Rounded" },
+          { "value": "999px", "label": "Pill" }
+        ],
+        "default": "0px"
+      },
+      {
+        "type": "select", "id": "btn_size",
+        "label": "Button size",
+        "options": [
+          { "value": "sm", "label": "Small" },
+          { "value": "md", "label": "Medium" },
+          { "value": "lg", "label": "Large" }
+        ],
+        "default": "md"
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "select", "id": "page_width",
+        "label": "Maximum page width",
+        "options": [
+          { "value": "1200px", "label": "1200px (default)" },
+          { "value": "1400px", "label": "1400px (wide)" },
+          { "value": "1600px", "label": "1600px (extra wide)" },
+          { "value": "100%",   "label": "Full width" }
+        ],
+        "default": "1200px"
+      },
+      {
+        "type": "range", "id": "section_gap",
+        "label": "Section vertical spacing (px)", "min": 20, "max": 100, "step": 4, "default": 60
+      },
+      {
+        "type": "range", "id": "card_radius",
+        "label": "Card corner radius (px)", "min": 0, "max": 20, "step": 1, "default": 0
+      }
+    ]
+  },
+  {
+    "name": "Header",
+    "settings": [
+      {
+        "type": "checkbox", "id": "header_announcement_bar",
+        "label": "Show announcement bar", "default": true
+      },
+      {
+        "type": "text", "id": "header_announcement_text",
+        "label": "Announcement bar text",
+        "default": "FREE SHIPPING ON ORDERS ABOVE ₹999 · USE CODE: FIRST10 FOR 10% OFF"
+      },
+      {
+        "type": "color", "id": "header_announcement_bg",
+        "label": "Announcement bar background", "default": "#003d35"
+      },
+      {
+        "type": "color", "id": "header_announcement_text_color",
+        "label": "Announcement bar text color", "default": "#ffffff"
+      }
+    ]
+  },
+  {
+    "name": "Product cards",
+    "settings": [
+      {
+        "type": "select", "id": "card_image_ratio",
+        "label": "Product card image ratio",
+        "options": [
+          { "value": "1/1",  "label": "Square (1:1)" },
+          { "value": "3/4",  "label": "Portrait (3:4)" },
+          { "value": "4/5",  "label": "Portrait (4:5)" },
+          { "value": "4/3",  "label": "Landscape (4:3)" }
+        ],
+        "default": "3/4"
+      },
+      {
+        "type": "checkbox", "id": "card_show_vendor",
+        "label": "Show brand / vendor name", "default": true
+      },
+      {
+        "type": "checkbox", "id": "card_show_discount",
+        "label": "Show discount percentage", "default": true
+      },
+      {
+        "type": "checkbox", "id": "card_show_wishlist",
+        "label": "Show wishlist button", "default": true
+      },
+      {
+        "type": "select", "id": "card_hover_effect",
+        "label": "Card hover effect",
+        "options": [
+          { "value": "none",   "label": "None" },
+          { "value": "lift",   "label": "Lift / shadow" },
+          { "value": "zoom",   "label": "Image zoom" },
+          { "value": "both",   "label": "Lift + zoom" }
+        ],
+        "default": "both"
+      }
+    ]
+  },
+  {
+    "name": "Footer",
+    "settings": [
+      {
+        "type": "image_picker", "id": "footer_logo",
+        "label": "Footer logo (leave blank to use header logo)"
+      },
+      {
+        "type": "richtext", "id": "footer_about",
+        "label": "About text",
+        "default": "<p>India's premier destination for luxury fashion &amp; lifestyle.</p>"
+      },
+      {
+        "type": "text", "id": "footer_copyright",
+        "label": "Copyright line",
+        "default": "© 2025 Banani. All rights reserved."
+      },
+      {
+        "type": "link_list", "id": "footer_menu_1",
+        "label": "Footer menu 1"
+      },
+      {
+        "type": "text", "id": "footer_menu_1_label",
+        "label": "Footer menu 1 heading", "default": "Shop"
+      },
+      {
+        "type": "link_list", "id": "footer_menu_2",
+        "label": "Footer menu 2"
+      },
+      {
+        "type": "text", "id": "footer_menu_2_label",
+        "label": "Footer menu 2 heading", "default": "Help"
+      },
+      {
+        "type": "text", "id": "footer_instagram_url",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "text", "id": "footer_facebook_url",
+        "label": "Facebook URL"
+      },
+      {
+        "type": "text", "id": "footer_twitter_url",
+        "label": "Twitter / X URL"
+      },
+      {
+        "type": "text", "id": "footer_youtube_url",
+        "label": "YouTube URL"
+      },
+      {
+        "type": "checkbox", "id": "footer_show_payment_icons",
+        "label": "Show payment icons", "default": true
+      },
+      {
+        "type": "checkbox", "id": "footer_show_newsletter",
+        "label": "Show newsletter signup", "default": true
+      },
+      {
+        "type": "text", "id": "footer_newsletter_heading",
+        "label": "Newsletter heading", "default": "Stay in the loop"
+      }
+    ]
+  },
+  {
+    "name": "Animations",
+    "settings": [
+      {
+        "type": "checkbox", "id": "enable_animations",
+        "label": "Enable scroll animations", "default": true
+      },
+      {
+        "type": "select", "id": "animation_style",
+        "label": "Animation style",
+        "options": [
+          { "value": "fade",      "label": "Fade in" },
+          { "value": "slide-up",  "label": "Slide up" },
+          { "value": "slide-left","label": "Slide from left" },
+          { "value": "zoom",      "label": "Zoom in" }
+        ],
+        "default": "slide-up"
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker", "id": "favicon",
+        "label": "Favicon image"
+      }
+    ]
+  },
+  {
+    "name": "Social sharing",
+    "settings": [
+      {
+        "type": "checkbox", "id": "share_facebook",  "label": "Share on Facebook",  "default": true
+      },
+      {
+        "type": "checkbox", "id": "share_twitter",   "label": "Share on Twitter/X",  "default": true
+      },
+      {
+        "type": "checkbox", "id": "share_whatsapp",  "label": "Share on WhatsApp",   "default": true
+      },
+      {
+        "type": "checkbox", "id": "share_pinterest", "label": "Share on Pinterest",  "default": false
+      }
+    ]
+  },
+  {
+    "name": "Custom CSS",
+    "settings": [
+      {
+        "type": "textarea", "id": "custom_css",
+        "label": "Custom CSS",
+        "info": "Advanced: add your own CSS overrides here."
+      }
+    ]
+  },
+  {
+    "name": "Custom JavaScript",
+    "settings": [
+      {
+        "type": "textarea", "id": "custom_js",
+        "label": "Custom JavaScript (body end)",
+        "info": "Advanced: add tracking scripts or custom JS here."
       }
     ]
   }

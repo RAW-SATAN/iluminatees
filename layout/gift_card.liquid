@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ gift_card.initial_value | money_without_trailing_zeros }} Gift Card — {{ shop.name }}</title>
+  {{ content_for_header }}
+  {{ 'banani.css' | asset_url | stylesheet_tag }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Space Grotesk',sans-serif;background:#f8f8f8;color:#111;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
+    .gc-header{text-align:center;margin-bottom:40px}
+    .gc-logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.15em;color:#003d35}
+    .gc-card{background:#003d35;color:#fff;width:100%;max-width:480px;padding:40px;border-radius:4px;text-align:center;margin-bottom:32px}
+    .gc-card__shop{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.1em;margin-bottom:24px}
+    .gc-card__amount{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:#e31837;margin-bottom:8px}
+    .gc-card__label{font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+    .gc-inner{width:100%;max-width:480px}
+    .gc-balance{background:#fff;border:1px solid #e5e5e5;padding:24px;text-align:center;margin-bottom:24px}
+    .gc-balance__label{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:4px}
+    .gc-balance__amount{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#111}
+    .gc-code-wrap{background:#fff;border:1px solid #e5e5e5;padding:24px;text-align:center;margin-bottom:24px}
+    .gc-code-label{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:12px}
+    .gc-code{font-family:monospace;font-size:1.4rem;letter-spacing:.15em;color:#111;word-break:break-all;margin-bottom:16px}
+    .gc-qr{margin:0 auto 16px;display:block}
+    .gc-copy-btn{background:#e31837;color:#fff;border:none;padding:12px 28px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;cursor:pointer}
+    .gc-copy-btn:hover{background:#c01030}
+    .gc-actions{display:flex;gap:12px;justify-content:center}
+    .gc-btn{padding:12px 28px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;cursor:pointer;text-decoration:none}
+    .gc-btn--primary{background:#003d35;color:#fff}
+    .gc-btn--outline{background:transparent;color:#003d35;border:2px solid #003d35}
+    .gc-expiry{font-size:.8rem;color:#888;text-align:center;margin-top:16px}
+  </style>
+</head>
+<body>
+  <header class="gc-header">
+    <a href="{{ shop.url }}" class="gc-logo">{{ shop.name }}</a>
+  </header>
+
+  <div class="gc-card">
+    <p class="gc-card__shop">{{ shop.name }}</p>
+    <p class="gc-card__amount">{{ gift_card.initial_value | money_without_trailing_zeros }}</p>
+    <p class="gc-card__label">Gift Card</p>
+  </div>
+
+  <div class="gc-inner">
+    {%- if gift_card.enabled -%}
+
+      <div class="gc-balance">
+        <p class="gc-balance__label">Remaining balance</p>
+        <p class="gc-balance__amount">{{ gift_card.balance | money }}</p>
+      </div>
+
+      <div class="gc-code-wrap">
+        <p class="gc-code-label">Your gift card code</p>
+        <p class="gc-code" id="GiftCardCode">{{ gift_card.code | format_code }}</p>
+
+        {%- assign qr_size = 120 -%}
+        <img
+          class="gc-qr"
+          src="{{ gift_card.qr_identifier | image_url: width: qr_size }}"
+          alt="QR code for gift card {{ gift_card.code | format_code }}"
+          width="{{ qr_size }}"
+          height="{{ qr_size }}"
+        >
+
+        <button class="gc-copy-btn" onclick="navigator.clipboard.writeText('{{ gift_card.code }}').then(function(){this.textContent='Copied!'},()=>{})" type="button">
+          Copy code
+        </button>
+      </div>
+
+      {%- if gift_card.expires_on -%}
+        <p class="gc-expiry">Expires {{ gift_card.expires_on | date: '%B %d, %Y' }}</p>
+      {%- endif -%}
+
+    {%- else -%}
+      <p style="text-align:center;color:#888;">This gift card has been disabled.</p>
+    {%- endif -%}
+
+    <div class="gc-actions" style="margin-top:28px">
+      <a href="{{ shop.url }}" class="gc-btn gc-btn--primary">Shop now</a>
+      <a href="javascript:window.print()" class="gc-btn gc-btn--outline">Print</a>
+    </div>
+  </div>
+
+  {{ content_for_layout }}
+</body>
+</html>

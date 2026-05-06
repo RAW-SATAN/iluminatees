@@ -1,0 +1,85 @@
+{% comment %} Customer registration page {% endcomment %}
+
+<div class="auth-page">
+  <div class="auth-page__inner">
+
+    <div class="auth-card">
+      <h1 class="auth-card__title">Create account</h1>
+      <p class="auth-card__sub">Join {{ shop.name }} for exclusive offers</p>
+
+      {% form 'create_customer' %}
+        {%- if form.errors -%}
+          <div class="form-errors" role="alert">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="RegisterFirstName">First name</label>
+            <input
+              type="text"
+              id="RegisterFirstName"
+              name="customer[first_name]"
+              autocomplete="given-name"
+              value="{{ form.first_name }}"
+            >
+          </div>
+          <div class="form-group">
+            <label for="RegisterLastName">Last name</label>
+            <input
+              type="text"
+              id="RegisterLastName"
+              name="customer[last_name]"
+              autocomplete="family-name"
+              value="{{ form.last_name }}"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="RegisterEmail">Email <span>*</span></label>
+          <input
+            type="email"
+            id="RegisterEmail"
+            name="customer[email]"
+            autocomplete="email"
+            value="{{ form.email }}"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="RegisterPassword">Password <span>*</span></label>
+          <input
+            type="password"
+            id="RegisterPassword"
+            name="customer[password]"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="auth-card__submit">Create account</button>
+      {% endform %}
+
+      <div class="auth-card__divider"><span>or</span></div>
+
+      <p class="auth-card__switch">
+        Already have an account?
+        <a href="{{ routes.account_login_url }}">Sign in</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Customer Register",
+  "tag": "section",
+  "class": "section-customer-register",
+  "settings": [],
+  "presets": [{ "name": "Customer Register" }]
+}
+{% endschema %}

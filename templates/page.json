@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "generic_page": {
+      "type": "generic-page",
+      "settings": {}
+    }
+  },
+  "order": ["generic_page"]
+}

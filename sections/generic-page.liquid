@@ -1,0 +1,45 @@
+{% comment %} Generic page template (page.json) {% endcomment %}
+
+<div class="generic-page">
+  {%- if section.settings.show_breadcrumb -%}
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="/" class="breadcrumb__link">Home</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">{{ page.title }}</span>
+    </nav>
+  {%- endif -%}
+
+  <div class="generic-page__inner{% if section.settings.narrow %} generic-page__inner--narrow{% endif %}">
+    {%- if section.settings.show_title -%}
+      <h1 class="generic-page__title">{{ page.title }}</h1>
+    {%- endif -%}
+
+    <div class="generic-page__content rte">
+      {{ page.content }}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Page",
+  "tag": "section",
+  "class": "section-page",
+  "settings": [
+    {
+      "type": "checkbox", "id": "show_title",
+      "label": "Show page title", "default": true
+    },
+    {
+      "type": "checkbox", "id": "show_breadcrumb",
+      "label": "Show breadcrumb", "default": true
+    },
+    {
+      "type": "checkbox", "id": "narrow",
+      "label": "Narrow content width (prose width)",
+      "default": true
+    }
+  ],
+  "presets": [{ "name": "Page" }]
+}
+{% endschema %}

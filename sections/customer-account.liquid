@@ -1,0 +1,74 @@
+{% comment %} Customer account dashboard {% endcomment %}
+
+<div class="account-page">
+  <div class="account-page__inner">
+
+    <div class="account-page__header">
+      <h1 class="account-page__title">My account</h1>
+      <a href="{{ routes.account_logout_url }}" class="account-page__logout">Sign out</a>
+    </div>
+
+    <div class="account-page__body">
+      <aside class="account-sidebar">
+        <nav class="account-sidebar__nav">
+          <a href="{{ routes.account_url }}" class="account-sidebar__link is-active">Orders</a>
+          <a href="{{ routes.account_addresses_url }}" class="account-sidebar__link">Addresses</a>
+        </nav>
+
+        <div class="account-sidebar__info">
+          <p class="account-sidebar__name">{{ customer.name }}</p>
+          <p class="account-sidebar__email">{{ customer.email }}</p>
+        </div>
+      </aside>
+
+      <div class="account-main">
+        <h2 class="account-main__section-title">Order history</h2>
+
+        {%- if customer.orders.size > 0 -%}
+          <div class="account-orders">
+            <div class="account-orders__head">
+              <span>Order</span>
+              <span>Date</span>
+              <span>Payment</span>
+              <span>Fulfillment</span>
+              <span>Total</span>
+            </div>
+            {%- for order in customer.orders -%}
+              <div class="account-orders__row">
+                <span><a href="{{ order.customer_url }}" class="account-orders__id">{{ order.name }}</a></span>
+                <span>{{ order.created_at | date: '%b %d, %Y' }}</span>
+                <span>
+                  <span class="account-orders__badge account-orders__badge--{{ order.financial_status }}">
+                    {{ order.financial_status_label }}
+                  </span>
+                </span>
+                <span>
+                  <span class="account-orders__badge account-orders__badge--{{ order.fulfillment_status }}">
+                    {{ order.fulfillment_status_label | default: 'Unfulfilled' }}
+                  </span>
+                </span>
+                <span>{{ order.total_price | money }}</span>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <div class="account-orders__empty">
+            <p>You haven't placed any orders yet.</p>
+            <a href="/collections/all" class="btn-primary" style="display:inline-block;margin-top:16px">Start shopping</a>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Customer Account",
+  "tag": "section",
+  "class": "section-customer-account",
+  "settings": [],
+  "presets": [{ "name": "Customer Account" }]
+}
+{% endschema %}

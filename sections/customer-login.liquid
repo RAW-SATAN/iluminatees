@@ -1,0 +1,114 @@
+{% comment %} Customer login page {% endcomment %}
+
+<div class="auth-page">
+  <div class="auth-page__inner">
+
+    <div class="auth-card">
+      <h1 class="auth-card__title">Sign in</h1>
+      <p class="auth-card__sub">Welcome back to {{ shop.name }}</p>
+
+      {% form 'customer_login' %}
+        {%- if form.errors -%}
+          <div class="form-errors" role="alert">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="form-group">
+          <label for="CustomerEmail">Email</label>
+          <input
+            type="email"
+            id="CustomerEmail"
+            name="customer[email]"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            value="{{ form.email }}"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="CustomerPassword">
+            Password
+            <a href="#RecoverPasswordForm" class="auth-card__forgot" id="ForgotLink">Forgot password?</a>
+          </label>
+          <input
+            type="password"
+            id="CustomerPassword"
+            name="customer[password]"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="auth-card__submit">Sign in</button>
+      {% endform %}
+
+      <div class="auth-card__divider"><span>or</span></div>
+
+      <p class="auth-card__switch">
+        New customer?
+        <a href="{{ routes.account_register_url }}">Create an account</a>
+      </p>
+    </div>
+
+    <div class="auth-card auth-card--recover" id="RecoverPasswordForm" style="display:none">
+      <h2 class="auth-card__title">Reset password</h2>
+      <p class="auth-card__sub">Enter your email and we'll send you a reset link.</p>
+
+      {% form 'recover_customer_password' %}
+        {%- if form.errors -%}
+          <div class="form-errors" role="alert">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+        {%- if form.posted_successfully? -%}
+          <p class="form-success">If that email exists, you'll receive a reset link shortly.</p>
+        {%- endif -%}
+        <div class="form-group">
+          <label for="RecoverEmail">Email</label>
+          <input type="email" id="RecoverEmail" name="email" autocomplete="email" required>
+        </div>
+        <button type="submit" class="auth-card__submit">Send reset link</button>
+      {% endform %}
+
+      <p class="auth-card__switch" style="margin-top:16px">
+        <a href="#" id="HideRecoverLink">← Back to sign in</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function(){
+    var forgot = document.getElementById('ForgotLink');
+    var hide   = document.getElementById('HideRecoverLink');
+    var login  = forgot ? forgot.closest('.auth-card') : null;
+    var recover = document.getElementById('RecoverPasswordForm');
+    if (!forgot || !recover) return;
+    forgot.addEventListener('click', function(e){
+      e.preventDefault();
+      if(login) login.style.display='none';
+      recover.style.display='';
+    });
+    if(hide) hide.addEventListener('click', function(e){
+      e.preventDefault();
+      if(login) login.style.display='';
+      recover.style.display='none';
+    });
+    {%- if form.errors contains 'form' -%}
+      if(login) login.style.display='none';
+      recover.style.display='';
+    {%- endif -%}
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Customer Login",
+  "tag": "section",
+  "class": "section-customer-login",
+  "settings": [],
+  "presets": [{ "name": "Customer Login" }]
+}
+{% endschema %}

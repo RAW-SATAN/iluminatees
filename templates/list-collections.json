@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "collections_list": {
+      "type": "list-collections",
+      "settings": {
+        "heading": "All Collections",
+        "columns": "3",
+        "image_ratio": "3/4",
+        "sort": "alphabetical"
+      }
+    }
+  },
+  "order": ["collections_list"]
+}

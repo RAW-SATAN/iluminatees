@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "article_main": {
+      "type": "article-page",
+      "settings": {
+        "show_author": true,
+        "show_date": true,
+        "show_tags": true,
+        "show_share_buttons": true,
+        "show_related": true,
+        "related_count": 3
+      }
+    }
+  },
+  "order": ["article_main"]
+}
