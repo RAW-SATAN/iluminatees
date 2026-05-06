@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "about_page": {
+      "type": "about-page",
+      "blocks": {
+        "s1": { "type": "stat",  "settings": { "number": "500+",  "label": "Premium Brands" } },
+        "s2": { "type": "stat",  "settings": { "number": "2M+",   "label": "Happy Customers" } },
+        "s3": { "type": "stat",  "settings": { "number": "50K+",  "label": "Products" } },
+        "s4": { "type": "stat",  "settings": { "number": "100%",  "label": "Authentic" } },
+        "v1": { "type": "value", "settings": { "icon": "✦", "title": "Authenticity",  "description": "Every product sourced directly from verified brands." } },
+        "v2": { "type": "value", "settings": { "icon": "◈", "title": "Quality First", "description": "Rigorous quality checks before every shipment." } },
+        "v3": { "type": "value", "settings": { "icon": "◉", "title": "Fair Pricing",  "description": "Best prices with no hidden charges, ever." } },
+        "v4": { "type": "value", "settings": { "icon": "⟁", "title": "Easy Returns",  "description": "30-day hassle-free returns on all orders." } }
+      },
+      "block_order": ["s1","s2","s3","s4","v1","v2","v3","v4"],
+      "settings": {}
+    }
+  },
+  "order": ["about_page"]
+}

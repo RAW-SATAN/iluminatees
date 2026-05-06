@@ -1,0 +1,143 @@
+{% comment %} Contact Page {% endcomment %}
+
+<div class="contact-page">
+
+  <div class="contact-page__hero">
+    <p class="contact-page__eyebrow">{{ section.settings.eyebrow | default: 'WE'RE HERE TO HELP' }}</p>
+    <h1 class="contact-page__heading">{{ section.settings.heading | default: 'CONTACT US' }}</h1>
+    <p class="contact-page__sub">{{ section.settings.subtext | default: 'Have a question? Our team is available Mon–Sat, 10 AM–7 PM.' }}</p>
+  </div>
+
+  <div class="contact-page__layout">
+
+    {%- comment -%} Contact info cards {%- endcomment -%}
+    <div class="contact-page__info">
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 12 19.79 19.79 0 011.65 3.44 2 2 0 013.62 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.91 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <h3 class="contact-card__title">Phone</h3>
+        <p class="contact-card__value">{{ section.settings.phone | default: '+91 99207 05705' }}</p>
+        <p class="contact-card__note">Mon–Sat, 10 AM–7 PM</p>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h3 class="contact-card__title">Email</h3>
+        <p class="contact-card__value">{{ section.settings.email | default: 'support@vantura.com' }}</p>
+        <p class="contact-card__note">Reply within 24 hours</p>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        <h3 class="contact-card__title">Address</h3>
+        <p class="contact-card__value">{{ section.settings.address | default: 'Mumbai, Maharashtra, India' }}</p>
+        <p class="contact-card__note">{{ section.settings.address_note | default: 'No walk-in store' }}</p>
+      </div>
+
+      {%- if section.settings.show_social -%}
+        <div class="contact-page__social">
+          <p class="contact-page__social-title">Follow Us</p>
+          <div class="contact-page__social-links">
+            {%- if section.settings.instagram != blank -%}
+              <a href="{{ section.settings.instagram }}" class="contact-page__social-link" target="_blank" rel="noopener" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                Instagram
+              </a>
+            {%- endif -%}
+            {%- if section.settings.facebook != blank -%}
+              <a href="{{ section.settings.facebook }}" class="contact-page__social-link" target="_blank" rel="noopener" aria-label="Facebook">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                Facebook
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Contact Form {%- endcomment -%}
+    <div class="contact-page__form-wrap">
+      <h2 class="contact-page__form-title">Send us a message</h2>
+
+      {%- form 'contact', id: 'ContactForm' -%}
+        {%- if form.posted_successfully? -%}
+          <div class="contact-form__success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#003d35" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p>Thank you! We'll get back to you shortly.</p>
+          </div>
+        {%- endif -%}
+
+        {%- if form.errors -%}
+          <div class="contact-form__error">Please fix the errors below.</div>
+        {%- endif -%}
+
+        <div class="contact-form__row">
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="ContactName">Full Name *</label>
+            <input type="text" id="ContactName" name="contact[name]" class="contact-form__input"
+              value="{{ form.name }}" placeholder="Your full name" required>
+          </div>
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="ContactEmail">Email *</label>
+            <input type="email" id="ContactEmail" name="contact[email]" class="contact-form__input"
+              value="{{ form.email }}" placeholder="your@email.com" required>
+          </div>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="ContactPhone">Phone</label>
+          <input type="tel" id="ContactPhone" name="contact[phone]" class="contact-form__input"
+            placeholder="+91 00000 00000">
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="ContactSubject">Subject</label>
+          <select id="ContactSubject" name="contact[subject]" class="contact-form__select">
+            <option value="">Select a topic...</option>
+            <option>Order Query</option>
+            <option>Return / Exchange</option>
+            <option>Product Information</option>
+            <option>Payment Issue</option>
+            <option>Brand Partnership</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="ContactMessage">Message *</label>
+          <textarea id="ContactMessage" name="contact[body]" rows="5" class="contact-form__textarea"
+            placeholder="Tell us how we can help..." required>{{ form.body }}</textarea>
+        </div>
+
+        <button type="submit" class="contact-form__submit">SEND MESSAGE</button>
+      {%- endform -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact Page",
+  "tag": "section",
+  "class": "section-contact-page",
+  "settings": [
+    { "type": "text",     "id": "eyebrow",      "label": "Eyebrow",      "default": "WE'RE HERE TO HELP" },
+    { "type": "text",     "id": "heading",      "label": "Heading",      "default": "CONTACT US" },
+    { "type": "text",     "id": "subtext",      "label": "Sub-text",     "default": "Our team is available Mon–Sat, 10 AM–7 PM." },
+    { "type": "text",     "id": "phone",        "label": "Phone number", "default": "+91 99207 05705" },
+    { "type": "text",     "id": "email",        "label": "Email address","default": "support@store.com" },
+    { "type": "text",     "id": "address",      "label": "Address",      "default": "Mumbai, Maharashtra, India" },
+    { "type": "text",     "id": "address_note", "label": "Address note", "default": "No walk-in store" },
+    { "type": "checkbox", "id": "show_social",  "label": "Show social links", "default": true },
+    { "type": "url",      "id": "instagram",    "label": "Instagram URL" },
+    { "type": "url",      "id": "facebook",     "label": "Facebook URL" }
+  ],
+  "presets": [{ "name": "Contact Page" }]
+}
+{% endschema %}

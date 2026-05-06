@@ -1,0 +1,144 @@
+{% comment %} Search Page {% endcomment %}
+
+<div class="search-page">
+  <div class="search-page__hero">
+    <h1 class="search-page__heading">
+      {%- if search.performed -%}
+        {%- if search.results_count > 0 -%}
+          {{ search.results_count }} results for &ldquo;{{ search.terms | escape }}&rdquo;
+        {%- else -%}
+          No results for &ldquo;{{ search.terms | escape }}&rdquo;
+        {%- endif -%}
+      {%- else -%}
+        SEARCH
+      {%- endif -%}
+    </h1>
+
+    <form action="{{ routes.search_url }}" method="get" class="search-page__form" role="search">
+      <input type="hidden" name="type" value="product">
+      <div class="search-page__input-wrap">
+        <svg class="search-page__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="{{ section.settings.placeholder | default: 'Search for products, brands and more...' }}"
+          class="search-page__input"
+          autofocus
+          autocomplete="off"
+          aria-label="Search"
+        >
+        {%- if search.terms != blank -%}
+          <a href="{{ routes.search_url }}" class="search-page__clear" aria-label="Clear">✕</a>
+        {%- endif -%}
+        <button type="submit" class="search-page__btn">SEARCH</button>
+      </div>
+    </form>
+
+    {%- unless search.performed -%}
+      {%- if section.settings.trending_terms != blank -%}
+        <div class="search-page__trending">
+          <span class="search-page__trending-label">Trending:</span>
+          {%- assign terms = section.settings.trending_terms | split: ',' -%}
+          {%- for term in terms -%}
+            <a href="{{ routes.search_url }}?type=product&q={{ term | strip | url_encode }}" class="search-page__trending-pill">{{ term | strip }}</a>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- endunless -%}
+  </div>
+
+  {%- if search.performed -%}
+    {%- if search.results_count > 0 -%}
+      <div class="search-page__results">
+
+        {%- comment -%} Filter pills: All / Products / Pages {%- endcomment -%}
+        <div class="search-page__filters">
+          <a href="{{ routes.search_url }}?q={{ search.terms | url_encode }}&type=product" class="search-page__filter-pill{% if search.results.first.object_type == 'product' %} is-active{% endif %}">Products</a>
+          <a href="{{ routes.search_url }}?q={{ search.terms | url_encode }}&type=page,article" class="search-page__filter-pill">Pages & Articles</a>
+        </div>
+
+        <div class="search-page__grid">
+          {%- for result in search.results -%}
+            {%- if result.object_type == 'product' -%}
+              <div class="prod-card">
+                <div class="prod-card__img-wrap" style="aspect-ratio:{{ section.settings.image_ratio | default: '3/4' }}">
+                  {%- if result.featured_image -%}
+                    <img src="{{ result.featured_image | image_url: width: 600 }}" alt="{{ result.title | escape }}" class="prod-card__img" loading="lazy">
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'prod-card__placeholder' }}
+                  {%- endif -%}
+                  {%- if result.tags contains 'BESTSELLER' -%}
+                    <span class="prod-card__badge prod-card__badge--bestseller">BESTSELLER</span>
+                  {%- endif -%}
+                  <button class="prod-card__wish" aria-label="Wishlist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  </button>
+                </div>
+                <p class="prod-card__brand">{{ result.vendor | upcase }}</p>
+                <a href="{{ result.url }}" class="prod-card__name">{{ result.title }}</a>
+                <div class="prod-card__pricing">
+                  {%- if result.compare_at_price > result.price -%}
+                    <span class="prod-card__price">{{ result.price | money }}</span>
+                    <span class="prod-card__compare">{{ result.compare_at_price | money }}</span>
+                    <span class="prod-card__discount">({{ result.compare_at_price | minus: result.price | times: 100 | divided_by: result.compare_at_price }}% off)</span>
+                  {%- else -%}
+                    <span class="prod-card__price">{{ result.price | money }}</span>
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- else -%}
+              <div class="search-page__page-result">
+                <a href="{{ result.url }}" class="search-page__page-title">{{ result.title }}</a>
+                <p class="search-page__page-excerpt">{{ result.content | strip_html | truncate: 120 }}</p>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <div class="col-page__pagination">
+            {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}">← Prev</a>{%- endif -%}
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a href="{{ part.url }}">{{ part.title }}</a>
+              {%- else -%}
+                <span class="current">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if paginate.next -%}<a href="{{ paginate.next.url }}">Next →</a>{%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+    {%- else -%}
+      <div class="search-page__no-results">
+        <p class="search-page__no-results-icon">🔍</p>
+        <p class="search-page__no-results-text">We couldn't find anything for <strong>{{ search.terms | escape }}</strong></p>
+        <p class="search-page__no-results-sub">Check the spelling, try a different word, or browse our collections.</p>
+        <a href="/collections/all" class="cart-page__empty-btn">BROWSE ALL PRODUCTS</a>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Search Page",
+  "tag": "section",
+  "class": "section-search-page",
+  "settings": [
+    { "type": "text",   "id": "placeholder",    "label": "Search box placeholder", "default": "Search for products, brands and more..." },
+    { "type": "text",   "id": "trending_terms",  "label": "Trending search terms (comma separated)", "default": "T-Shirts, Polo, Formal Shirts, Denim, Sneakers" },
+    { "type": "select", "id": "image_ratio",     "label": "Product image ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "4/5", "label": "Portrait (4:5)" }
+      ],
+      "default": "3/4"
+    }
+  ],
+  "presets": [{ "name": "Search Page" }]
+}
+{% endschema %}

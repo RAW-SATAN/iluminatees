@@ -1,0 +1,141 @@
+{% comment %} About Us Page {% endcomment %}
+
+<div class="about-page">
+
+  {%- comment -%} Hero {%- endcomment -%}
+  <div class="about-hero">
+    {%- if section.settings.hero_image != blank -%}
+      <img src="{{ section.settings.hero_image | image_url: width: 1600 }}" alt="{{ section.settings.heading | escape }}" class="about-hero__img" loading="eager">
+    {%- else -%}
+      <div class="about-hero__placeholder"></div>
+    {%- endif -%}
+    <div class="about-hero__overlay">
+      <p class="about-hero__eyebrow">{{ section.settings.eyebrow | default: 'OUR STORY' }}</p>
+      <h1 class="about-hero__heading">{{ section.settings.heading | default: 'BORN IN INDIA. MADE FOR THE WORLD.' }}</h1>
+    </div>
+  </div>
+
+  {%- comment -%} Story section {%- endcomment -%}
+  <div class="about-story">
+    <div class="about-story__inner">
+      <div class="about-story__text">
+        <p class="about-story__eyebrow">{{ section.settings.story_eyebrow | default: 'WHO WE ARE' }}</p>
+        <h2 class="about-story__title">{{ section.settings.story_title | default: 'Redefining Premium Fashion' }}</h2>
+        <div class="about-story__body">
+          {{ section.settings.story_body | default: '<p>We are a curated marketplace for the finest fashion brands in India. Our mission is to bring you authentic, premium products at fair prices — from iconic global labels to emerging Indian designers.</p><p>Founded with a passion for style and a commitment to quality, we work directly with brands to ensure every product on our platform meets the highest standards.</p>' }}
+        </div>
+      </div>
+      {%- if section.settings.story_image != blank -%}
+        <div class="about-story__img-wrap">
+          <img src="{{ section.settings.story_image | image_url: width: 800 }}" alt="Our Story" class="about-story__img" loading="lazy">
+        </div>
+      {%- else -%}
+        <div class="about-story__img-placeholder"></div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%} Stats {%- endcomment -%}
+  <div class="about-stats">
+    <div class="about-stats__inner">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'stat' -%}
+          <div class="about-stat" {{ block.shopify_attributes }}>
+            <p class="about-stat__number">{{ block.settings.number }}</p>
+            <p class="about-stat__label">{{ block.settings.label }}</p>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%} Values {%- endcomment -%}
+  <div class="about-values">
+    <div class="about-values__inner">
+      <h2 class="about-values__title">{{ section.settings.values_title | default: 'OUR VALUES' }}</h2>
+      <div class="about-values__grid">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'value' -%}
+            <div class="about-value" {{ block.shopify_attributes }}>
+              <div class="about-value__icon">{{ block.settings.icon | default: '★' }}</div>
+              <h3 class="about-value__title">{{ block.settings.title }}</h3>
+              <p class="about-value__desc">{{ block.settings.description }}</p>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} CTA {%- endcomment -%}
+  <div class="about-cta">
+    <p class="about-cta__eyebrow">{{ section.settings.cta_eyebrow | default: 'READY TO SHOP?' }}</p>
+    <h2 class="about-cta__title">{{ section.settings.cta_title | default: 'Discover Our Collection' }}</h2>
+    <p class="about-cta__sub">{{ section.settings.cta_sub | default: '10,000+ premium styles across every category.' }}</p>
+    <a href="{{ section.settings.cta_link | default: '/collections/all' }}" class="about-cta__btn">
+      {{ section.settings.cta_label | default: 'SHOP NOW' }}
+    </a>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "About Page",
+  "tag": "section",
+  "class": "section-about-page",
+  "settings": [
+    { "type": "header",       "content": "Hero" },
+    { "type": "image_picker", "id": "hero_image",     "label": "Hero background image" },
+    { "type": "text",         "id": "eyebrow",        "label": "Eyebrow",    "default": "OUR STORY" },
+    { "type": "text",         "id": "heading",        "label": "Hero heading","default": "BORN IN INDIA. MADE FOR THE WORLD." },
+    { "type": "header",       "content": "Story Section" },
+    { "type": "image_picker", "id": "story_image",    "label": "Story image" },
+    { "type": "text",         "id": "story_eyebrow",  "label": "Story eyebrow", "default": "WHO WE ARE" },
+    { "type": "text",         "id": "story_title",    "label": "Story title",   "default": "Redefining Premium Fashion" },
+    { "type": "richtext",     "id": "story_body",     "label": "Story body text" },
+    { "type": "header",       "content": "Values Section" },
+    { "type": "text",         "id": "values_title",   "label": "Values heading", "default": "OUR VALUES" },
+    { "type": "header",       "content": "CTA Section" },
+    { "type": "text",         "id": "cta_eyebrow",    "label": "CTA eyebrow",  "default": "READY TO SHOP?" },
+    { "type": "text",         "id": "cta_title",      "label": "CTA title",    "default": "Discover Our Collection" },
+    { "type": "text",         "id": "cta_sub",        "label": "CTA sub-text", "default": "10,000+ premium styles across every category." },
+    { "type": "url",          "id": "cta_link",       "label": "CTA link" },
+    { "type": "text",         "id": "cta_label",      "label": "CTA button text", "default": "SHOP NOW" }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat Number",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number",  "default": "500+" },
+        { "type": "text", "id": "label",  "label": "Label",   "default": "Brands" }
+      ]
+    },
+    {
+      "type": "value",
+      "name": "Brand Value",
+      "settings": [
+        { "type": "text", "id": "icon",        "label": "Icon (emoji)", "default": "✦" },
+        { "type": "text", "id": "title",       "label": "Value title",  "default": "Authenticity" },
+        { "type": "text", "id": "description", "label": "Description",  "default": "Every product is sourced directly from the brand." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Page",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "500+",    "label": "Premium Brands" } },
+        { "type": "stat", "settings": { "number": "2M+",     "label": "Happy Customers" } },
+        { "type": "stat", "settings": { "number": "50K+",    "label": "Products" } },
+        { "type": "stat", "settings": { "number": "100%",    "label": "Authentic" } },
+        { "type": "value","settings": { "icon": "✦", "title": "Authenticity",  "description": "Every product sourced directly from verified brands." } },
+        { "type": "value","settings": { "icon": "◈", "title": "Quality First", "description": "Rigorous quality checks before every shipment." } },
+        { "type": "value","settings": { "icon": "◉", "title": "Fair Pricing",  "description": "Best prices with no hidden charges, ever." } },
+        { "type": "value","settings": { "icon": "⟁", "title": "Easy Returns",  "description": "30-day hassle-free returns on all orders." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

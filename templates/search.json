@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "search_page": {
+      "type": "search-page",
+      "settings": {}
+    }
+  },
+  "order": ["search_page"]
+}
