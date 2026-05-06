@@ -90,8 +90,9 @@
           <div class="col-page__grid-toggle">
             <span class="col-page__grid-label">VIEW</span>
             {%- for cols in '2,3,4' | split: ',' -%}
+              {%- assign cols_int = cols | plus: 0 -%}
               <button class="col-page__grid-btn{% if forloop.index == 2 %} is-active{% endif %}" data-cols="{{ cols }}" aria-label="{{ cols }} columns">
-                {%- for i in (1..cols) -%}<span class="col-page__grid-bar"></span>{%- endfor -%}
+                {%- for i in (1..cols_int) -%}<span class="col-page__grid-bar"></span>{%- endfor -%}
               </button>
             {%- endfor -%}
           </div>
