@@ -1,0 +1,88 @@
+{
+  "sections": {
+    "header": {
+      "name": "Header",
+      "settings": {
+        "logo": { "label": "Logo image" },
+        "logo_width": { "label": "Logo width (px)" },
+        "menu": { "label": "Menu" },
+        "top_bar_text": { "label": "Top bar text" },
+        "sticky": { "label": "Sticky header" },
+        "show_search": { "label": "Show search" },
+        "show_account": { "label": "Show account link" }
+      }
+    },
+    "footer": {
+      "name": "Footer",
+      "settings": {
+        "footer_logo": { "label": "Footer logo" },
+        "footer_about": { "label": "About text" },
+        "footer_copyright": { "label": "Copyright line" }
+      }
+    },
+    "hero-banner": {
+      "name": "Hero Banner",
+      "presets": { "name": "Hero Banner" }
+    },
+    "collection-page": {
+      "name": "Collection Page",
+      "settings": {
+        "products_per_page": { "label": "Products per page" },
+        "default_columns": { "label": "Default grid columns" },
+        "image_ratio": { "label": "Product image ratio" },
+        "show_filter_count": { "label": "Show filter counts" },
+        "sticky_sidebar": { "label": "Sticky filter sidebar" }
+      }
+    },
+    "product-page": {
+      "name": "Product Page"
+    },
+    "cart-page": {
+      "name": "Cart Page"
+    },
+    "search-page": {
+      "name": "Search Page"
+    },
+    "contact-page": {
+      "name": "Contact Page"
+    },
+    "about-page": {
+      "name": "About Page"
+    },
+    "404-page": {
+      "name": "404 Page"
+    },
+    "blog-page": {
+      "name": "Blog Page"
+    },
+    "article-page": {
+      "name": "Article Page"
+    },
+    "generic-page": {
+      "name": "Page"
+    },
+    "list-collections": {
+      "name": "Collections List"
+    }
+  },
+  "settings": {
+    "colors": {
+      "heading": "Colors"
+    },
+    "typography": {
+      "heading": "Typography"
+    },
+    "layout": {
+      "heading": "Layout"
+    },
+    "buttons": {
+      "heading": "Buttons"
+    },
+    "favicon": {
+      "heading": "Favicon",
+      "settings": {
+        "favicon": { "label": "Favicon image", "info": "Will be scaled down to 32×32px" }
+      }
+    }
+  }
+}

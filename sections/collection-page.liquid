@@ -4,7 +4,6 @@
 
 <div class="col-page">
 
-  {%- comment -%} Breadcrumb {%- endcomment -%}
   <nav class="breadcrumb" aria-label="breadcrumb">
     <a href="/" class="breadcrumb__link">Home</a>
     <span class="breadcrumb__sep">/</span>
@@ -17,7 +16,6 @@
 
   <div class="col-page__body">
 
-    {%- comment -%} Sidebar {%- endcomment -%}
     <aside class="col-page__sidebar{% if section.settings.sticky_sidebar %} col-page__sidebar--sticky{% endif %}" aria-label="Filters">
       <h2 class="col-page__sidebar-title">FILTER BY</h2>
 
@@ -63,7 +61,6 @@
           </div>
         </div>
       {%- else -%}
-        {%- comment -%} Placeholder filters when no filters configured {%- endcomment -%}
         {%- assign placeholder_filters = 'Category,Size,Color,Price,Brand' | split: ',' -%}
         {%- for f in placeholder_filters -%}
           <div class="filter-group">
@@ -76,20 +73,18 @@
       {%- endfor -%}
     </aside>
 
-    {%- comment -%} Main content {%- endcomment -%}
     <div class="col-page__main">
 
-      {%- comment -%} Toolbar {%- endcomment -%}
       <div class="col-page__toolbar">
         <p class="col-page__count">
           <strong>{{ collection.products_count }}</strong> products
         </p>
 
         <div class="col-page__toolbar-right">
-          {%- comment -%} Grid toggle {%- endcomment -%}
           <div class="col-page__grid-toggle">
             <span class="col-page__grid-label">VIEW</span>
-            {%- for cols in '2,3,4' | split: ',' -%}
+            {%- assign grid_col_options = '2,3,4' | split: ',' -%}
+            {%- for cols in grid_col_options -%}
               {%- assign cols_int = cols | plus: 0 -%}
               <button class="col-page__grid-btn{% if forloop.index == 2 %} is-active{% endif %}" data-cols="{{ cols }}" aria-label="{{ cols }} columns">
                 {%- for i in (1..cols_int) -%}<span class="col-page__grid-bar"></span>{%- endfor -%}
@@ -97,7 +92,6 @@
             {%- endfor -%}
           </div>
 
-          {%- comment -%} Sort {%- endcomment -%}
           <div class="col-page__sort">
             <label class="col-page__sort-label" for="ColSort">SORT</label>
             <div class="col-page__sort-wrap">
@@ -114,7 +108,6 @@
         </div>
       </div>
 
-      {%- comment -%} Active filters {%- endcomment -%}
       {%- assign active_filters_count = 0 -%}
       {%- for filter in collection.filters -%}
         {%- assign active_filters_count = active_filters_count | plus: filter.active_values.size -%}
@@ -132,7 +125,6 @@
         </div>
       {%- endif -%}
 
-      {%- comment -%} Product grid {%- endcomment -%}
       <div class="col-page__grid" id="ColProductGrid" data-cols="{{ section.settings.default_columns | default: 3 }}">
         {%- for product in collection.products -%}
           <div class="prod-card">
@@ -184,7 +176,6 @@
         {%- endfor -%}
       </div>
 
-      {%- comment -%} Pagination {%- endcomment -%}
       {%- if paginate.pages > 1 -%}
         <div class="col-page__pagination">
           {%- if paginate.previous -%}
