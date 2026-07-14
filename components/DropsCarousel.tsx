@@ -61,12 +61,12 @@ export function DropsCarousel() {
       backgroundSize: "52px 52px",
       borderTop: "1px solid #ebebeb",
       borderBottom: "1px solid #ebebeb",
-      paddingBottom: "2.5rem",
+      paddingBottom: "1.5rem",
       overflow: "hidden",
     }}>
 
       {/* ── Title ─────────────────────────────────── */}
-      <div style={{ textAlign: "center", padding: "1.8rem 1rem 0.5rem" }}>
+      <div style={{ textAlign: "center", padding: "1rem 1rem 0" }}>
         {/* Drops logo image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -87,7 +87,7 @@ export function DropsCarousel() {
       <div style={{
         position: "relative",
         width: "100%",
-        height: "clamp(220px, 28vw, 300px)",
+        height: "clamp(190px, 22vw, 260px)",
       }}>
         {products.map((prod, pIdx) => {
           const d = slotOf(pIdx, idx, products.length);
