@@ -67,39 +67,47 @@ export function DropsCarousel() {
 
       {/* ── Title ─────────────────────────────────── */}
       <div style={{ textAlign: "center", padding: "2.8rem 1rem 2rem" }}>
-        {/* Outlined DROPS with script overlay — CC-style */}
-        <div style={{ position: "relative", display: "inline-block", lineHeight: 1 }}>
+        {/*
+          Inline SVG logo — outlined DROPS with circle mask + cursive overlay.
+          Anton font loads from CSS so SVG text inherits it correctly.
+        */}
+        <svg
+          viewBox="0 0 560 116"
+          role="img"
+          aria-label="DROPS iluminatees:"
+          style={{ width: "min(92vw, 560px)", height: "auto", display: "block", margin: "0 auto", overflow: "visible" }}
+        >
           {/* Outlined DROPS */}
-          <span style={{
-            display: "block",
-            fontFamily: "Anton, sans-serif",
-            fontSize: "clamp(4.5rem, 12vw, 10rem)",
-            letterSpacing: "0.12em",
-            lineHeight: 1,
-            textTransform: "uppercase",
-            color: "transparent",
-            WebkitTextStroke: "2px #111",
-            userSelect: "none",
-          }}>
+          <text
+            x="280" y="100"
+            fontFamily="Anton, Impact, sans-serif"
+            fontSize="106"
+            textAnchor="middle"
+            fill="none"
+            stroke="#111"
+            strokeWidth="2"
+            letterSpacing="5"
+          >
             DROPS
-          </span>
-          {/* Cursive iluminatees: overlaid in center */}
-          <span style={{
-            position: "absolute",
-            top: "50%", left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontFamily: "Georgia, 'Times New Roman', serif",
-            fontStyle: "italic",
-            fontWeight: 400,
-            fontSize: "clamp(1.6rem, 4.5vw, 4rem)",
-            color: "#111",
-            whiteSpace: "nowrap",
-            letterSpacing: "0.01em",
-            pointerEvents: "none",
-          }}>
+          </text>
+
+          {/* White circle mask over the O — creates the "punch-out" for the script */}
+          <circle cx="280" cy="54" r="44" fill="white" stroke="#111" strokeWidth="1.6" />
+
+          {/* Script iluminatees: centered on the circle, extends beyond it */}
+          <text
+            x="280" y="67"
+            fontFamily="Georgia, 'Times New Roman', serif"
+            fontStyle="italic"
+            fontSize="28"
+            fill="#111"
+            textAnchor="middle"
+            letterSpacing="-0.3"
+          >
             iluminatees:
-          </span>
-        </div>
+          </text>
+        </svg>
+
         <p style={{
           fontFamily: "Inter, sans-serif", fontSize: "0.72rem",
           color: "#999", letterSpacing: "0.06em", marginTop: 14,
