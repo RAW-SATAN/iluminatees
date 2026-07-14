@@ -125,7 +125,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
       {/* ── Two-panel ─────────────────────────────── */}
       <div
-        style={{ maxWidth: 1280, margin: "0 auto", padding: "1.5rem 1.5rem 0", display: "grid", gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)", gap: "2.5rem", alignItems: "start" }}
+        style={{ maxWidth: 1280, margin: "0 auto", padding: "1.5rem 1.5rem 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem", alignItems: "start" }}
         className="product-grid"
       >
 
@@ -136,8 +136,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             {/* Thumbnails */}
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[0, 1, 2].map(i => (
-                <div key={i} style={{ width: 62, height: 72, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                  <ProductMockup product={product} size={46} />
+                <div key={i} style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                  <ProductMockup product={product} size={52} />
                 </div>
               ))}
             </div>
@@ -158,14 +158,14 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 </button>
               </div>
 
-              <div style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 420, padding: "2.5rem 2rem", position: "relative" }}>
+              <div style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: "3rem 2rem", position: "relative" }}>
                 <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
                   <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.34rem", color: "#111", letterSpacing: "0.04em", lineHeight: 1.3 }}>
                     AS SEEN ON<br />
                     <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em" }}>SHARK TANK</span>
                   </div>
                 </div>
-                <ProductMockup product={product} size={300} />
+                <ProductMockup product={product} size={340} />
               </div>
 
               {/* Sold + rating bar */}
