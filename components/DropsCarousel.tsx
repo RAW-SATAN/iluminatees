@@ -7,27 +7,39 @@ import { products } from "@/lib/products";
 import { ProductMockup } from "./ProductMockup";
 import { useWishlist } from "./WishlistProvider";
 
-/* distance → visual weight */
-const SLOT = [
-  { d: -2, scale: 0.42, opacity: 0.3,  tx: "-38vw", zIndex: 1 },
-  { d: -1, scale: 0.65, opacity: 0.55, tx: "-21vw", zIndex: 2 },
-  { d:  0, scale: 1.00, opacity: 1.0,  tx:   "0",   zIndex: 4 },
-  { d:  1, scale: 0.65, opacity: 0.55, tx:  "21vw", zIndex: 2 },
-  { d:  2, scale: 0.42, opacity: 0.3,  tx:  "38vw", zIndex: 1 },
+/*
+  Key insight: key each item by its product index (not slot).
+  When idx changes, React transitions the SAME DOM node from
+  slot +1 → slot 0, giving a real physical grow/shrink motion.
+*/
+
+/* slot index -2…+2 → visual properties */
+const SLOTS = [
+  { scale: 0.40, opacity: 0.28, tx: "-38vw", zIndex: 1 }, // -2
+  { scale: 0.63, opacity: 0.52, tx: "-21vw", zIndex: 2 }, // -1
+  { scale: 1.00, opacity: 1.00, tx:    "0",  zIndex: 4 }, //  0  ← center
+  { scale: 0.63, opacity: 0.52, tx:  "21vw", zIndex: 2 }, // +1
+  { scale: 0.40, opacity: 0.28, tx:  "38vw", zIndex: 1 }, // +2
 ];
+
+/* off-screen "waiting" position for products outside ±2 */
+const OFF = { scale: 0.28, opacity: 0, zIndex: 0 };
+
+function slotOf(pIdx: number, center: number, total: number) {
+  let d = ((pIdx - center) % total + total) % total;
+  if (d > total / 2) d -= total;
+  return d; // signed distance from center
+}
 
 const TAG_MAP: Record<string, string> = {
   bestseller: "BESTSELLER",
   limited:    "LIMITED EDITION",
   premium:    "APEX PREMIUM",
   classic:    "CLASSIC DROP",
-  "new-drop": "NEW DROP",
 };
-
 function getTag(p: (typeof products)[0]) {
   for (const t of p.tags) if (TAG_MAP[t]) return TAG_MAP[t];
-  if (p.limited) return "LIMITED EDITION";
-  return "NEW ARRIVAL";
+  return p.limited ? "LIMITED EDITION" : "NEW ARRIVAL";
 }
 
 export function DropsCarousel() {
@@ -44,7 +56,8 @@ export function DropsCarousel() {
     <section style={{
       background: "#fff",
       backgroundImage:
-        "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)",
+        "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)," +
+        "linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)",
       backgroundSize: "52px 52px",
       borderTop: "1px solid #ebebeb",
       borderBottom: "1px solid #ebebeb",
@@ -57,9 +70,7 @@ export function DropsCarousel() {
         <div style={{
           fontFamily: "Anton, sans-serif",
           fontSize: "clamp(3.5rem, 9vw, 7.5rem)",
-          letterSpacing: "0.08em",
-          color: "#111",
-          lineHeight: 1,
+          letterSpacing: "0.08em", color: "#111", lineHeight: 1,
           textTransform: "uppercase",
         }}>
           DROPS
@@ -67,60 +78,68 @@ export function DropsCarousel() {
             fontFamily: "Inter, sans-serif",
             fontWeight: 300, fontStyle: "italic",
             fontSize: "clamp(1.2rem, 3vw, 2.8rem)",
-            letterSpacing: "0.02em",
-            color: "#555",
-            marginLeft: "0.3em",
+            letterSpacing: "0.02em", color: "#555", marginLeft: "0.3em",
           }}>
             iluminatees:
           </span>
         </div>
         <p style={{
-          fontFamily: "Inter, sans-serif",
-          fontSize: "0.72rem", color: "#999",
-          letterSpacing: "0.06em", marginTop: 8,
+          fontFamily: "Inter, sans-serif", fontSize: "0.72rem",
+          color: "#999", letterSpacing: "0.06em", marginTop: 8,
         }}>
           Fresh Drops From The Vault. Refreshed Daily.
         </p>
       </div>
 
-      {/* ── Fan of products ───────────────────────── */}
+      {/* ── Fan stage ─────────────────────────────── */}
       <div style={{
         position: "relative",
-        height: "clamp(240px, 32vw, 340px)",
+        height: "clamp(230px, 30vw, 320px)",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
-        {SLOT.map(({ d, scale, opacity, tx, zIndex }) => {
-          const pIdx = (idx + d + products.length) % products.length;
-          const prod = products[pIdx];
+        {products.map((prod, pIdx) => {
+          const d = slotOf(pIdx, idx, products.length);
+          const abs = Math.abs(d);
+
+          /* properties: use OFF for |d| > 2 (invisible but rendered for smooth entry) */
+          const s = abs <= 2 ? SLOTS[d + 2] : {
+            ...OFF,
+            tx: d < 0 ? "-52vw" : "52vw",
+          } as typeof SLOTS[0];
+
           const isCenter = d === 0;
+          const isClickable = abs === 1 || abs === 2;
+
           return (
             <div
-              key={d}
-              onClick={d !== 0 ? (d < 0 ? prev : next) : undefined}
+              key={pIdx}                          /* ← keyed by product, not slot */
+              onClick={isClickable ? (d < 0 ? prev : next) : undefined}
               style={{
                 position: "absolute",
                 left: "50%",
-                transform: `translateX(calc(-50% + ${tx})) scale(${scale})`,
-                opacity,
-                zIndex,
-                transition: "transform 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease",
-                cursor: d !== 0 ? "pointer" : "default",
-                pointerEvents: d === 0 ? "none" : "auto",
+                /* spring easing: second value > 1 = overshoot → grow pop */
+                transition:
+                  "transform 0.52s cubic-bezier(0.34, 1.38, 0.64, 1)," +
+                  "opacity 0.38s ease",
+                transform: `translateX(calc(-50% + ${"tx" in s ? s.tx : "0"})) scale(${s.scale})`,
+                opacity: s.opacity,
+                zIndex: s.zIndex,
+                cursor: isClickable ? "pointer" : "default",
+                pointerEvents: isClickable ? "auto" : "none",
               }}
             >
               <div style={{
-                width: "clamp(160px, 18vw, 220px)",
-                height: "clamp(160px, 18vw, 220px)",
+                width:  "clamp(150px, 17vw, 210px)",
+                height: "clamp(150px, 17vw, 210px)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 background: isCenter ? "#fff" : "transparent",
-                borderRadius: isCenter ? 4 : 0,
-                boxShadow: isCenter ? "0 12px 48px rgba(0,0,0,0.10)" : "none",
-                border: isCenter ? "1px solid #eee" : "none",
+                borderRadius: 4,
+                boxShadow: isCenter ? "0 16px 56px rgba(0,0,0,0.12)" : "none",
+                border:     isCenter ? "1px solid #eee" : "none",
+                /* inner scale spring so the image itself pops */
+                transition: "box-shadow 0.4s ease, border-color 0.4s ease",
               }}>
-                <ProductMockup
-                  product={prod}
-                  size={isCenter ? 180 : 140}
-                />
+                <ProductMockup product={prod} size={isCenter ? 175 : 135} />
               </div>
             </div>
           );
@@ -129,42 +148,37 @@ export function DropsCarousel() {
 
       {/* ── Info card ─────────────────────────────── */}
       <div style={{
-        maxWidth: 380, margin: "1.6rem auto 0",
+        maxWidth: 390, margin: "1.8rem auto 0",
         background: "#fff",
-        border: "1px solid #e8e8e8",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-        padding: "1.2rem 1.4rem",
+        border: "1px solid #e4e4e4",
+        boxShadow: "0 4px 28px rgba(0,0,0,0.07)",
+        padding: "1.2rem 1.5rem",
         position: "relative",
       }}>
-        {/* Nav arrows */}
-        <button
-          onClick={prev}
-          style={{
-            position: "absolute", left: -20, top: "50%", transform: "translateY(-50%)",
-            width: 36, height: 36, borderRadius: "50%",
-            background: "#fff", border: "1px solid #e0e0e0",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", zIndex: 5,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-          }}
-        >
-          <ChevronLeft size={14} color="#555" />
-        </button>
-        <button
-          onClick={next}
-          style={{
-            position: "absolute", right: -20, top: "50%", transform: "translateY(-50%)",
-            width: 36, height: 36, borderRadius: "50%",
-            background: "#fff", border: "1px solid #e0e0e0",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", zIndex: 5,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-          }}
-        >
-          <ChevronRight size={14} color="#555" />
-        </button>
+        {/* Arrows */}
+        {[
+          { fn: prev, side: "left",  icon: <ChevronLeft  size={14} color="#555" /> },
+          { fn: next, side: "right", icon: <ChevronRight size={14} color="#555" /> },
+        ].map(({ fn, side, icon }) => (
+          <button
+            key={side}
+            onClick={fn}
+            style={{
+              position: "absolute",
+              [side]: -20,
+              top: "50%", transform: "translateY(-50%)",
+              width: 38, height: 38, borderRadius: "50%",
+              background: "#fff", border: "1px solid #e0e0e0",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", zIndex: 5,
+              boxShadow: "0 2px 10px rgba(0,0,0,0.09)",
+            }}
+          >
+            {icon}
+          </button>
+        ))}
 
-        {/* Tag row */}
+        {/* Tag + heart */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
           <span style={{
             fontFamily: "Inter, sans-serif", fontWeight: 800,
@@ -188,13 +202,13 @@ export function DropsCarousel() {
         {/* Name */}
         <div style={{
           fontFamily: "Anton, sans-serif",
-          fontSize: "1.05rem", letterSpacing: "0.04em",
+          fontSize: "1.1rem", letterSpacing: "0.04em",
           color: "#111", marginBottom: 8,
         }}>
           {center.name}
         </div>
 
-        {/* Price row */}
+        {/* Price */}
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
           <span style={{
             fontFamily: "Space Mono, monospace",
@@ -228,7 +242,7 @@ export function DropsCarousel() {
             fontFamily: "Inter, sans-serif", fontWeight: 800,
             fontSize: "0.58rem", letterSpacing: "0.18em",
             textTransform: "uppercase", textDecoration: "none",
-            padding: "0.7rem", textAlign: "center",
+            padding: "0.72rem", textAlign: "center",
           }}
         >
           Explore
@@ -236,20 +250,16 @@ export function DropsCarousel() {
       </div>
 
       {/* ── Progress dots ─────────────────────────── */}
-      <div style={{
-        display: "flex", justifyContent: "center", gap: 5, marginTop: 16,
-      }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 5, marginTop: 18 }}>
         {products.map((_, i) => (
           <button
             key={i}
             onClick={() => setIdx(i)}
             style={{
-              width: i === idx ? 22 : 6, height: 5,
-              borderRadius: 3,
+              width: i === idx ? 22 : 6, height: 5, borderRadius: 3,
               background: i === idx ? "#111" : "#ddd",
-              border: "none", cursor: "pointer",
-              transition: "width 0.3s, background 0.3s",
-              padding: 0,
+              border: "none", cursor: "pointer", padding: 0,
+              transition: "width 0.35s, background 0.3s",
             }}
           />
         ))}
