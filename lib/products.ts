@@ -1,0 +1,241 @@
+export type ProductSize = "XS" | "S" | "M" | "L" | "XL" | "XXL";
+export type ProductCategory = "SACRED" | "CIPHER" | "APEX";
+
+export interface Product {
+  id: string;
+  slug: string;
+  name: string;
+  codename: string;
+  category: ProductCategory;
+  price: number;
+  originalPrice?: number;
+  description: string;
+  lore: string;
+  symbol: "eye" | "pyramid" | "compass" | "star" | "spiral" | "cross" | "ouroboros" | "hexagon" | "rose" | "ankh" | "omega" | "sigil";
+  shirtColor: string;
+  accentColor: string;
+  sizes: ProductSize[];
+  inStock: boolean;
+  limited: boolean;
+  tags: string[];
+}
+
+export const products: Product[] = [
+  {
+    id: "01",
+    slug: "eye-of-providence",
+    name: "Eye of Providence",
+    codename: "DOSSIER-01",
+    category: "APEX",
+    price: 1333,
+    originalPrice: 1999,
+    description: "The all-seeing eye, rendered in hand-etched linework on 220 GSM heavyweight cotton. Oversized fit. Pre-washed for that worn-in feel.",
+    lore: "They said you cannot unsee it. Once the eye finds you, it never looks away. Worn by the architects of civilizations that rose and fell before yours was named.",
+    symbol: "eye",
+    shirtColor: "#0d0d0d",
+    accentColor: "#c9a84c",
+    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: false,
+    tags: ["bestseller", "oversized", "heavyweight"],
+  },
+  {
+    id: "02",
+    slug: "novus-ordo-seclorum",
+    name: "Novus Ordo Seclorum",
+    codename: "DOSSIER-02",
+    category: "SACRED",
+    price: 999,
+    description: "New order of the ages. Worn on the back of every dollar since 1935. Boxy fit on 180 GSM ringspun cotton.",
+    lore: "Thirteen layers. Thirteen stars. Thirteen arrows. The number no empire dares ignore. This shirt carries the weight of four hundred years of hidden architecture.",
+    symbol: "pyramid",
+    shirtColor: "#1a1a0a",
+    accentColor: "#e8c060",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: false,
+    tags: ["classic", "boxy"],
+  },
+  {
+    id: "03",
+    slug: "sacred-geometry",
+    name: "Sacred Geometry",
+    codename: "DOSSIER-03",
+    category: "SACRED",
+    price: 1111,
+    description: "The Flower of Life. A pattern found carved into the Temple of Osiris, 6000 years before your calendar began. Slim fit, 200 GSM.",
+    lore: "Metatron's Cube encoded in every intersection. If you trace the lines long enough, you find the blueprint of every atom in existence. Including yours.",
+    symbol: "hexagon",
+    shirtColor: "#0a0a1a",
+    accentColor: "#c9a84c",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: ["slim", "geometric"],
+  },
+  {
+    id: "04",
+    slug: "the-architect",
+    name: "The Architect",
+    codename: "DOSSIER-04",
+    category: "APEX",
+    price: 2222,
+    description: "Compass and square — the tools that built cathedrals, navies, and nations. Drop-shoulder silhouette on 240 GSM premium cotton.",
+    lore: "Every city you live in was designed by someone who swore an oath you were never meant to hear. The Architect never builds for the tenants.",
+    symbol: "compass",
+    shirtColor: "#0a1212",
+    accentColor: "#ffd700",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: true,
+    tags: ["premium", "drop-shoulder", "limited"],
+  },
+  {
+    id: "05",
+    slug: "third-eye-open",
+    name: "Third Eye Open",
+    codename: "DOSSIER-05",
+    category: "CIPHER",
+    price: 1555,
+    description: "Ajna. The sixth chakra. The one they closed your school curriculum around. Relaxed fit, 210 GSM washed cotton.",
+    lore: "Pineal gland. Calcified by fluoride, reopened by knowledge. The ancients called it the seat of the soul. The moderns called it a vestigial gland. Draw your own conclusions.",
+    symbol: "eye",
+    shirtColor: "#12001a",
+    accentColor: "#d4a0ff",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: ["relaxed", "washed"],
+  },
+  {
+    id: "06",
+    slug: "annuit-coeptis",
+    name: "Annuit Coeptis",
+    codename: "DOSSIER-06",
+    category: "SACRED",
+    price: 888,
+    description: "He approves of the undertakings. Whether He is watching or you are building — either way, you proceed. Regular fit, 180 GSM.",
+    lore: "The motto was suggested in 1782 by Charles Thomson, who had translated the Bible and helped conceal the true founding documents. Some things are approved by design.",
+    symbol: "star",
+    shirtColor: "#1a1200",
+    accentColor: "#c9a84c",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: false,
+    tags: ["regular-fit", "everyday"],
+  },
+  {
+    id: "07",
+    slug: "cipher-33",
+    name: "Cipher 33",
+    codename: "DOSSIER-07",
+    category: "APEX",
+    price: 3333,
+    description: "The highest degree. The number that ends all further questioning. Heavyweight drop-shoulder, 260 GSM, pre-shrunk.",
+    lore: "33 vertebrae in the human spine. 33 degrees of Scottish Rite Freemasonry. 33 is the age at which a certain carpenter was silenced. Some numbers are not coincidences.",
+    symbol: "compass",
+    shirtColor: "#050505",
+    accentColor: "#ffd700",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: true,
+    tags: ["apex", "heavyweight", "limited", "collectible"],
+  },
+  {
+    id: "08",
+    slug: "the-grand-lodge",
+    name: "The Grand Lodge",
+    codename: "DOSSIER-08",
+    category: "CIPHER",
+    price: 1999,
+    description: "Gothic arch, stone by stone. The structure that holds every secret society's ceiling up. Boxy fit, 220 GSM organic cotton.",
+    lore: "Every lodge has a door. You're either in the room or you're not. There is no middle floor, no waiting list. You are brought in — or you are kept out.",
+    symbol: "cross",
+    shirtColor: "#001a00",
+    accentColor: "#c9a84c",
+    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: false,
+    tags: ["boxy", "organic"],
+  },
+  {
+    id: "09",
+    slug: "sic-semper",
+    name: "Sic Semper",
+    codename: "DOSSIER-09",
+    category: "CIPHER",
+    price: 1444,
+    description: "Thus always to tyrants. The oldest warning in the oldest rooms. Regular fit, 190 GSM cotton-linen blend.",
+    lore: "Said at the fall of Julius Caesar. Said again in Ford's Theatre. The phrase outlives every regime it condemns. Power is temporary. The warning is eternal.",
+    symbol: "star",
+    shirtColor: "#1a0500",
+    accentColor: "#e8c060",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: false,
+    tags: ["cotton-linen", "regular-fit"],
+  },
+  {
+    id: "10",
+    slug: "the-veil",
+    name: "The Veil",
+    codename: "DOSSIER-10",
+    category: "APEX",
+    price: 4444,
+    description: "Nothing visible. Everything present. Tonal black-on-black embossed design. Ultra-heavy 280 GSM milled cotton.",
+    lore: "The most dangerous truths are the ones you cannot point to. The Veil is not a cover-up. It is a filter. Most never see it at all. You are not most.",
+    symbol: "ouroboros",
+    shirtColor: "#050505",
+    accentColor: "#1a1a1a",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: true,
+    tags: ["apex", "ultra-heavy", "tonal", "limited", "collectible"],
+  },
+  {
+    id: "11",
+    slug: "order-of-the-rose",
+    name: "Order of the Rose",
+    codename: "DOSSIER-11",
+    category: "SACRED",
+    price: 1777,
+    description: "Rosicrucian rose. The oldest cross-cult symbol of hidden knowledge. Relaxed fit, 210 GSM, garment-dyed burgundy.",
+    lore: "The Rosicrucian Manifestos of 1614 promised a universal reformation of the whole wide world. They published two pamphlets and disappeared. No one has ever confirmed who wrote them.",
+    symbol: "rose",
+    shirtColor: "#1a0010",
+    accentColor: "#c9a84c",
+    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: false,
+    tags: ["garment-dyed", "relaxed", "burgundy"],
+  },
+  {
+    id: "12",
+    slug: "quantum-eye",
+    name: "Quantum Eye",
+    codename: "DOSSIER-12",
+    category: "CIPHER",
+    price: 2666,
+    description: "Surveillance in every photon. The eye that observes collapses the wave function. Oversized, 220 GSM, acid-wash finish.",
+    lore: "The observer effect. Look at a particle and it stops behaving randomly — as if it knew it was being watched. At scale, this is not quantum physics. It is politics.",
+    symbol: "sigil",
+    shirtColor: "#001a1a",
+    accentColor: "#00e5ff",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    inStock: true,
+    limited: true,
+    tags: ["oversized", "acid-wash", "limited"],
+  },
+];
+
+export function getProductBySlug(slug: string): Product | undefined {
+  return products.find((p) => p.slug === slug);
+}
+
+export function getProductsByCategory(category: ProductCategory): Product[] {
+  return products.filter((p) => p.category === category);
+}
+
+export function getFeaturedProducts(): Product[] {
+  return products.filter((p) => ["eye-of-providence", "cipher-33", "the-veil", "quantum-eye", "the-architect", "sacred-geometry"].includes(p.slug));
+}
