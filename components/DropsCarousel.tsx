@@ -68,43 +68,53 @@ export function DropsCarousel() {
       {/* ── Title ─────────────────────────────────── */}
       <div style={{ textAlign: "center", padding: "2.8rem 1rem 2rem" }}>
         {/*
-          Inline SVG logo — outlined DROPS with circle mask + cursive overlay.
-          Anton font loads from CSS so SVG text inherits it correctly.
+          Inline SVG logo — "Luckiest Guy" chunky outlined DROPS,
+          oval mask over O, "Dancing Script" cursive overlay.
+          Both fonts load via CSS so they apply inside the inline SVG.
         */}
         <svg
-          viewBox="0 0 560 116"
+          viewBox="0 0 780 172"
           role="img"
-          aria-label="DROPS iluminatees:"
-          style={{ width: "min(92vw, 560px)", height: "auto", display: "block", margin: "0 auto", overflow: "visible" }}
+          aria-label="DROPS iluminatees'"
+          style={{ width: "min(94vw, 720px)", height: "auto", display: "block", margin: "0 auto", overflow: "visible" }}
         >
-          {/* Outlined DROPS */}
+          <defs>
+            {/* Drop shadow filter for the letters */}
+            <filter id="letter-shadow" x="-5%" y="-5%" width="115%" height="115%">
+              <feDropShadow dx="3" dy="3" stdDeviation="0" floodColor="#000" floodOpacity="1" />
+            </filter>
+          </defs>
+
+          {/* ── DROPS — white fill, thick black stroke, Luckiest Guy ── */}
           <text
-            x="280" y="100"
-            fontFamily="Anton, Impact, sans-serif"
-            fontSize="106"
+            x="390" y="148"
+            fontFamily="'Luckiest Guy', Impact, sans-serif"
+            fontSize="148"
             textAnchor="middle"
-            fill="none"
+            letterSpacing="4"
+            fill="white"
             stroke="#111"
-            strokeWidth="2"
-            letterSpacing="5"
+            strokeWidth="6"
+            paintOrder="stroke"
+            style={{ filter: "url(#letter-shadow)" }}
           >
             DROPS
           </text>
 
-          {/* White circle mask over the O — creates the "punch-out" for the script */}
-          <circle cx="280" cy="54" r="44" fill="white" stroke="#111" strokeWidth="1.6" />
+          {/* ── Oval mask over the O area ── */}
+          <ellipse cx="390" cy="82" rx="86" ry="78" fill="white" stroke="#111" strokeWidth="5" />
 
-          {/* Script iluminatees: centered on the circle, extends beyond it */}
+          {/* ── 'iluminatees' — Dancing Script cursive in the oval ── */}
           <text
-            x="280" y="67"
-            fontFamily="Georgia, 'Times New Roman', serif"
-            fontStyle="italic"
-            fontSize="28"
+            x="390" y="104"
+            fontFamily="'Dancing Script', 'Great Vibes', cursive"
+            fontWeight="700"
+            fontSize="46"
             fill="#111"
             textAnchor="middle"
-            letterSpacing="-0.3"
+            letterSpacing="-0.5"
           >
-            iluminatees:
+            &apos;iluminatees&apos;
           </text>
         </svg>
 
