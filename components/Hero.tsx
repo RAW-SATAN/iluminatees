@@ -6,56 +6,68 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { products } from "@/lib/products";
 import { ProductMockup } from "./ProductMockup";
 
-/* ── Slide data ─────────────────────────────────────────── */
+/* ── Carousel slides ────────────────────────────────────── */
 const SLIDES = [
   {
     slug:        "eye-of-providence",
     tag:         "BESTSELLER",
-    bg:          "radial-gradient(ellipse 75% 90% at 22% 55%, rgba(232,0,13,0.30) 0%, transparent 60%), #050505",
+    subtext:     "220 GSM · Heavyweight Cotton · Oversized Fit",
+    bg:          "linear-gradient(135deg, #c8000010 0%, #8b000018 100%), radial-gradient(ellipse 80% 70% at 35% 55%, rgba(220,0,10,0.22) 0%, transparent 65%), #fdf5f5",
     accentColor: "#e8000d",
+    textColor:   "#111",
     sideLabel:   "NEW DROP",
     sideEmoji:   "👁",
-    sideBg:      "rgba(232,0,13,0.14)",
-    sideBorder:  "rgba(232,0,13,0.40)",
+    sideBg:      "rgba(232,0,13,0.12)",
+    sideActiveBg:"rgba(232,0,13,0.18)",
+    sideActive:  "#e8000d",
   },
   {
     slug:        "the-architect",
     tag:         "APEX PREMIUM",
-    bg:          "radial-gradient(ellipse 75% 90% at 22% 55%, rgba(130,0,220,0.24) 0%, transparent 60%), #04040b",
-    accentColor: "#9c27b0",
+    subtext:     "240 GSM · Drop-shoulder · Pre-washed",
+    bg:          "linear-gradient(135deg, #3300660a 0%, #66009918 100%), radial-gradient(ellipse 80% 70% at 35% 55%, rgba(100,0,180,0.18) 0%, transparent 65%), #faf5ff",
+    accentColor: "#7c00cc",
+    textColor:   "#111",
     sideLabel:   "APEX TIER",
     sideEmoji:   "⬡",
-    sideBg:      "rgba(156,39,176,0.14)",
-    sideBorder:  "rgba(156,39,176,0.40)",
+    sideBg:      "rgba(124,0,204,0.10)",
+    sideActiveBg:"rgba(124,0,204,0.16)",
+    sideActive:  "#7c00cc",
   },
   {
     slug:        "cipher-33",
     tag:         "LIMITED EDITION",
-    bg:          "radial-gradient(ellipse 75% 90% at 22% 55%, rgba(0,190,100,0.20) 0%, transparent 60%), #04090505",
-    accentColor: "#00c853",
+    subtext:     "260 GSM · Drop-shoulder · Only 100 Pieces",
+    bg:          "linear-gradient(135deg, #00220008 0%, #00660014 100%), radial-gradient(ellipse 80% 70% at 35% 55%, rgba(0,150,80,0.18) 0%, transparent 65%), #f4fff8",
+    accentColor: "#00843d",
+    textColor:   "#111",
     sideLabel:   "LIMITED",
     sideEmoji:   "△",
-    sideBg:      "rgba(0,200,83,0.12)",
-    sideBorder:  "rgba(0,200,83,0.35)",
+    sideBg:      "rgba(0,132,61,0.10)",
+    sideActiveBg:"rgba(0,132,61,0.16)",
+    sideActive:  "#00843d",
   },
   {
     slug:        "sacred-geometry",
     tag:         "SACRED SERIES",
-    bg:          "radial-gradient(ellipse 75% 90% at 22% 55%, rgba(201,168,76,0.24) 0%, transparent 60%), #080600",
-    accentColor: "#c9a84c",
+    subtext:     "200 GSM · Slim Fit · Garment Dyed",
+    bg:          "linear-gradient(135deg, #1a0d0008 0%, #c9a84c14 100%), radial-gradient(ellipse 80% 70% at 35% 55%, rgba(180,130,30,0.18) 0%, transparent 65%), #fffdf0",
+    accentColor: "#a07820",
+    textColor:   "#111",
     sideLabel:   "SACRED",
     sideEmoji:   "✦",
-    sideBg:      "rgba(201,168,76,0.12)",
-    sideBorder:  "rgba(201,168,76,0.40)",
+    sideBg:      "rgba(160,120,32,0.10)",
+    sideActiveBg:"rgba(160,120,32,0.16)",
+    sideActive:  "#a07820",
   },
 ];
 
 const EXTRA_CATS = [
-  { label: "CIPHER",      emoji: "◈", href: "/shop?cat=CIPHER", bg: "rgba(0,188,212,0.10)", border: "rgba(0,188,212,0.28)" },
-  { label: "OVERSIZED",   emoji: "□", href: "/shop",             bg: "rgba(96,125,139,0.10)", border: "rgba(96,125,139,0.28)" },
-  { label: "HEAVYWEIGHT", emoji: "▣", href: "/shop",             bg: "rgba(121,85,72,0.10)",  border: "rgba(121,85,72,0.28)"  },
-  { label: "MENS",        emoji: "▲", href: "/shop",             bg: "rgba(55,71,79,0.10)",   border: "rgba(55,71,79,0.28)"   },
-  { label: "SALE",        emoji: "%", href: "/shop",             bg: "rgba(232,0,13,0.10)",   border: "rgba(232,0,13,0.28)"   },
+  { label: "CIPHER",      emoji: "◈", href: "/shop?cat=CIPHER", sideBg: "rgba(0,160,200,0.10)", sideActive: "#0090bb" },
+  { label: "OVERSIZED",   emoji: "□", href: "/shop",            sideBg: "rgba(80,100,120,0.10)", sideActive: "#607080" },
+  { label: "HEAVYWEIGHT", emoji: "▣", href: "/shop",            sideBg: "rgba(100,70,50,0.10)",  sideActive: "#7a5040" },
+  { label: "MENS",        emoji: "▲", href: "/shop",            sideBg: "rgba(40,55,70,0.10)",   sideActive: "#405060" },
+  { label: "SALE",        emoji: "%", href: "/shop",            sideBg: "rgba(232,0,13,0.10)",   sideActive: "#e8000d" },
 ];
 
 /* ── Component ──────────────────────────────────────────── */
@@ -64,35 +76,32 @@ export function Hero() {
   const [isHovering, setIsHovering] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
-  /* Auto-advance */
   useEffect(() => {
     if (isHovering) { clearInterval(timerRef.current); return; }
     timerRef.current = setInterval(() => {
       setSlide((s) => (s + 1) % SLIDES.length);
-    }, 4200);
+    }, 4000);
     return () => clearInterval(timerRef.current);
   }, [isHovering]);
 
-  const cur  = SLIDES[slide];
-  const next = () => setSlide((s) => (s + 1) % SLIDES.length);
   const prev = () => setSlide((s) => (s - 1 + SLIDES.length) % SLIDES.length);
+  const next = () => setSlide((s) => (s + 1) % SLIDES.length);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "clamp(380px, 46vw, 480px)",
-        background: "#040404",
-        borderBottom: "1px solid #1a1a1a",
-      }}
-    >
+    <div style={{
+      display: "flex",
+      height: "clamp(360px, 44vw, 460px)",
+      borderBottom: "1px solid #e8e8e8",
+      background: "#fff",
+    }}>
+
       {/* ── Left Sidebar ──────────────────────────────── */}
       <div
         className="hidden md:flex no-scrollbar"
         style={{
-          width: 192, flexShrink: 0,
-          background: "#060606",
-          borderRight: "1px solid #141414",
+          width: 200, flexShrink: 0,
+          background: "#121212",
+          borderRight: "1px solid #1e1e1e",
           overflowY: "auto",
           flexDirection: "column",
         }}
@@ -100,6 +109,7 @@ export function Hero() {
         {/* Slide-linked categories */}
         {SLIDES.map((s, i) => {
           const prod = products.find((p) => p.slug === s.slug)!;
+          const active = slide === i;
           return (
             <button
               key={s.slug}
@@ -107,70 +117,74 @@ export function Hero() {
               onMouseLeave={() => setIsHovering(false)}
               style={{
                 display: "flex", alignItems: "center", gap: 10,
-                padding: "12px 14px",
-                background: slide === i ? s.sideBg : "transparent",
-                borderLeft: `3px solid ${slide === i ? s.accentColor : "transparent"}`,
-                borderBottom: "1px solid #141414",
+                padding: "11px 13px",
+                background: active ? s.sideActiveBg : "transparent",
+                borderLeft: `3px solid ${active ? s.sideActive : "transparent"}`,
+                borderBottom: "1px solid #1e1e1e",
                 width: "100%", textAlign: "left",
-                transition: "background 0.25s, border-color 0.25s",
+                transition: "background 0.2s, border-color 0.2s",
               }}
             >
-              {/* Thumbnail */}
               <div style={{
                 width: 38, height: 38, borderRadius: 3, flexShrink: 0,
-                background: s.sideBg,
-                border: `1px solid ${slide === i ? s.accentColor : s.sideBorder}`,
+                background: active ? s.sideActiveBg : s.sideBg,
+                border: `1px solid ${active ? s.sideActive : "rgba(255,255,255,0.08)"}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 15,
-                transition: "border-color 0.25s",
+                fontSize: 14, transition: "border-color 0.2s",
               }}>
                 {s.sideEmoji}
               </div>
-              <span style={{
-                fontFamily: "Inter, sans-serif", fontSize: "0.57rem",
-                fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-                color: slide === i ? "#fff" : "rgba(255,255,255,0.38)",
-                transition: "color 0.25s",
-                lineHeight: 1.2,
-              }}>
-                {s.sideLabel}
-                <br />
-                <span style={{ fontWeight: 400, fontSize: "0.48rem", color: "rgba(255,255,255,0.22)", letterSpacing: "0.05em" }}>
+              <div>
+                <div style={{
+                  fontFamily: "Inter, sans-serif", fontSize: "0.56rem",
+                  fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                  color: active ? "#fff" : "rgba(255,255,255,0.5)",
+                  lineHeight: 1.2, transition: "color 0.2s",
+                }}>
+                  {s.sideLabel}
+                </div>
+                <div style={{
+                  fontFamily: "Inter, sans-serif", fontSize: "0.46rem",
+                  color: "rgba(255,255,255,0.25)", letterSpacing: "0.02em",
+                  marginTop: 1,
+                }}>
                   {prod.name}
-                </span>
-              </span>
+                </div>
+              </div>
             </button>
           );
         })}
 
         {/* Divider */}
-        <div style={{ height: 1, background: "#1c1c1c", margin: "4px 0" }} />
+        <div style={{ height: 1, background: "#222", margin: "3px 0" }} />
 
         {/* Extra cats */}
-        {EXTRA_CATS.map(({ label, emoji, href, bg, border }) => (
+        {EXTRA_CATS.map(({ label, emoji, href, sideBg, sideActive }) => (
           <Link
             key={label}
             href={href}
             style={{
               display: "flex", alignItems: "center", gap: 10,
-              padding: "10px 14px",
+              padding: "10px 13px",
               borderLeft: "3px solid transparent",
-              borderBottom: "1px solid #141414",
+              borderBottom: "1px solid #1e1e1e",
               textDecoration: "none",
+              transition: "background 0.15s",
             }}
           >
             <div style={{
               width: 36, height: 36, borderRadius: 3, flexShrink: 0,
-              background: bg, border: `1px solid ${border}`,
+              background: sideBg,
+              border: "1px solid rgba(255,255,255,0.07)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 14,
+              fontSize: 13,
             }}>
               {emoji}
             </div>
             <span style={{
-              fontFamily: "Inter, sans-serif", fontSize: "0.56rem",
-              fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-              color: "rgba(255,255,255,0.32)",
+              fontFamily: "Inter, sans-serif", fontSize: "0.55rem",
+              fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
+              color: "rgba(255,255,255,0.35)",
             }}>
               {label}
             </span>
@@ -186,30 +200,30 @@ export function Hero() {
       >
         {SLIDES.map((s, i) => {
           const prod = products.find((p) => p.slug === s.slug)!;
-          const isActive = slide === i;
+          const active = slide === i;
           return (
             <div
               key={s.slug}
               style={{
                 position: "absolute", inset: 0,
                 background: s.bg,
-                opacity: isActive ? 1 : 0,
-                transition: "opacity 0.65s ease",
-                pointerEvents: isActive ? "auto" : "none",
+                opacity: active ? 1 : 0,
+                transition: "opacity 0.55s ease",
+                pointerEvents: active ? "auto" : "none",
                 display: "flex", alignItems: "center",
-                padding: "0 clamp(1.5rem, 4vw, 4rem)",
-                gap: "2rem",
+                padding: "0 clamp(1.5rem, 4vw, 3.5rem)",
+                gap: "1.5rem",
               }}
             >
-              {/* Info */}
-              <div style={{ flex: 1, zIndex: 1 }}>
-                {/* Tag pill */}
+              {/* Left: text */}
+              <div style={{ flex: 1 }}>
+                {/* Tag */}
                 <div style={{
                   display: "inline-flex",
                   background: s.accentColor, color: "#fff",
                   fontFamily: "Inter, sans-serif", fontWeight: 800,
                   fontSize: "0.44rem", letterSpacing: "0.28em",
-                  padding: "0.22rem 0.65rem", marginBottom: 14,
+                  padding: "0.2rem 0.6rem", marginBottom: 12,
                 }}>
                   {s.tag}
                 </div>
@@ -217,27 +231,35 @@ export function Hero() {
                 {/* Headline */}
                 <h2 style={{
                   fontFamily: "Anton, sans-serif",
-                  fontSize: "clamp(2.4rem, 4.5vw, 4.8rem)",
-                  lineHeight: 0.88, letterSpacing: "-0.01em",
-                  textTransform: "uppercase", color: "#fff",
-                  marginBottom: 18, whiteSpace: "pre-line",
+                  fontSize: "clamp(2.2rem, 4.5vw, 4.6rem)",
+                  lineHeight: 0.9, letterSpacing: "0.01em",
+                  textTransform: "uppercase", color: s.textColor,
+                  marginBottom: 14,
                 }}>
                   {prod.name}
                 </h2>
 
+                {/* Subtext */}
+                <p style={{
+                  fontFamily: "Inter, sans-serif", fontSize: "0.65rem",
+                  color: "#888", letterSpacing: "0.04em", marginBottom: 18,
+                }}>
+                  {s.subtext}
+                </p>
+
                 {/* Price */}
-                <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 26 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 24 }}>
                   <span style={{
                     fontFamily: "Space Mono, monospace", fontWeight: 700,
-                    fontSize: "1.15rem", color: "#fff",
+                    fontSize: "1.35rem", color: "#111",
                   }}>
                     ₹{prod.price.toLocaleString("en-IN")}
                   </span>
                   {prod.originalPrice && (
                     <>
                       <span style={{
-                        fontFamily: "Space Mono, monospace", fontSize: "0.78rem",
-                        textDecoration: "line-through", color: "#555",
+                        fontFamily: "Space Mono, monospace", fontSize: "0.85rem",
+                        textDecoration: "line-through", color: "#bbb",
                       }}>
                         ₹{prod.originalPrice.toLocaleString("en-IN")}
                       </span>
@@ -253,63 +275,60 @@ export function Hero() {
                   href={`/product/${prod.slug}`}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 8,
-                    background: "#fff", color: "#000",
+                    background: "#111", color: "#fff",
                     fontFamily: "Inter, sans-serif", fontWeight: 800,
                     fontSize: "0.62rem", letterSpacing: "0.14em",
                     textTransform: "uppercase", textDecoration: "none",
-                    padding: "0.72rem 1.5rem",
+                    padding: "0.75rem 1.6rem",
                   }}
                 >
                   SHOP NOW →
                 </Link>
               </div>
 
-              {/* Product mockup */}
+              {/* Right: product visual */}
               <div
                 className="hidden sm:block"
                 style={{
                   flexShrink: 0,
-                  filter: `drop-shadow(0 0 55px ${s.accentColor}30)`,
-                  opacity: isActive ? 1 : 0,
-                  transform: isActive ? "scale(1) translateY(0)" : "scale(0.92) translateY(10px)",
-                  transition: "opacity 0.6s 0.25s, transform 0.6s 0.25s",
+                  opacity: active ? 1 : 0,
+                  transform: active ? "scale(1) translateY(0)" : "scale(0.94) translateY(8px)",
+                  transition: "opacity 0.5s 0.2s, transform 0.5s 0.2s",
+                  filter: `drop-shadow(0 8px 40px ${s.accentColor}28)`,
                 }}
               >
-                <ProductMockup product={prod} size={clamp(160, 200)} />
+                <ProductMockup product={prod} size={190} />
               </div>
             </div>
           );
         })}
 
-        {/* Prev / Next arrows */}
-        <button
-          onClick={prev}
-          style={{
-            position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)",
-            background: "rgba(0,0,0,0.55)", border: "1px solid #2a2a2a",
-            color: "#fff", width: 32, height: 32,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            zIndex: 10,
-          }}
-        >
-          <ChevronLeft size={15} />
-        </button>
-        <button
-          onClick={next}
-          style={{
-            position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-            background: "rgba(0,0,0,0.55)", border: "1px solid #2a2a2a",
-            color: "#fff", width: 32, height: 32,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            zIndex: 10,
-          }}
-        >
-          <ChevronRight size={15} />
-        </button>
+        {/* Arrows */}
+        {[
+          { dir: "prev", fn: prev, left: 10 },
+          { dir: "next", fn: next, right: 10 },
+        ].map(({ dir, fn, left, right }: { dir: string; fn: () => void; left?: number; right?: number }) => (
+          <button
+            key={dir}
+            onClick={fn}
+            style={{
+              position: "absolute", top: "50%", transform: "translateY(-50%)",
+              left, right,
+              background: "rgba(255,255,255,0.85)", border: "1px solid #ddd",
+              color: "#333", width: 32, height: 32,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              zIndex: 10, cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+              transition: "background 0.2s",
+            }}
+          >
+            {dir === "prev" ? <ChevronLeft size={15} /> : <ChevronRight size={15} />}
+          </button>
+        ))}
 
-        {/* Slide dots */}
+        {/* Dots */}
         <div style={{
-          position: "absolute", bottom: 16, left: 0, right: 0,
+          position: "absolute", bottom: 14, left: 0, right: 0,
           display: "flex", justifyContent: "center", gap: 6, zIndex: 10,
         }}>
           {SLIDES.map((s, i) => (
@@ -317,10 +336,11 @@ export function Hero() {
               key={i}
               onClick={() => setSlide(i)}
               style={{
-                width: slide === i ? 22 : 6, height: 6, borderRadius: 3,
-                background: slide === i ? SLIDES[i].accentColor : "rgba(255,255,255,0.2)",
-                border: "none",
-                transition: "width 0.35s, background 0.35s",
+                width: slide === i ? 20 : 6, height: 6,
+                borderRadius: 3,
+                background: slide === i ? SLIDES[slide].accentColor : "#ccc",
+                border: "none", cursor: "pointer",
+                transition: "width 0.3s, background 0.3s",
               }}
             />
           ))}
@@ -331,97 +351,83 @@ export function Hero() {
       <div
         className="hidden lg:flex"
         style={{
-          width: 290, flexShrink: 0,
-          borderLeft: "1px solid #1a1a1a",
-          background: "radial-gradient(ellipse 80% 55% at 50% 30%, rgba(232,0,13,0.14) 0%, transparent 65%), #060606",
+          width: 280, flexShrink: 0,
+          borderLeft: "1px solid #e8e8e8",
+          background: "linear-gradient(160deg, #fff5f5 0%, #fff0f0 100%)",
           flexDirection: "column",
           alignItems: "center", justifyContent: "center",
           padding: "2rem 1.4rem",
-          gap: 14, textAlign: "center",
+          gap: 12, textAlign: "center",
           position: "relative", overflow: "hidden",
         }}
       >
-        {/* Top label */}
         <div style={{
-          fontFamily: "Space Mono, monospace", fontSize: "0.4rem",
+          fontFamily: "Inter, sans-serif", fontSize: "0.42rem", fontWeight: 700,
           letterSpacing: "0.45em", color: "#e8000d", textTransform: "uppercase",
         }}>
           EXCLUSIVE OFFER
         </div>
 
-        {/* Headline */}
         <h3 style={{
           fontFamily: "Anton, sans-serif",
-          fontSize: "2.6rem", lineHeight: 0.9,
-          letterSpacing: "0.01em", textTransform: "uppercase", color: "#fff",
+          fontSize: "2.4rem", lineHeight: 0.9,
+          letterSpacing: "0.01em", textTransform: "uppercase", color: "#111",
         }}>
-          BIGGEST SALE OF THE SEASON
+          BIGGEST SALE OF THE YEAR
         </h3>
 
-        {/* Discount */}
         <div style={{
           fontFamily: "Anton, sans-serif",
-          fontSize: "1.55rem", color: "#e8000d", letterSpacing: "0.04em",
+          fontSize: "1.4rem", color: "#e8000d",
+          letterSpacing: "0.04em",
         }}>
           GET UP TO 40% OFF
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "#1c1c1c", width: "70%", margin: "2px 0" }} />
+        <div style={{ height: 1, background: "#eee", width: "70%" }} />
 
         <p style={{
-          fontFamily: "Inter, sans-serif", fontSize: "0.6rem",
-          color: "rgba(255,255,255,0.35)", lineHeight: 1.55,
+          fontFamily: "Inter, sans-serif", fontSize: "0.58rem",
+          color: "#999", lineHeight: 1.6,
         }}>
           Limited drops. Heavyweight cotton.<br />No compromises.
         </p>
 
-        {/* CTA */}
         <Link
           href="/shop"
           style={{
             display: "block", width: "100%",
             background: "#e8000d", color: "#fff",
             fontFamily: "Inter, sans-serif", fontWeight: 800,
-            fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase",
-            textDecoration: "none", padding: "0.85rem", textAlign: "center",
+            fontSize: "0.6rem", letterSpacing: "0.18em",
+            textTransform: "uppercase", textDecoration: "none",
+            padding: "0.85rem", textAlign: "center",
           }}
         >
           SHOP SALE →
         </Link>
 
-        {/* Date tag */}
         <div style={{
           fontFamily: "Space Mono, monospace", fontSize: "0.36rem",
-          letterSpacing: "0.3em", color: "rgba(255,255,255,0.12)",
+          letterSpacing: "0.25em", color: "#ccc",
         }}>
-          LIMITED · SS&apos;26 SEASON
+          15 JUL — 31 AUG &apos;26
         </div>
 
         {/* Decorative circles */}
-        {[
-          { size: 180, opacity: 0.04, top: -60, right: -60 },
-          { size: 100, opacity: 0.06, bottom: -30, left: -30 },
-        ].map((c, i) => (
-          <div
-            key={i}
-            aria-hidden
-            style={{
-              position: "absolute",
-              width: c.size, height: c.size, borderRadius: "50%",
-              border: "1px solid #e8000d",
-              opacity: c.opacity,
-              top: c.top, bottom: c.bottom, left: c.left, right: c.right,
-              pointerEvents: "none",
-            }}
-          />
-        ))}
+        <div aria-hidden style={{
+          position: "absolute", top: -50, right: -50,
+          width: 160, height: 160, borderRadius: "50%",
+          border: "1px solid rgba(232,0,13,0.12)",
+          pointerEvents: "none",
+        }} />
+        <div aria-hidden style={{
+          position: "absolute", bottom: -30, left: -30,
+          width: 100, height: 100, borderRadius: "50%",
+          border: "1px solid rgba(232,0,13,0.10)",
+          pointerEvents: "none",
+        }} />
       </div>
     </div>
   );
-}
-
-/* tiny helper — avoids importing clamp from a lib */
-function clamp(min: number, max: number) {
-  return max; // returns max for desktop; CSS handles responsive
 }
