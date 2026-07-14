@@ -160,7 +160,18 @@ const TILES = [
     col: "1 / 4",
     row: "3 / 4",
     featured: false,
-    wide: true,
+  },
+  {
+    key: "SALE",
+    label: "SALE",
+    sub: "UPTO 40% OFF",
+    href: "/shop?filter=sale",
+    accent: "#ff4d55",
+    bg: "linear-gradient(145deg, #1f0002 0%, #0a0000 100%)",
+    Symbol: SymbolDrops,
+    col: "4 / 7",
+    row: "3 / 4",
+    featured: false,
   },
 ];
 
@@ -200,7 +211,7 @@ export function CategoryGrid() {
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(6, 1fr)",
-          gridTemplateRows: "200px 200px 120px",
+          gridTemplateRows: "200px 200px 160px",
           gap: "10px",
         }}
           className="category-bento"
