@@ -67,13 +67,24 @@ export function DropsCarousel() {
 
       {/* ── Title ─────────────────────────────────── */}
       <div style={{ textAlign: "center", padding: "1rem 1rem 0" }}>
-        {/* Drops logo image */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/drops-logo.png"
-          alt="DROPS iluminatees'"
-          style={{ width: "min(92vw, 600px)", height: "auto", display: "block", margin: "0 auto" }}
-        />
+        {/* Drops logo — crop internal whitespace from PNG */}
+        <div style={{
+          width: "min(92vw, 600px)",
+          margin: "0 auto",
+          overflow: "hidden",
+          /* image ratio 1536×1024 = 0.667. Show top 60% = strip bottom whitespace */
+          height: "calc(min(92vw, 600px) * 0.4)",
+        }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/drops-logo.png"
+            alt="DROPS iluminatees'"
+            style={{
+              width: "100%", height: "auto", display: "block",
+              marginTop: "-3%", /* trim top whitespace */
+            }}
+          />
+        </div>
 
         <p style={{
           fontFamily: "Inter, sans-serif", fontSize: "0.72rem",
