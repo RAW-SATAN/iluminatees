@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, TrendingUp, Heart } from "lucide-react";
+import { Plus, TrendingUp, Heart, Check } from "lucide-react";
 import { products, type Product } from "@/lib/products";
 import { ProductMockup } from "./ProductMockup";
 import { useWishlist } from "./WishlistProvider";
+import { useCart } from "./CartProvider";
 
 /* ── Category tabs ──────────────────────────────────────── */
 const CATS = [
@@ -47,71 +48,84 @@ function getTag(p: Product): TagStyle {
 /* ── Product tile ───────────────────────────────────────── */
 function ProductTile({ product }: { product: Product }) {
   const { toggleItem, isWishlisted } = useWishlist();
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
   const tag  = getTag(product);
   const emi  = Math.round(product.price / 9);
   const wishlisted = isWishlisted(product.slug);
+
+  function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault();
+    addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: "M", quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1400);
+  }
 
   return (
     <div
       className="product-card"
       style={{
         background: "#fff",
+        border: "1px solid #eee",
         display: "flex", flexDirection: "column",
         position: "relative", overflow: "hidden",
+        borderRadius: 16,
       }}
     >
-      {/* Tag + wishlist row */}
+      {/* Tag badge */}
       <div style={{
-        position: "absolute", top: 8, left: 0, right: 0,
-        display: "flex", justifyContent: "space-between",
-        alignItems: "flex-start", padding: "0 8px", zIndex: 2,
+        position: "absolute", top: 10, left: 10, zIndex: 2,
       }}>
         <span style={{
           background: tag.bg, color: tag.color,
           fontFamily: "Inter, sans-serif", fontWeight: 800,
-          fontSize: "0.4rem", letterSpacing: "0.22em",
-          textTransform: "uppercase", padding: "0.2rem 0.5rem",
+          fontSize: "0.4rem", letterSpacing: "0.2em",
+          textTransform: "uppercase", padding: "0.22rem 0.55rem",
           borderRadius: 5,
         }}>
           {tag.label}
         </span>
-        <button
-          onClick={(e) => { e.preventDefault(); toggleItem(product.slug); }}
-          style={{
-            width: 26, height: 26, borderRadius: "50%",
-            background: "#fff", border: "1px solid #e8e8e8",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-          }}
-          aria-label="Add to wishlist"
-        >
-          <Heart
-            size={11}
-            color={wishlisted ? "#e8000d" : "#aaa"}
-            fill={wishlisted ? "#e8000d" : "none"}
-          />
-        </button>
       </div>
 
+      {/* Quick-add "+" button */}
+      <button
+        onClick={handleAddToCart}
+        style={{
+          position: "absolute", top: 8, right: 8, zIndex: 2,
+          width: 30, height: 30, borderRadius: "50%",
+          background: added ? "#111" : "#fff",
+          border: "1px solid #e0e0e0",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer",
+          boxShadow: "0 1px 6px rgba(0,0,0,0.08)",
+          transition: "background 0.2s, border-color 0.2s",
+        }}
+        aria-label="Add to cart"
+      >
+        {added
+          ? <Check size={13} color="#fff" strokeWidth={3} />
+          : <Plus size={13} color="#555" strokeWidth={2.5} />
+        }
+      </button>
+
       {/* Product image */}
-      <Link href={`/product/${product.slug}`} style={{ textDecoration: "none" }}>
+      <Link href={`/product/${product.slug}`} style={{ textDecoration: "none", flex: 1 }}>
         <div style={{
           background: "#f9f9f9",
           display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "2rem 1rem 1rem",
-          minHeight: 180,
+          padding: "2.4rem 1rem 1.2rem",
+          minHeight: 210,
         }}>
-          <ProductMockup product={product} size={120} />
+          <ProductMockup product={product} size={140} />
         </div>
 
         {/* Info */}
-        <div style={{ padding: "0.75rem 0.85rem 0.9rem" }}>
+        <div style={{ padding: "0.85rem 1rem 1rem", borderTop: "1px solid #f5f5f5" }}>
           <div style={{
             fontFamily: "Inter, sans-serif",
-            fontSize: "0.62rem", fontWeight: 600,
-            color: "#111", lineHeight: 1.3,
-            marginBottom: 6,
+            fontSize: "0.64rem", fontWeight: 600,
+            color: "#111", lineHeight: 1.35,
+            marginBottom: 7,
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -121,10 +135,10 @@ function ProductTile({ product }: { product: Product }) {
           </div>
 
           {/* Price row */}
-          <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap", marginBottom: 3 }}>
             <span style={{
               fontFamily: "Space Mono, monospace",
-              fontWeight: 700, fontSize: "0.78rem", color: "#111",
+              fontWeight: 700, fontSize: "0.82rem", color: "#111",
             }}>
               ₹{product.price.toLocaleString("en-IN")}
             </span>
@@ -143,10 +157,34 @@ function ProductTile({ product }: { product: Product }) {
           <div style={{
             fontFamily: "Inter, sans-serif",
             fontSize: "0.48rem", color: "#aaa",
-            letterSpacing: "0.02em", marginTop: 3,
+            letterSpacing: "0.02em",
           }}>
             EMI @ ₹{emi.toLocaleString("en-IN")}/Month
           </div>
+
+          {/* Wishlist row */}
+          <button
+            onClick={(e) => { e.preventDefault(); toggleItem(product.slug); }}
+            style={{
+              marginTop: 10,
+              display: "flex", alignItems: "center", gap: 4,
+              background: "none", border: "none", cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            <Heart
+              size={11}
+              color={wishlisted ? "#e8000d" : "#ccc"}
+              fill={wishlisted ? "#e8000d" : "none"}
+            />
+            <span style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: "0.46rem", color: wishlisted ? "#e8000d" : "#bbb",
+              fontWeight: 600, letterSpacing: "0.08em",
+            }}>
+              {wishlisted ? "SAVED" : "WISHLIST"}
+            </span>
+          </button>
         </div>
       </Link>
     </div>
@@ -240,8 +278,8 @@ export function TrendingSection() {
         ) : (
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-            gap: "12px",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: "14px",
           }}>
             {filtered.map((product) => (
               <ProductTile key={product.slug} product={product} />
