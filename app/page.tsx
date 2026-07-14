@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Hero } from "@/components/Hero";
 import { DropsCarousel } from "@/components/DropsCarousel";
 import { TrendingSection } from "@/components/TrendingSection";
+import { BrandStory } from "@/components/BrandStory";
 import { NewsletterForm } from "@/components/NewsletterForm";
 
 export default function HomePage() {
@@ -14,6 +15,9 @@ export default function HomePage() {
 
       {/* ── Trending Section ─────────────────────────── */}
       <TrendingSection />
+
+      {/* ── Brand Story ──────────────────────────────── */}
+      <BrandStory />
 
       {/* ── Manifesto strip ─────────────────────────── */}
       <div style={{
