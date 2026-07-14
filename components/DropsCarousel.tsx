@@ -67,56 +67,13 @@ export function DropsCarousel() {
 
       {/* ── Title ─────────────────────────────────── */}
       <div style={{ textAlign: "center", padding: "2.8rem 1rem 2rem" }}>
-        {/*
-          Inline SVG logo — "Luckiest Guy" chunky outlined DROPS,
-          oval mask over O, "Dancing Script" cursive overlay.
-          Both fonts load via CSS so they apply inside the inline SVG.
-        */}
-        <svg
-          viewBox="0 0 780 172"
-          role="img"
-          aria-label="DROPS iluminatees'"
-          style={{ width: "min(94vw, 720px)", height: "auto", display: "block", margin: "0 auto", overflow: "visible" }}
-        >
-          <defs>
-            {/* Drop shadow filter for the letters */}
-            <filter id="letter-shadow" x="-5%" y="-5%" width="115%" height="115%">
-              <feDropShadow dx="3" dy="3" stdDeviation="0" floodColor="#000" floodOpacity="1" />
-            </filter>
-          </defs>
-
-          {/* ── DROPS — white fill, thick black stroke, Luckiest Guy ── */}
-          <text
-            x="390" y="148"
-            fontFamily="'Luckiest Guy', Impact, sans-serif"
-            fontSize="148"
-            textAnchor="middle"
-            letterSpacing="4"
-            fill="white"
-            stroke="#111"
-            strokeWidth="6"
-            paintOrder="stroke"
-            style={{ filter: "url(#letter-shadow)" }}
-          >
-            DROPS
-          </text>
-
-          {/* ── Oval mask over the O area ── */}
-          <ellipse cx="390" cy="82" rx="86" ry="78" fill="white" stroke="#111" strokeWidth="5" />
-
-          {/* ── 'iluminatees' — Dancing Script cursive in the oval ── */}
-          <text
-            x="390" y="104"
-            fontFamily="'Dancing Script', 'Great Vibes', cursive"
-            fontWeight="700"
-            fontSize="46"
-            fill="#111"
-            textAnchor="middle"
-            letterSpacing="-0.5"
-          >
-            &apos;iluminatees&apos;
-          </text>
-        </svg>
+        {/* Drops logo image */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/drops-logo.png"
+          alt="DROPS iluminatees'"
+          style={{ width: "min(92vw, 680px)", height: "auto", display: "block", margin: "0 auto" }}
+        />
 
         <p style={{
           fontFamily: "Inter, sans-serif", fontSize: "0.72rem",
