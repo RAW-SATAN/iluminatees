@@ -66,18 +66,18 @@ export function DropsCarousel() {
     }}>
 
       {/* ── Title ─────────────────────────────────── */}
-      <div style={{ textAlign: "center", padding: "2.8rem 1rem 2rem" }}>
+      <div style={{ textAlign: "center", padding: "1.8rem 1rem 0.5rem" }}>
         {/* Drops logo image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/drops-logo.png"
           alt="DROPS iluminatees'"
-          style={{ width: "min(92vw, 680px)", height: "auto", display: "block", margin: "0 auto" }}
+          style={{ width: "min(92vw, 600px)", height: "auto", display: "block", margin: "0 auto" }}
         />
 
         <p style={{
           fontFamily: "Inter, sans-serif", fontSize: "0.72rem",
-          color: "#999", letterSpacing: "0.06em", marginTop: 14,
+          color: "#999", letterSpacing: "0.06em", marginTop: 8,
         }}>
           Fresh Drops From The Vault. Refreshed Daily.
         </p>
@@ -87,7 +87,7 @@ export function DropsCarousel() {
       <div style={{
         position: "relative",
         width: "100%",
-        height: "clamp(240px, 32vw, 340px)",
+        height: "clamp(220px, 28vw, 300px)",
       }}>
         {products.map((prod, pIdx) => {
           const d = slotOf(pIdx, idx, products.length);
