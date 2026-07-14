@@ -48,10 +48,10 @@ const WA_CHATS = [
 ];
 
 const REVIEWS = [
-  { name: "Aryan Dam", product: "Eye of Providence", rating: 4, text: "Got my tee from ILUMINATEES — quality is insane, fast shipping, print is crisp even after multiple washes...", initials: "AD" },
-  { name: "Priya Sharma", product: "Sacred Geometry", rating: 4, text: "My Sacred Geometry tee is perfect! Quick delivery and the fabric is genuinely heavyweight, not like those cheap ones...", initials: "PS" },
-  { name: "Raj Mehta", product: "Cipher 33", rating: 5, text: "Cipher 33 is stunning. The unboxing experience alone was worth it. Will definitely order again from ILUMINATEES...", initials: "RM" },
-  { name: "Vikram Patel", product: "The Architect", rating: 4, text: "The Architect drop delivered faster than expected. Packaging is premium and the tee fits exactly as described...", initials: "VP" },
+  { name: "Aryan Dam", productName: "Eye of Providence", slug: "eye-of-providence", rating: 4, text: "Got my tee from ILUMINATEES — quality is insane, fast shipping, print is crisp even after multiple washes..." },
+  { name: "Priya Sharma", productName: "Sacred Geometry", slug: "sacred-geometry", rating: 4, text: "My Sacred Geometry tee is perfect! Quick delivery and the fabric is genuinely heavyweight, not like those cheap ones..." },
+  { name: "Raj Mehta", productName: "Cipher 33", slug: "cipher-33", rating: 5, text: "Cipher 33 is stunning. The unboxing experience alone was worth it. Will definitely order again from ILUMINATEES..." },
+  { name: "Vikram Patel", productName: "The Architect", slug: "the-architect", rating: 4, text: "The Architect drop delivered faster than expected. Packaging is premium and the tee fits exactly as described..." },
 ];
 
 const GUARANTEES = [
@@ -334,7 +334,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </button>
                 ))}
               </div>
-              {/* Seller row */}
+              {/* Seller row 1 */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 0", borderTop: "1px solid #f5f5f5" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <div style={{ width: 38, height: 38, borderRadius: 8, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -352,6 +352,24 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </div>
                 </div>
                 <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#111" }}>₹{product.price.toLocaleString("en-IN")}</span>
+              </div>
+              {/* Seller row 2 */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 0", borderTop: "1px solid #f5f5f5" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 8, background: "#e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.4rem", color: "#555", fontWeight: 700 }}>INTL</span>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111", display: "flex", alignItems: "center", gap: 5 }}>
+                      International Drop
+                      <span style={{ background: "#dbeafe", color: "#1d4ed8", borderRadius: 4, padding: "0.08rem 0.32rem", fontSize: "0.48rem", fontWeight: 700 }}>✓ Verified</span>
+                    </div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#555", marginTop: 2 }}>
+                      Free Delivery · Sourced By {new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} · USA
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#111" }}>₹{(product.price * 12).toLocaleString("en-IN")}</span>
               </div>
             </div>
 
@@ -418,6 +436,60 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       </div>
 
+      {/* ── Dark "Get The Look" banner ────────────── */}
+      <div style={{ maxWidth: 1280, margin: "3rem auto 0", padding: "0 1.5rem" }}>
+        <div style={{ background: "#0d0d0d", borderRadius: 16, padding: "2rem 2.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "2rem", overflow: "hidden", position: "relative" }}>
+          <div style={{ position: "absolute", right: "30%", top: "50%", transform: "translateY(-50%)", width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.03)", pointerEvents: "none" }} />
+          <div>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "rgba(255,255,255,0.4)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
+              CUT THE HASSLE AND
+            </div>
+            <div style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 3vw, 2rem)", color: "#fff", letterSpacing: "0.04em", marginBottom: 20 }}>
+              Join The Order
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ background: "#fff", borderRadius: 8, padding: "0.4rem 0.8rem", display: "flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#111"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.38rem", color: "#555" }}>Download on the</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.58rem", color: "#111" }}>App Store</div>
+                </div>
+              </div>
+              <div style={{ background: "#fff", borderRadius: 8, padding: "0.4rem 0.8rem", display: "flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#111"><path d="M3.18 23.76c.3.17.64.22.98.14l12.48-7.17-2.83-2.83-10.63 9.86zm-1.7-20.1C1.18 4.04 1 4.53 1 5.1v13.8c0 .57.18 1.06.48 1.44l.08.07 7.74-7.73v-.18L1.56 3.6l-.08.06zM20.49 10.7l-2.66-1.53-3.15 3.14 3.15 3.15 2.68-1.54c.76-.44.76-1.78-.02-2.22zm-17.3 11.06l10.56-9.73-2.83-2.83-7.73 12.56z"/></svg>
+                <div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.38rem", color: "#555" }}>Get it on</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.58rem", color: "#111" }}>Google Play</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* QR + phone mockup */}
+          <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0 }}>
+            <div style={{ width: 70, height: 70, background: "#fff", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
+              <svg width="58" height="58" viewBox="0 0 58 58">
+                <rect width="58" height="58" fill="#fff"/>
+                {/* QR pattern simplified */}
+                {[0,1,2,3,4,5,6].map(r => [0,1,2,3,4,5,6].map(c => {
+                  const border = (r <= 6 && c <= 6) || (r <= 6 && c >= 0);
+                  const isEye = (r < 7 && c < 7) || (r < 7 && c > 49) || (r > 49 && c < 7);
+                  return <rect key={`${r}-${c}`} x={4 + c * 7} y={4 + r * 7} width={6} height={6} fill={((r + c) % 3 === 0 || (r === 0 || r === 6) || (c === 0 || c === 6)) ? "#111" : "#fff"} />;
+                }))}
+              </svg>
+            </div>
+            <div style={{ width: 90, height: 130, background: "#1a1a1a", borderRadius: 14, border: "3px solid #333", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+              <div style={{ width: "100%", height: "100%", background: "linear-gradient(145deg, #111 0%, #1a1a1a 100%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                <div style={{ fontFamily: "Anton, sans-serif", fontSize: "0.55rem", color: "#fff", letterSpacing: "0.1em" }}>ILUMINATEES</div>
+                <div style={{ width: 40, height: 40, background: "#222", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: "1.2rem" }}>👁</span>
+                </div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.32rem", color: "rgba(255,255,255,0.4)" }}>TAP TO EXPLORE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ── Reviews ───────────────────────────────── */}
       <div style={{ maxWidth: 1280, margin: "3rem auto 0", padding: "0 1.5rem" }}>
         <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>
@@ -429,22 +501,28 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           </h2>
           <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#aaa" }}>5.8k+ Reviews</span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          {REVIEWS.map(rev => (
-            <div key={rev.name} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "1.1rem 0", borderBottom: "1px solid #f0f0f0" }}>
-              <div style={{ flex: 1 }}>
-                <StarRow rating={rev.rating} />
-                <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#111", margin: "6px 0 2px" }}>{rev.product}</div>
-                <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#555", lineHeight: 1.5 }}>{rev.text}</div>
-              </div>
-              <div style={{ textAlign: "right", flexShrink: 0 }}>
-                <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#111" }}>{rev.name}</div>
-                <div style={{ width: 48, height: 48, borderRadius: 8, background: "#f0f0f0", marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#555" }}>{rev.initials}</span>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {REVIEWS.map(rev => {
+            const revProduct = products.find(p => p.slug === rev.slug);
+            return (
+              <div key={rev.name} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "1.1rem 0", borderBottom: "1px solid #f0f0f0" }}>
+                <div style={{ flex: 1 }}>
+                  <StarRow rating={rev.rating} />
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#111", margin: "6px 0 2px" }}>{rev.productName}</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#555", lineHeight: 1.5 }}>{rev.text}</div>
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#111", marginBottom: 6 }}>{rev.name}</div>
+                  <div style={{ width: 52, height: 52, borderRadius: 8, background: "#f5f5f5", border: "1px solid #eee", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                    {revProduct
+                      ? <ProductMockup product={revProduct} size={40} />
+                      : <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#aaa" }}>{rev.name.slice(0, 2).toUpperCase()}</span>
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
