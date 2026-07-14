@@ -67,25 +67,42 @@ export function DropsCarousel() {
 
       {/* ── Title ─────────────────────────────────── */}
       <div style={{ textAlign: "center", padding: "2.8rem 1rem 2rem" }}>
-        <div style={{
-          fontFamily: "Anton, sans-serif",
-          fontSize: "clamp(3.5rem, 9vw, 7.5rem)",
-          letterSpacing: "0.08em", color: "#111", lineHeight: 1,
-          textTransform: "uppercase",
-        }}>
-          DROPS
+        {/* Outlined DROPS with script overlay — CC-style */}
+        <div style={{ position: "relative", display: "inline-block", lineHeight: 1 }}>
+          {/* Outlined DROPS */}
           <span style={{
-            fontFamily: "Inter, sans-serif",
-            fontWeight: 300, fontStyle: "italic",
-            fontSize: "clamp(1.2rem, 3vw, 2.8rem)",
-            letterSpacing: "0.02em", color: "#555", marginLeft: "0.3em",
+            display: "block",
+            fontFamily: "Anton, sans-serif",
+            fontSize: "clamp(4.5rem, 12vw, 10rem)",
+            letterSpacing: "0.12em",
+            lineHeight: 1,
+            textTransform: "uppercase",
+            color: "transparent",
+            WebkitTextStroke: "2px #111",
+            userSelect: "none",
+          }}>
+            DROPS
+          </span>
+          {/* Cursive iluminatees: overlaid in center */}
+          <span style={{
+            position: "absolute",
+            top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            fontFamily: "Georgia, 'Times New Roman', serif",
+            fontStyle: "italic",
+            fontWeight: 400,
+            fontSize: "clamp(1.6rem, 4.5vw, 4rem)",
+            color: "#111",
+            whiteSpace: "nowrap",
+            letterSpacing: "0.01em",
+            pointerEvents: "none",
           }}>
             iluminatees:
           </span>
         </div>
         <p style={{
           fontFamily: "Inter, sans-serif", fontSize: "0.72rem",
-          color: "#999", letterSpacing: "0.06em", marginTop: 8,
+          color: "#999", letterSpacing: "0.06em", marginTop: 14,
         }}>
           Fresh Drops From The Vault. Refreshed Daily.
         </p>
