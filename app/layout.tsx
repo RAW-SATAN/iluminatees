@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/components/CartProvider";
+import { WishlistProvider } from "@/components/WishlistProvider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBubble } from "@/components/StickyBubble";
@@ -21,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full">
       <body className="grain min-h-full antialiased">
         <CartProvider>
-          {/* Film grain — from globals.css .grain::after */}
+          <WishlistProvider>
           <Navbar />
           {/*
             Navbar height:
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main style={{ paddingTop: 126 }}>{children}</main>
           <Footer />
           <StickyBubble />
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

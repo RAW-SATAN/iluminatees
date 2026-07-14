@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Heart, ShoppingBag, Search, MapPin, Menu, X, Headphones } from "lucide-react";
 import { useCart } from "./CartProvider";
+import { useWishlist } from "./WishlistProvider";
 
 const PLACEHOLDERS = [
   "Search For Tees...",
@@ -30,16 +31,58 @@ const MARQUEE_ITEMS = [
   "NEW ARRIVALS", "WELCOME", "NEW ARRIVALS", "WELCOME",
 ];
 
+interface GeoData {
+  city: string;
+  postal: string;
+  country_code: string;
+  flag: string;
+}
+
+function countryFlag(code: string) {
+  return code
+    .toUpperCase()
+    .split("")
+    .map((c) => String.fromCodePoint(0x1f1e6 - 65 + c.charCodeAt(0)))
+    .join("");
+}
+
 export function Navbar() {
   const { itemCount } = useCart();
-  const [phIdx,    setPhIdx]    = useState(0);
+  const { itemCount: wishCount } = useWishlist();
+  const [phIdx,     setPhIdx]    = useState(0);
   const [searchVal, setSearchVal] = useState("");
-  const [menuOpen, setMenuOpen]  = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [geo,       setGeo]       = useState<GeoData | null>(null);
 
+  /* Rotating placeholder */
   useEffect(() => {
     const t = setInterval(() => setPhIdx((i) => (i + 1) % PLACEHOLDERS.length), 2600);
     return () => clearInterval(t);
   }, []);
+
+  /* IP geolocation — no user permission needed */
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.city && d.postal && d.country_code) {
+          setGeo({
+            city:         d.city,
+            postal:       d.postal,
+            country_code: d.country_code,
+            flag:         countryFlag(d.country_code),
+          });
+        }
+      })
+      .catch(() => {/* silently fallback */});
+  }, []);
+
+  const cityLine = geo
+    ? `${geo.city}, ${geo.postal}`
+    : "INDIA";
+
+  const flagEmoji   = geo?.flag  ?? "🇮🇳";
+  const countryCode = geo?.country_code ?? "IN";
 
   return (
     <>
@@ -63,16 +106,16 @@ export function Navbar() {
                 ILUMINATEES<sup style={{ fontSize: "0.42em", marginLeft: 1 }}>®</sup>
               </span>
             </Link>
-            {/* Delivery line */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: 3, marginTop: 1,
-            }}>
+            {/* Delivery location */}
+            <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 1 }}>
               <MapPin size={9} color="#888" />
               <span style={{
                 fontFamily: "Inter, sans-serif", fontSize: "0.5rem",
                 color: "#888", letterSpacing: "0.04em",
               }}>
-                Delivering To&nbsp;<strong style={{ color: "#111" }}>INDIA</strong>&nbsp;▾
+                Delivering To&nbsp;
+                <strong style={{ color: "#111" }}>{cityLine}</strong>
+                &nbsp;▾
               </span>
             </div>
           </div>
@@ -104,26 +147,56 @@ export function Navbar() {
 
             {/* Flag + country */}
             <div className="hidden md:flex" style={{ alignItems: "center", gap: 5 }}>
-              <span style={{ fontSize: 16 }}>🇮🇳</span>
-              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#555", fontWeight: 600 }}>IN</span>
+              <span style={{ fontSize: 16 }}>{flagEmoji}</span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#555", fontWeight: 600 }}>
+                {countryCode}
+              </span>
               <span style={{ color: "#ccc" }}>▾</span>
             </div>
 
-            {/* Headphones */}
-            <button
-              className="hidden md:block"
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            {/* Support — WhatsApp */}
+            <a
+              href="https://wa.me/919999999999?text=Hi%2C%20I%20need%20help%20with%20my%20ILUMINATEES%20order"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex"
+              title="Chat Support"
+              style={{
+                alignItems: "center",
+                background: "none", border: "none", padding: 0,
+                cursor: "pointer", textDecoration: "none",
+              }}
             >
               <Headphones size={18} color="#555" />
-            </button>
+            </a>
 
             {/* Wishlist */}
-            <button
-              className="hidden sm:block"
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            <Link
+              href="/wishlist"
+              className="hidden sm:flex"
+              style={{
+                alignItems: "center", position: "relative",
+                textDecoration: "none",
+              }}
+              title={`Wishlist (${wishCount})`}
             >
-              <Heart size={18} color="#555" />
-            </button>
+              <Heart
+                size={18}
+                color={wishCount > 0 ? "#e8000d" : "#555"}
+                fill={wishCount > 0 ? "#e8000d" : "none"}
+              />
+              {wishCount > 0 && (
+                <span style={{
+                  position: "absolute", top: -6, right: -6,
+                  background: "#e8000d", color: "#fff",
+                  width: 15, height: 15, borderRadius: "50%",
+                  fontSize: "0.42rem", fontWeight: 800,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {wishCount}
+                </span>
+              )}
+            </Link>
 
             {/* Cart */}
             <Link href="/cart" style={{ textDecoration: "none", position: "relative" }}>
@@ -198,7 +271,7 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* ── Marquee strip ─── dark like Culture Circle ── */}
+        {/* ── Marquee strip ────────────────────────────── */}
         <div style={{ background: "#111", overflow: "hidden", padding: "0.38rem 0" }}>
           <div className="marquee-track marquee-anim">
             {[0, 1].map((k) => (
@@ -245,6 +318,22 @@ export function Navbar() {
               {label}
             </Link>
           ))}
+          {/* Mobile: support link */}
+          <a
+            href="https://wa.me/919999999999?text=Hi%2C%20I%20need%20help%20with%20my%20ILUMINATEES%20order"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "1rem 1.5rem",
+              borderBottom: "1px solid #f0f0f0",
+              fontFamily: "Anton, sans-serif",
+              fontSize: "1.6rem", letterSpacing: "0.08em",
+              textTransform: "uppercase", color: "#25d366", textDecoration: "none",
+            }}
+          >
+            💬 SUPPORT
+          </a>
         </div>
       )}
     </>
