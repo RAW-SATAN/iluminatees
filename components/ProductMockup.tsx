@@ -166,14 +166,17 @@ const symbols: Record<string, (color: string) => React.ReactNode> = {
 };
 
 interface Props {
-  product: Pick<Product, "shirtColor" | "accentColor" | "symbol">;
+  product: Pick<Product, "shirtColor" | "accentColor" | "symbol" | "slug">;
   size?: number;
   className?: string;
 }
 
 export function ProductMockup({ product, size = 260, className }: Props) {
-  const { shirtColor, accentColor, symbol } = product;
+  const { shirtColor, accentColor, symbol, slug } = product;
   const SymbolEl = symbols[symbol] ?? symbols.eye;
+  /* Use slug (unique per product) as the SVG ID prefix so multiple
+     ProductMockup instances with the same symbol never share gradient IDs. */
+  const uid = slug;
 
   return (
     <svg
@@ -184,30 +187,30 @@ export function ProductMockup({ product, size = 260, className }: Props) {
       aria-hidden
     >
       <defs>
-        <filter id={`glow-${symbol}`} x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={`glow-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="3" result="blur" />
           <feComposite in="SourceGraphic" in2="blur" operator="over" />
         </filter>
-        <linearGradient id={`shirt-grad-${symbol}`} x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={`shirt-grad-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={shirtColor} />
           <stop offset="50%" stopColor={shirtColor} stopOpacity="0.95" />
           <stop offset="100%" stopColor={shirtColor} />
         </linearGradient>
-        <radialGradient id={`light-${symbol}`} cx="50%" cy="35%" r="60%">
+        <radialGradient id={`light-${uid}`} cx="50%" cy="35%" r="60%">
           <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
           <stop offset="100%" stopColor="rgba(0,0,0,0)" />
         </radialGradient>
       </defs>
 
       {/* T-shirt body */}
-      <path d={TSHIRT_PATH} fill={`url(#shirt-grad-${symbol})`} />
+      <path d={TSHIRT_PATH} fill={`url(#shirt-grad-${uid})`} />
       {/* Subtle fabric highlight */}
-      <path d={TSHIRT_PATH} fill={`url(#light-${symbol})`} />
+      <path d={TSHIRT_PATH} fill={`url(#light-${uid})`} />
       {/* Neck ribbing */}
       <ellipse cx="100" cy="28" rx="22" ry="6" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
 
       {/* Symbol */}
-      <g filter={`url(#glow-${symbol})`}>
+      <g filter={`url(#glow-${uid})`}>
         {SymbolEl(accentColor)}
       </g>
     </svg>

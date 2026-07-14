@@ -94,8 +94,8 @@ export function DropsCarousel() {
       {/* ── Fan stage ─────────────────────────────── */}
       <div style={{
         position: "relative",
-        height: "clamp(230px, 30vw, 320px)",
-        display: "flex", alignItems: "center", justifyContent: "center",
+        width: "100%",
+        height: "clamp(240px, 32vw, 340px)",
       }}>
         {products.map((prod, pIdx) => {
           const d = slotOf(pIdx, idx, products.length);
@@ -117,11 +117,12 @@ export function DropsCarousel() {
               style={{
                 position: "absolute",
                 left: "50%",
+                top: "50%",
                 /* spring easing: second value > 1 = overshoot → grow pop */
                 transition:
                   "transform 0.52s cubic-bezier(0.34, 1.38, 0.64, 1)," +
                   "opacity 0.38s ease",
-                transform: `translateX(calc(-50% + ${"tx" in s ? s.tx : "0"})) scale(${s.scale})`,
+                transform: `translate(calc(-50% + ${"tx" in s ? s.tx : "0px"}), -50%) scale(${s.scale})`,
                 opacity: s.opacity,
                 zIndex: s.zIndex,
                 cursor: isClickable ? "pointer" : "default",
