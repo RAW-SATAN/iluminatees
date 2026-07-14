@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { Hero } from "@/components/Hero";
 import { DropsCarousel } from "@/components/DropsCarousel";
-import { ProductCard } from "@/components/ProductCard";
+import { TrendingSection } from "@/components/TrendingSection";
 import { NewsletterForm } from "@/components/NewsletterForm";
-import { getFeaturedProducts } from "@/lib/products";
 
 export default function HomePage() {
-  const featured = getFeaturedProducts();
-
   return (
     <>
       <Hero />
@@ -15,48 +12,8 @@ export default function HomePage() {
       {/* ── Drops Carousel ──────────────────────────── */}
       <DropsCarousel />
 
-      {/* ── Featured Products ───────────────────────── */}
-      <section style={{ maxWidth: 1280, margin: "0 auto", padding: "3.5rem 1.5rem" }}>
-        {/* Section header */}
-        <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-          <span style={{
-            fontFamily: "Space Mono, monospace",
-            fontSize: "0.48rem", letterSpacing: "0.5em",
-            color: "#e8000d", textTransform: "uppercase",
-          }}>
-            CLASSIFIED CATALOG
-          </span>
-          <h2 style={{
-            fontFamily: "Anton, sans-serif",
-            fontSize: "clamp(1.8rem, 4vw, 2.6rem)",
-            letterSpacing: "0.1em", color: "#111",
-            marginTop: 8, textTransform: "uppercase",
-          }}>
-            THE INITIATED FILES
-          </h2>
-          <div style={{ height: 2, width: 60, background: "#e8000d", margin: "12px auto 0" }} />
-        </div>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-          gap: "1px",
-          background: "#eee",
-          border: "1px solid #eee",
-        }}>
-          {featured.map((p, i) => (
-            <div key={p.id} style={{ background: "#fff" }}>
-              <ProductCard product={p} index={i} />
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}>
-          <Link href="/shop" className="btn-black" style={{ padding: "0.85rem 2.5rem", textDecoration: "none", fontSize: "0.62rem" }}>
-            VIEW FULL COLLECTION →
-          </Link>
-        </div>
-      </section>
+      {/* ── Trending Section ─────────────────────────── */}
+      <TrendingSection />
 
       {/* ── Manifesto strip ─────────────────────────── */}
       <div style={{

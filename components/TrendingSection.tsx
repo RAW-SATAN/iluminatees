@@ -1,0 +1,273 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Plus, TrendingUp, Heart } from "lucide-react";
+import { products, type Product } from "@/lib/products";
+import { ProductMockup } from "./ProductMockup";
+import { useWishlist } from "./WishlistProvider";
+
+/* ── Category tabs ──────────────────────────────────────── */
+const CATS = [
+  { key: "ALL",        label: "ALL" },
+  { key: "APEX",       label: "APEX" },
+  { key: "SACRED",     label: "SACRED" },
+  { key: "CIPHER",     label: "CIPHER" },
+  { key: "BESTSELLER", label: "BESTSELLER" },
+  { key: "LIMITED",    label: "LIMITED DROPS" },
+  { key: "SALE",       label: "SALE" },
+];
+
+function filterProducts(cat: string): Product[] {
+  switch (cat) {
+    case "APEX":       return products.filter((p) => p.category === "APEX");
+    case "SACRED":     return products.filter((p) => p.category === "SACRED");
+    case "CIPHER":     return products.filter((p) => p.category === "CIPHER");
+    case "BESTSELLER": return products.filter((p) => p.tags.includes("bestseller"));
+    case "LIMITED":    return products.filter((p) => p.limited);
+    case "SALE":       return products.filter((p) => !!p.originalPrice);
+    default:           return products;
+  }
+}
+
+/* ── Tag badge ──────────────────────────────────────────── */
+interface TagStyle { label: string; color: string; bg: string }
+
+function getTag(p: Product): TagStyle {
+  if (p.originalPrice) {
+    const pct = Math.round((1 - p.price / p.originalPrice) * 100);
+    return { label: `UPTO ${pct}% OFF`, color: "#fff", bg: "#e8000d" };
+  }
+  if (p.limited)              return { label: "LIMITED EDITION", color: "#fff",  bg: "#e8000d" };
+  if (p.tags.includes("bestseller")) return { label: "BESTSELLER",     color: "#111",  bg: "#ffd700" };
+  if (p.category === "APEX")  return { label: "⚡ APEX",          color: "#fff",  bg: "#7c00cc" };
+  return                               { label: "NEW ARRIVAL",     color: "#fff",  bg: "#111"    };
+}
+
+/* ── Product tile ───────────────────────────────────────── */
+function ProductTile({ product }: { product: Product }) {
+  const { toggleItem, isWishlisted } = useWishlist();
+  const tag  = getTag(product);
+  const emi  = Math.round(product.price / 9);
+  const wishlisted = isWishlisted(product.slug);
+
+  return (
+    <div
+      className="product-card"
+      style={{
+        background: "#fff",
+        display: "flex", flexDirection: "column",
+        position: "relative", overflow: "hidden",
+      }}
+    >
+      {/* Tag + wishlist row */}
+      <div style={{
+        position: "absolute", top: 8, left: 0, right: 0,
+        display: "flex", justifyContent: "space-between",
+        alignItems: "flex-start", padding: "0 8px", zIndex: 2,
+      }}>
+        <span style={{
+          background: tag.bg, color: tag.color,
+          fontFamily: "Inter, sans-serif", fontWeight: 800,
+          fontSize: "0.4rem", letterSpacing: "0.22em",
+          textTransform: "uppercase", padding: "0.2rem 0.5rem",
+        }}>
+          {tag.label}
+        </span>
+        <button
+          onClick={(e) => { e.preventDefault(); toggleItem(product.slug); }}
+          style={{
+            width: 26, height: 26, borderRadius: "50%",
+            background: "#fff", border: "1px solid #e8e8e8",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+          }}
+          aria-label="Add to wishlist"
+        >
+          <Heart
+            size={11}
+            color={wishlisted ? "#e8000d" : "#aaa"}
+            fill={wishlisted ? "#e8000d" : "none"}
+          />
+        </button>
+      </div>
+
+      {/* Product image */}
+      <Link href={`/product/${product.slug}`} style={{ textDecoration: "none" }}>
+        <div style={{
+          background: "#f9f9f9",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "2rem 1rem 1rem",
+          minHeight: 180,
+        }}>
+          <ProductMockup product={product} size={120} />
+        </div>
+
+        {/* Info */}
+        <div style={{ padding: "0.75rem 0.85rem 0.9rem" }}>
+          <div style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: "0.62rem", fontWeight: 600,
+            color: "#111", lineHeight: 1.3,
+            marginBottom: 6,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}>
+            {product.name}
+          </div>
+
+          {/* Price row */}
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
+            <span style={{
+              fontFamily: "Space Mono, monospace",
+              fontWeight: 700, fontSize: "0.78rem", color: "#111",
+            }}>
+              ₹{product.price.toLocaleString("en-IN")}
+            </span>
+            {product.originalPrice && (
+              <span style={{
+                fontFamily: "Space Mono, monospace",
+                fontSize: "0.6rem", color: "#bbb",
+                textDecoration: "line-through",
+              }}>
+                ₹{product.originalPrice.toLocaleString("en-IN")}
+              </span>
+            )}
+          </div>
+
+          {/* EMI */}
+          <div style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: "0.48rem", color: "#aaa",
+            letterSpacing: "0.02em", marginTop: 3,
+          }}>
+            EMI @ ₹{emi.toLocaleString("en-IN")}/Month
+          </div>
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+/* ── Main component ─────────────────────────────────────── */
+export function TrendingSection() {
+  const [activeCat, setActiveCat] = useState("ALL");
+  const filtered = filterProducts(activeCat);
+
+  return (
+    <section style={{ background: "#fff", padding: "3rem 0" }}>
+      <div style={{ maxWidth: 1440, margin: "0 auto", padding: "0 1.5rem" }}>
+
+        {/* Header */}
+        <div style={{ marginBottom: "1.8rem" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, marginBottom: 4,
+          }}>
+            <TrendingUp size={14} color="#e8000d" />
+            <span style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: "0.56rem", fontWeight: 600,
+              color: "#e8000d", letterSpacing: "0.18em",
+              textTransform: "uppercase",
+            }}>
+              WHAT&apos;S NEW &amp;
+            </span>
+          </div>
+          <h2 style={{
+            fontFamily: "Anton, sans-serif",
+            fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
+            letterSpacing: "0.04em", color: "#111",
+            textTransform: "uppercase", marginBottom: 4,
+          }}>
+            Trending in the Vault
+          </h2>
+          <p style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: "0.65rem", color: "#999",
+          }}>
+            The Collection That Made It To The Top Drops
+          </p>
+        </div>
+
+        {/* Category tabs */}
+        <div
+          className="no-scrollbar"
+          style={{
+            display: "flex", gap: 0,
+            borderBottom: "2px solid #f0f0f0",
+            overflowX: "auto",
+            marginBottom: "1.8rem",
+          }}
+        >
+          {CATS.map(({ key, label }) => {
+            const active = activeCat === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setActiveCat(key)}
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 700, fontSize: "0.58rem",
+                  letterSpacing: "0.1em", textTransform: "uppercase",
+                  color: active ? "#111" : "#aaa",
+                  background: "none", border: "none",
+                  borderBottom: active ? "2px solid #111" : "2px solid transparent",
+                  padding: "0.6rem 1.1rem",
+                  cursor: "pointer", whiteSpace: "nowrap",
+                  marginBottom: -2,
+                  transition: "color 0.2s, border-color 0.2s",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Product grid */}
+        {filtered.length === 0 ? (
+          <div style={{
+            textAlign: "center", padding: "3rem",
+            fontFamily: "Inter, sans-serif", color: "#ccc",
+            fontSize: "0.7rem",
+          }}>
+            No products in this category yet.
+          </div>
+        ) : (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+            gap: "1px",
+            background: "#ebebeb",
+            border: "1px solid #ebebeb",
+          }}>
+            {filtered.map((product) => (
+              <ProductTile key={product.slug} product={product} />
+            ))}
+          </div>
+        )}
+
+        {/* View all */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}>
+          <Link
+            href="/shop"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              fontFamily: "Inter, sans-serif", fontWeight: 700,
+              fontSize: "0.6rem", letterSpacing: "0.14em",
+              textTransform: "uppercase", textDecoration: "none",
+              color: "#111", borderBottom: "1.5px solid #111",
+              paddingBottom: 2,
+            }}
+          >
+            VIEW ALL {filtered.length} DROPS →
+          </Link>
+        </div>
+
+      </div>
+    </section>
+  );
+}
