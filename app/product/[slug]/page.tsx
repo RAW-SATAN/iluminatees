@@ -3,7 +3,7 @@
 import { notFound } from "next/navigation";
 import { useState, use } from "react";
 import Link from "next/link";
-import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check } from "lucide-react";
+import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check, Share2 } from "lucide-react";
 import { getProductBySlug, products, type ProductSize } from "@/lib/products";
 import { ProductMockup } from "@/components/ProductMockup";
 import { useCart } from "@/components/CartProvider";
@@ -12,18 +12,12 @@ import { useWishlist } from "@/components/WishlistProvider";
 const SIZES: ProductSize[] = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const FAQS = [
-  {
-    q: "Shippings & EMIs",
-    a: "We ship Pan-India within 3-5 business days. Express delivery available at checkout. EMI available on all orders above ₹999 via Razorpay / PhonePe Pay Later. No-cost EMI on select cards.",
-  },
-  {
-    q: "FAQ",
-    a: "Q: Are these 100% cotton? Yes — all ILUMINATEES use 220-260 GSM heavyweight ringspun cotton.\nQ: Can I wash them? Cold wash, inside out, no tumble dry.\nQ: Do you restock? Limited drops are never restocked. Sacred and Cipher series may restock once per season.",
-  },
-  {
-    q: "Product Information",
-    a: "220-260 GSM heavyweight cotton. Pre-washed, pre-shrunk. Oversized / boxy / relaxed fit depending on the style. All prints are screen-printed, not DTG. Sizing is unisex — refer to size chart for exact measurements.",
-  },
+  { q: "Check Check Authenticated", a: "Every ILUMINATEES drop undergoes a 5-level verification before dispatch — fabric GSM check, print quality, stitching, sizing accuracy, and packaging integrity. You get what you paid for, guaranteed." },
+  { q: "Our Promise", a: "Heavyweight cotton, screen-printed graphics that outlast the trend, and drops that actually sell out. No filler. No fast fashion. Only pieces worth owning." },
+  { q: "Money Back Guarantee", a: "If your order arrives damaged, wrong size, or not as described — we refund 100%, no questions asked. Just WhatsApp us within 48 hours of delivery." },
+  { q: "Shippings & EMIs", a: "Ships Pan-India within 3-5 business days. Express delivery available. No-cost EMI on orders above ₹999 via Razorpay, PhonePe Pay Later, and select cards." },
+  { q: "FAQ", a: "Q: 100% cotton? Yes — 220-260 GSM heavyweight ringspun cotton.\nQ: Wash care? Cold wash, inside out, no tumble dry.\nQ: Restocks? Limited drops never restock. Sacred/Cipher series may restock once per season." },
+  { q: "Product Information", a: "220-260 GSM heavyweight cotton. Pre-washed, pre-shrunk. Oversized/boxy/relaxed fit depending on style. Screen-printed graphics — not DTG. Unisex sizing." },
 ];
 
 const WA_CHATS = [
@@ -53,11 +47,18 @@ const WA_CHATS = [
   },
 ];
 
+const REVIEWS = [
+  { name: "Aryan Dam", product: "Eye of Providence", rating: 4, text: "Got my tee from ILUMINATEES — quality is insane, fast shipping, print is crisp even after multiple washes...", initials: "AD" },
+  { name: "Priya Sharma", product: "Sacred Geometry", rating: 4, text: "My Sacred Geometry tee is perfect! Quick delivery and the fabric is genuinely heavyweight, not like those cheap ones...", initials: "PS" },
+  { name: "Raj Mehta", product: "Cipher 33", rating: 5, text: "Cipher 33 is stunning. The unboxing experience alone was worth it. Will definitely order again from ILUMINATEES...", initials: "RM" },
+  { name: "Vikram Patel", product: "The Architect", rating: 4, text: "The Architect drop delivered faster than expected. Packaging is premium and the tee fits exactly as described...", initials: "VP" },
+];
+
 const GUARANTEES = [
-  { icon: "🏛️", title: "Luxury Sourcing", desc: "Premium 220-260 GSM heavyweight ringspun cotton — not the thin stuff. Every drop is quality-checked before it ships." },
-  { icon: "⚡", title: "Direct From Source", desc: "We control the full production chain — no middlemen, no markup. That's how we keep prices honest." },
-  { icon: "💰", title: "Best Price Promise", desc: "Find the same quality cheaper anywhere? We'll match it, no questions asked." },
-  { icon: "🤝", title: "Community First", desc: "10,000+ initiates already in the order. We grow together or we don't grow at all." },
+  { icon: "🏛️", title: "Luxury Marketplace", desc: "Premium drops priced fairly. Less popular pieces sell below market because we don't inflate." },
+  { icon: "⚡", title: "Competition Between Sellers", desc: "We constantly benchmark quality across the market so you always get the best value." },
+  { icon: "💰", title: "Price Comparision", desc: "We compare our prices across the market so you never overpay for quality streetwear." },
+  { icon: "🤝", title: "Helping Sellers, Helping You", desc: "We help our supply chain work smarter, passing the savings directly to you." },
 ];
 
 function AccordionItem({ q, a }: { q: string; a: string }) {
@@ -66,16 +67,26 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
     <div style={{ borderBottom: "1px solid #f0f0f0" }}>
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.9rem 0", background: "none", border: "none", cursor: "pointer", fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.7rem", color: "#111", textAlign: "left" }}
+        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem 0", background: "none", border: "none", cursor: "pointer", fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "0.78rem", color: "#111", textAlign: "left" }}
       >
         {q}
         {open ? <ChevronUp size={14} color="#555" /> : <ChevronDown size={14} color="#555" />}
       </button>
       {open && (
-        <div style={{ paddingBottom: "0.9rem", fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#666", lineHeight: 1.75, whiteSpace: "pre-line" }}>
+        <div style={{ paddingBottom: "1rem", fontFamily: "Inter, sans-serif", fontSize: "0.65rem", color: "#666", lineHeight: 1.75, whiteSpace: "pre-line" }}>
           {a}
         </div>
       )}
+    </div>
+  );
+}
+
+function StarRow({ rating }: { rating: number }) {
+  return (
+    <div style={{ display: "flex", gap: 2 }}>
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star key={i} size={13} color={i <= rating ? "#f5a623" : "#e0e0e0"} fill={i <= rating ? "#f5a623" : "none"} />
+      ))}
     </div>
   );
 }
@@ -88,26 +99,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
-  const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
-  const [sizeError, setSizeError] = useState(false);
+
+  const availSizes = SIZES.filter(s => product.sizes.includes(s));
+  const [selectedSize, setSelectedSize] = useState<ProductSize>(availSizes[2] ?? availSizes[0]);
   const [added, setAdded] = useState(false);
+  const [priceTab, setPriceTab] = useState<"recommended" | "lowest" | "fastest">("fastest");
 
   const wishlisted = isWishlisted(product.slug);
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null;
   const emi = Math.round(product.price / 9);
-  const sold = (parseInt(product.id) * 97 + 124);
-
+  const sold = parseInt(product.id) * 97 + 124;
   const related = products.filter(p => p.id !== product.id).slice(0, 6);
   const byTheCulture = products.filter(p => p.id !== product.id).slice(0, 5);
 
   function handleAddToCart() {
-    if (!selectedSize) {
-      setSizeError(true);
-      setTimeout(() => setSizeError(false), 2000);
-      return;
-    }
     addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
@@ -116,40 +123,53 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   return (
     <div style={{ minHeight: "100vh", background: "#fff" }}>
 
-      {/* ── Main two-panel ─────────────────────────────── */}
+      {/* ── Two-panel ─────────────────────────────── */}
       <div
-        style={{ maxWidth: 1280, margin: "0 auto", padding: "1.5rem 1.5rem 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "start" }}
+        style={{ maxWidth: 1280, margin: "0 auto", padding: "1.5rem 1.5rem 0", display: "grid", gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)", gap: "2.5rem", alignItems: "start" }}
         className="product-grid"
       >
-        {/* ── LEFT: Image panel ─────────────────────────── */}
-        <div>
+
+        {/* ── LEFT ──────────────────────────── */}
+        <div style={{ position: "sticky", top: 130 }}>
           <div style={{ display: "flex", gap: 10 }}>
 
             {/* Thumbnails */}
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[0, 1].map(i => (
-                <div key={i} style={{ width: 68, height: 68, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                  <ProductMockup product={product} size={50} />
+              {[0, 1, 2].map(i => (
+                <div key={i} style={{ width: 62, height: 72, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                  <ProductMockup product={product} size={46} />
                 </div>
               ))}
             </div>
 
             {/* Main image */}
-            <div style={{ flex: 1, position: "relative" }}>
-              <div style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 460, padding: "3rem 2rem" }}>
-                <ProductMockup product={product} size={320} />
+            <div style={{ flex: 1 }}>
+              {/* Icons row */}
+              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+                  <Share2 size={16} color="#555" />
+                </button>
+                <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8"><path d="M18 21l-6-3-6 3V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z" /></svg>
+                </button>
+                <button onClick={() => toggleItem(product.slug)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                  <Heart size={16} color={wishlisted ? "#e8000d" : "#555"} fill={wishlisted ? "#e8000d" : "none"} />
+                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555" }}>53.0k</span>
+                </button>
               </div>
 
-              {/* Wishlist */}
-              <button
-                onClick={() => toggleItem(product.slug)}
-                style={{ position: "absolute", top: 14, right: 14, width: 36, height: 36, borderRadius: "50%", background: "#fff", border: "1px solid #eee", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
-              >
-                <Heart size={15} color={wishlisted ? "#e8000d" : "#ccc"} fill={wishlisted ? "#e8000d" : "none"} />
-              </button>
+              <div style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 420, padding: "2.5rem 2rem", position: "relative" }}>
+                <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.34rem", color: "#111", letterSpacing: "0.04em", lineHeight: 1.3 }}>
+                    AS SEEN ON<br />
+                    <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em" }}>SHARK TANK</span>
+                  </div>
+                </div>
+                <ProductMockup product={product} size={300} />
+              </div>
 
-              {/* Bottom bar: sold + rating */}
-              <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.6rem 0.85rem", background: "#fff", border: "1px solid #eee", borderRadius: 8 }}>
+              {/* Sold + rating bar */}
+              <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.55rem 0.85rem", background: "#fff", border: "1px solid #eee", borderRadius: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <TrendingUp size={12} color="#e8000d" />
                   <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#333" }}>
@@ -166,153 +186,212 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           </div>
         </div>
 
-        {/* ── RIGHT: Info panel ─────────────────────────── */}
-        <div style={{ paddingTop: "0.25rem" }}>
+        {/* ── RIGHT ────────────────────────── */}
+        <div>
 
           {/* Breadcrumb */}
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.54rem", color: "#aaa", marginBottom: 12, letterSpacing: "0.03em" }}>
-            <Link href="/" style={{ color: "#aaa", textDecoration: "none" }}>Home</Link>
-            {" / "}
-            <Link href="/shop" style={{ color: "#aaa", textDecoration: "none" }}>Shop</Link>
-            {" / "}
-            <span style={{ color: "#555" }}>{product.name}</span>
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#aaa", marginBottom: 10, letterSpacing: "0.02em", textTransform: "uppercase" }}>
+            <Link href="/shop" style={{ color: "#aaa", textDecoration: "none" }}>SHOP</Link>
+            {" · "}
+            <Link href={`/shop?cat=${product.category}`} style={{ color: "#aaa", textDecoration: "none" }}>{product.category}</Link>
           </div>
 
-          {/* Trust badges */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
-            {["✅ Easy Exchanges", "⚡ On Time Guarantee", "🔒 Genuine Product"].map(b => (
-              <span key={b} style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.46rem", color: "#333", background: "#f5f5f5", border: "1px solid #e8e8e8", borderRadius: 20, padding: "0.26rem 0.6rem", letterSpacing: "0.02em" }}>
-                {b}
-              </span>
-            ))}
-          </div>
-
-          {/* Name */}
-          <h1 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.5rem, 3vw, 2.1rem)", letterSpacing: "0.04em", color: "#111", textTransform: "uppercase", marginBottom: 10, lineHeight: 1.1 }}>
+          {/* Product name */}
+          <h1 style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "clamp(1.1rem, 2.5vw, 1.45rem)", color: "#111", marginBottom: 16, lineHeight: 1.25 }}>
             {product.name}
           </h1>
 
+          {/* Trust badge buttons */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            <button style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#e8f5e9", border: "1px solid #c8e6c9", borderRadius: 8, padding: "0.65rem 0.85rem", cursor: "pointer" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#2e7d32", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Check size={11} color="#fff" strokeWidth={3} />
+                </span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.62rem", color: "#1b5e20" }}>Easy Exchanges</span>
+              </div>
+              <span style={{ fontSize: "0.7rem", color: "#2e7d32", fontWeight: 700 }}>›</span>
+            </button>
+            <button style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#e3f2fd", border: "1px solid #bbdefb", borderRadius: 8, padding: "0.65rem 0.85rem", cursor: "pointer" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#1565c0", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                </span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.62rem", color: "#0d47a1" }}>On Time Guarantee</span>
+              </div>
+              <span style={{ fontSize: "0.7rem", color: "#1565c0", fontWeight: 700 }}>›</span>
+            </button>
+          </div>
+
+          {/* Size dropdown */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.62rem", color: "#111", letterSpacing: "0.04em" }}>SELECT YOUR SIZE</span>
+              <div style={{ display: "flex", gap: 12 }}>
+                <a href="#" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555", textDecoration: "underline" }}>↗ Size Chart</a>
+                <a href="#" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555", textDecoration: "underline" }}>Find in store</a>
+              </div>
+            </div>
+            <div style={{ position: "relative" }}>
+              <select
+                value={selectedSize}
+                onChange={e => setSelectedSize(e.target.value as ProductSize)}
+                style={{ width: "100%", padding: "0.85rem 2.5rem 0.85rem 1rem", fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.78rem", color: "#111", background: "#fff", border: "1.5px solid #ddd", borderRadius: 8, appearance: "none", cursor: "pointer", outline: "none" }}
+              >
+                {availSizes.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+              <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                <ChevronDown size={14} color="#555" />
+              </div>
+            </div>
+          </div>
+
           {/* Urgency bar */}
-          <div style={{ background: "#fff8e6", border: "1px solid #ffc107", borderRadius: 6, padding: "0.38rem 0.8rem", marginBottom: 14, display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: "0.75rem" }}>🔥</span>
-            <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.52rem", color: "#8a5700", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              Biggest Sale of the Season
-            </span>
+          <div style={{ background: "#fff1f2", border: "1px solid #ffd7d9", borderRadius: 8, padding: "0.6rem 0.9rem", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#e8000d", display: "inline-block", flexShrink: 0 }} />
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.62rem", color: "#111" }}>Biggest Sale Of The Year</span>
+            </div>
+            <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.62rem", color: "#e8000d", flexShrink: 0 }}>98% Claimed</span>
           </div>
 
           {/* Price row */}
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
-            <span style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "1.5rem", color: "#111" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "#111" }}>
               ₹{product.price.toLocaleString("en-IN")}
             </span>
             {product.originalPrice && (
-              <>
-                <span style={{ fontFamily: "Space Mono, monospace", fontSize: "0.85rem", color: "#bbb", textDecoration: "line-through" }}>
-                  ₹{product.originalPrice.toLocaleString("en-IN")}
-                </span>
-                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.52rem", color: "#fff", background: "#e8000d", borderRadius: 4, padding: "0.18rem 0.5rem" }}>
-                  {discount}% OFF
-                </span>
-              </>
-            )}
-          </div>
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa", marginBottom: 20 }}>
-            EMI @ ₹{emi.toLocaleString("en-IN")}/month · No Cost EMI Available
-          </div>
-
-          {/* Size selector */}
-          <div style={{ marginBottom: 18 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.58rem", color: sizeError ? "#e8000d" : "#111", letterSpacing: "0.05em" }}>
-                {sizeError ? "⚠ Please select a size" : "SELECT SIZE"}
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.85rem", color: "#999", textDecoration: "line-through" }}>
+                ₹{product.originalPrice.toLocaleString("en-IN")}
               </span>
-              <a href="#" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa", textDecoration: "underline" }}>
-                Size Guide
-              </a>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {SIZES.map(size => {
-                const avail = product.sizes.includes(size);
-                const active = selectedSize === size;
-                return (
-                  <button
-                    key={size}
-                    disabled={!avail}
-                    onClick={() => { setSelectedSize(size); setSizeError(false); }}
-                    style={{
-                      width: 46, height: 46, borderRadius: 8,
-                      fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem",
-                      background: active ? "#111" : "#fff",
-                      color: active ? "#fff" : avail ? "#111" : "#ccc",
-                      border: `1.5px solid ${active ? "#111" : avail ? "#ddd" : "#eee"}`,
-                      cursor: avail ? "pointer" : "not-allowed",
-                      textDecoration: !avail ? "line-through" : "none",
-                      opacity: avail ? 1 : 0.4,
-                      transition: "all 0.15s",
-                    }}
-                  >
-                    {size}
-                  </button>
-                );
-              })}
-            </div>
+            )}
+            {discount && (
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111" }}>
+                {discount}% OFF
+              </span>
+            )}
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#888" }}>By ILUMINATEES</span>
           </div>
 
-          {/* Add to bag */}
+          {/* Delivery line */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#f5a623", display: "inline-block", flexShrink: 0 }} />
+            <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#111" }}>EXPRESS</span>
+            <span style={{ color: "#ccc" }}>·</span>
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#555" }}>Free Delivery</span>
+            <span style={{ color: "#ccc" }}>·</span>
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#555" }}>Ships Today</span>
+          </div>
+
+          {/* Add to cart */}
           <button
             onClick={handleAddToCart}
-            style={{
-              width: "100%", padding: "0.95rem", borderRadius: 10,
-              background: added ? "#333" : "#111", color: "#fff", border: "none",
-              fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.7rem",
-              letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer",
-              marginBottom: 12, transition: "background 0.2s",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            }}
+            style={{ width: "100%", padding: "1rem", borderRadius: 10, background: added ? "#333" : "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", marginBottom: 10, transition: "background 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
           >
-            {added ? <><Check size={14} /> ADDED TO BAG</> : "ADD TO BAG"}
+            {added ? <><Check size={15} /> Added To Bag</> : "Add To Cart →"}
           </button>
 
-          {/* Delivery info grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-            {[
-              { icon: "🚚", title: "Free Delivery", sub: "On all orders" },
-              { icon: "📦", title: "Ships Today", sub: "Order before 2 PM" },
-              { icon: "🔄", title: "Easy Returns", sub: "7-day return policy" },
-              { icon: "✅", title: "100% Authentic", sub: "Screen print guaranteed" },
-            ].map(({ icon, title, sub }) => (
-              <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "0.6rem 0.7rem", background: "#f9f9f9", borderRadius: 8, border: "1px solid #f0f0f0" }}>
-                <span style={{ fontSize: "0.85rem" }}>{icon}</span>
-                <div>
-                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.52rem", color: "#111" }}>{title}</div>
-                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.48rem", color: "#aaa" }}>{sub}</div>
-                </div>
-              </div>
-            ))}
+          {/* Pay later */}
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#888", textAlign: "center", marginBottom: 12 }}>
+            Get It At <strong style={{ color: "#111" }}>₹{emi.toLocaleString("en-IN")}/Month</strong> With ILUMINATEES Pay Later
           </div>
 
-          {/* FAQ accordion */}
-          <div style={{ borderTop: "1px solid #f0f0f0" }}>
-            {FAQS.map(f => <AccordionItem key={f.q} q={f.q} a={f.a} />)}
+          {/* Auth row */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.7rem 0.9rem", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, marginBottom: 16, cursor: "pointer" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Check size={11} color="#fff" strokeWidth={3} />
+              </span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.57rem", color: "#333", lineHeight: 1.4 }}>
+                Each Product Includes A{" "}
+                <span style={{ color: "#0066cc", textDecoration: "underline" }}>Quality Certificate</span>,{" "}
+                <span style={{ color: "#0066cc", textDecoration: "underline" }}>Buyer Protection Policy</span>{" "}
+                And{" "}
+                <span style={{ color: "#0066cc", textDecoration: "underline" }}>Delivery Insurance</span>
+              </span>
+            </div>
+            <span style={{ fontSize: "0.8rem", color: "#555", flexShrink: 0, marginLeft: 8 }}>›</span>
+          </div>
+
+          {/* Compare Prices */}
+          <div style={{ border: "1.5px solid #eee", borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.8rem 1rem", borderBottom: "1px solid #eee" }}>
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111" }}>
+                COMPARE PRICES FOR{" "}
+                <span style={{ color: "#0066cc" }}>{selectedSize}</span>
+              </span>
+              <ChevronDown size={14} color="#555" />
+            </div>
+            <div style={{ padding: "0.75rem 1rem 0" }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+                {(["recommended", "lowest", "fastest"] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setPriceTab(tab)}
+                    style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.54rem", padding: "0.32rem 0.65rem", borderRadius: 20, border: "1.5px solid", borderColor: priceTab === tab ? "#111" : "#ddd", background: priceTab === tab ? "#111" : "#fff", color: priceTab === tab ? "#fff" : "#555", cursor: "pointer" }}
+                  >
+                    {tab === "recommended" ? "Recommended" : tab === "lowest" ? "Lowest Price" : "Fastest Delivery"}
+                  </button>
+                ))}
+              </div>
+              {/* Seller row */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 0", borderTop: "1px solid #f5f5f5" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 8, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.42rem", color: "#fff", letterSpacing: "0.05em" }}>ILMN</span>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111", display: "flex", alignItems: "center", gap: 5 }}>
+                      ILUMINATEES
+                      <span style={{ background: "#dbeafe", color: "#1d4ed8", borderRadius: 4, padding: "0.08rem 0.32rem", fontSize: "0.48rem", fontWeight: 700 }}>✓ Verified</span>
+                    </div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#555", display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
+                      <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#f5a623", display: "inline-block" }} />
+                      EXPRESS · Free Delivery · Ships Today
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#111" }}>₹{product.price.toLocaleString("en-IN")}</span>
+              </div>
+            </div>
+
+            {/* Delivery & Services */}
+            <div style={{ borderTop: "1px solid #eee", padding: "0.8rem 1rem" }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.58rem", color: "#555", marginBottom: 12, letterSpacing: "0.06em" }}>
+                DELIVERY AND SERVICES
+              </div>
+              {[
+                { icon: "🔄", title: "Easy Exchange & Buyer Protection Policy", desc: "ILUMINATEES offers size exchange and 100% satisfaction guarantee on every drop." },
+                { icon: "📦", title: "Cash on Delivery Available", desc: "Available on orders above ₹999" },
+                { icon: "⚡", title: "Express Shipping", desc: "Your order ships today if placed before 2 PM." },
+              ].map(({ icon, title, desc }) => (
+                <div key={title} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
+                  <span style={{ fontSize: "1rem", flexShrink: 0 }}>{icon}</span>
+                  <div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#111" }}>{title}</div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#888", marginTop: 2 }}>{desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── WhatsApp Chats ─────────────────────────────── */}
+      {/* ── WhatsApp Chats (instead of Certificate) ── */}
       <div style={{ maxWidth: 1280, margin: "3.5rem auto 0", padding: "0 1.5rem" }}>
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#e8000d", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>
-            STRAIGHT FROM THE DMs
-          </div>
+        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>
+          STRAIGHT FROM THE DMs
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 20 }}>
           <h2 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 3vw, 2rem)", letterSpacing: "0.04em", color: "#111", textTransform: "uppercase" }}>
             What The Culture Says
           </h2>
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#aaa" }}>5.8k+ Reviews</span>
         </div>
-
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 16 }}>
           {WA_CHATS.map(chat => (
-            <div key={chat.name} style={{ borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.10)", border: "1px solid #e0e0e0" }}>
-              {/* WA header */}
+            <div key={chat.name} style={{ borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.09)", border: "1px solid #e0e0e0" }}>
               <div style={{ background: "#075E54", padding: "0.65rem 1rem", display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 34, height: 34, borderRadius: "50%", background: chat.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.75rem", color: "#fff", flexShrink: 0 }}>
                   {chat.avatar}
@@ -322,20 +401,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.46rem", color: "rgba(255,255,255,0.6)" }}>online</div>
                 </div>
               </div>
-
-              {/* Chat body */}
-              <div style={{ background: "#ece5dd", padding: "0.8rem", display: "flex", flexDirection: "column", gap: 7 }}>
+              <div style={{ background: "#ece5dd", padding: "0.75rem", display: "flex", flexDirection: "column", gap: 6 }}>
                 {chat.messages.map((msg, i) => (
                   <div key={i} style={{ display: "flex", justifyContent: msg.out ? "flex-end" : "flex-start" }}>
-                    <div style={{
-                      background: msg.out ? "#dcf8c6" : "#fff",
-                      borderRadius: msg.out ? "10px 10px 2px 10px" : "10px 10px 10px 2px",
-                      padding: "0.45rem 0.7rem",
-                      maxWidth: "82%",
-                      boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
-                    }}>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#111", lineHeight: 1.45 }}>{msg.text}</div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.42rem", color: "#aaa", textAlign: "right", marginTop: 3 }}>
+                    <div style={{ background: msg.out ? "#dcf8c6" : "#fff", borderRadius: msg.out ? "10px 10px 2px 10px" : "10px 10px 10px 2px", padding: "0.42rem 0.65rem", maxWidth: "82%", boxShadow: "0 1px 2px rgba(0,0,0,0.07)" }}>
+                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#111", lineHeight: 1.4 }}>{msg.text}</div>
+                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.42rem", color: "#aaa", textAlign: "right", marginTop: 2 }}>
                         {msg.time}{msg.out && " ✓✓"}
                       </div>
                     </div>
@@ -347,9 +418,49 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       </div>
 
-      {/* ── Guarantee Best Prices ──────────────────────── */}
+      {/* ── Reviews ───────────────────────────────── */}
       <div style={{ maxWidth: 1280, margin: "3rem auto 0", padding: "0 1.5rem" }}>
-        <div style={{ background: "#f9f9f9", borderRadius: 16, padding: "2rem 2rem 2rem" }}>
+        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>
+          LETS HEAR IT
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 20 }}>
+          <h2 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 3vw, 2rem)", letterSpacing: "0.04em", color: "#111", textTransform: "uppercase" }}>
+            From The Culture
+          </h2>
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#aaa" }}>5.8k+ Reviews</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {REVIEWS.map(rev => (
+            <div key={rev.name} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "1.1rem 0", borderBottom: "1px solid #f0f0f0" }}>
+              <div style={{ flex: 1 }}>
+                <StarRow rating={rev.rating} />
+                <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#111", margin: "6px 0 2px" }}>{rev.product}</div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#555", lineHeight: 1.5 }}>{rev.text}</div>
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#111" }}>{rev.name}</div>
+                <div style={{ width: 48, height: 48, borderRadius: 8, background: "#f0f0f0", marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#555" }}>{rev.initials}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── FAQ ───────────────────────────────────── */}
+      <div style={{ maxWidth: 1280, margin: "2.5rem auto 0", padding: "0 1.5rem" }}>
+        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.56rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>
+          MOST ASKED QUESTIONS
+        </div>
+        <div style={{ borderTop: "1px solid #f0f0f0" }}>
+          {FAQS.map(f => <AccordionItem key={f.q} q={f.q} a={f.a} />)}
+        </div>
+      </div>
+
+      {/* ── Guarantee Best Prices ─────────────────── */}
+      <div style={{ maxWidth: 1280, margin: "3rem auto 0", padding: "0 1.5rem" }}>
+        <div style={{ background: "#f9f9f9", borderRadius: 16, padding: "2rem" }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>
             HOW WE ALWAYS
           </div>
@@ -372,7 +483,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       </div>
 
-      {/* ── Similar Product ────────────────────────────── */}
+      {/* ── Similar Product ───────────────────────── */}
       <div style={{ maxWidth: 1280, margin: "3rem auto 0", padding: "0 1.5rem 1rem" }}>
         <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 14 }}>
           SIMILAR PRODUCT
@@ -381,7 +492,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           {related.map(p => {
             const pDisc = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : null;
             return (
-              <Link key={p.id} href={`/product/${p.slug}`} style={{ textDecoration: "none", display: "flex", flexDirection: "column", flexShrink: 0, width: 190, border: "1px solid #eee", borderRadius: 12, overflow: "hidden", background: "#fff", position: "relative" }}>
+              <Link key={p.id} href={`/product/${p.slug}`} style={{ textDecoration: "none", flexShrink: 0, width: 190, border: "1px solid #eee", borderRadius: 12, overflow: "hidden", background: "#fff", display: "flex", flexDirection: "column", position: "relative" }}>
                 {pDisc && (
                   <div style={{ position: "absolute", top: 8, left: 8, zIndex: 1, background: "#e8000d", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.42rem", letterSpacing: "0.1em", padding: "0.18rem 0.45rem", borderRadius: 4 }}>
                     UPTO {pDisc}% OFF
@@ -406,7 +517,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       </div>
 
-      {/* ── By The Culture ────────────────────────────── */}
+      {/* ── By The Culture ────────────────────────── */}
       <div style={{ maxWidth: 1280, margin: "2.5rem auto 0", padding: "0 1.5rem 5rem" }}>
         <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>
           YOU MAY ALSO LIKE
@@ -436,10 +547,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
       <style>{`
         @media (max-width: 768px) {
-          .product-grid {
-            grid-template-columns: 1fr !important;
-            gap: 1.5rem !important;
-          }
+          .product-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
         }
       `}</style>
     </div>
