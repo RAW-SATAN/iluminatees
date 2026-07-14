@@ -16,6 +16,7 @@ export function StickyBubble() {
         display: "flex", alignItems: "center", gap: 14,
         background: "#111",
         border: "1px solid #222",
+        borderRadius: 20,
         padding: "10px 16px 10px 12px",
         maxWidth: "calc(100vw - 2rem)",
         animation: "bubble-in 0.4s ease forwards",
@@ -60,6 +61,7 @@ export function StickyBubble() {
           fontSize: "0.52rem", letterSpacing: "0.14em",
           textTransform: "uppercase", textDecoration: "none",
           padding: "0.45rem 0.9rem", whiteSpace: "nowrap",
+          borderRadius: 10,
         }}
       >
         SHOP NOW

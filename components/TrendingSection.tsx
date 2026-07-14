@@ -71,6 +71,7 @@ function ProductTile({ product }: { product: Product }) {
           fontFamily: "Inter, sans-serif", fontWeight: 800,
           fontSize: "0.4rem", letterSpacing: "0.22em",
           textTransform: "uppercase", padding: "0.2rem 0.5rem",
+          borderRadius: 5,
         }}>
           {tag.label}
         </span>
@@ -240,9 +241,7 @@ export function TrendingSection() {
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-            gap: "1px",
-            background: "#ebebeb",
-            border: "1px solid #ebebeb",
+            gap: "12px",
           }}>
             {filtered.map((product) => (
               <ProductTile key={product.slug} product={product} />

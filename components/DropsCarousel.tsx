@@ -134,10 +134,9 @@ export function DropsCarousel() {
                 height: "clamp(150px, 17vw, 210px)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 background: isCenter ? "#fff" : "transparent",
-                borderRadius: 4,
+                borderRadius: 20,
                 boxShadow: isCenter ? "0 16px 56px rgba(0,0,0,0.12)" : "none",
                 border:     isCenter ? "1px solid #eee" : "none",
-                /* inner scale spring so the image itself pops */
                 transition: "box-shadow 0.4s ease, border-color 0.4s ease",
               }}>
                 <ProductMockup product={prod} size={isCenter ? 175 : 135} />
@@ -152,6 +151,7 @@ export function DropsCarousel() {
         maxWidth: 390, margin: "1.8rem auto 0",
         background: "#fff",
         border: "1px solid #e4e4e4",
+        borderRadius: 20,
         boxShadow: "0 4px 28px rgba(0,0,0,0.07)",
         padding: "1.2rem 1.5rem",
         position: "relative",
@@ -244,6 +244,7 @@ export function DropsCarousel() {
             fontSize: "0.58rem", letterSpacing: "0.18em",
             textTransform: "uppercase", textDecoration: "none",
             padding: "0.72rem", textAlign: "center",
+            borderRadius: 12,
           }}
         >
           Explore

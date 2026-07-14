@@ -133,7 +133,7 @@ export function BrandStory() {
                   width: isFeatured ? "clamp(280px, 30vw, 360px)" : "clamp(220px, 22vw, 280px)",
                   minHeight: isFeatured ? 340 : 300,
                   background: card.bg,
-                  borderRadius: 4,
+                  borderRadius: 20,
                   padding: "1.8rem 1.5rem",
                   display: "flex", flexDirection: "column",
                   justifyContent: "space-between",

@@ -55,6 +55,7 @@ body {
   font-family: "Inter", sans-serif; font-weight: 700;
   font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
   padding: 0.55rem 1rem; border: none; white-space: nowrap;
+  border-radius: 8px;
   transition: background 0.2s;
 }
 .btn-black:hover { background: #333; }
@@ -63,7 +64,7 @@ body {
   background: #e8000d; color: #fff;
   font-family: "Inter", sans-serif; font-weight: 700;
   font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
-  padding: 0.75rem 1.5rem; border: none;
+  padding: 0.75rem 1.5rem; border: none; border-radius: 8px;
   transition: background 0.2s;
 }
 .btn-red:hover { background: #cc0009; }
@@ -72,6 +73,7 @@ body {
   font-family: "Inter", sans-serif; font-weight: 700; letter-spacing: 0.12em;
   font-size: 0.7rem; padding: 0.75rem 2rem;
   border: 1px solid #111; color: #111; background: transparent;
+  border-radius: 8px;
   transition: background 0.2s, color 0.2s;
 }
 .btn-gold:hover { background: #111; color: #fff; }
@@ -80,7 +82,8 @@ body {
   background: #e8000d; color: #fff;
   font-family: "Inter", sans-serif; font-weight: 700;
   font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
-  padding: 0.85rem 1.8rem; border: none; transition: background 0.2s;
+  padding: 0.85rem 1.8rem; border: none; border-radius: 8px;
+  transition: background 0.2s;
 }
 .btn-primary:hover { background: #cc0009; }
 
@@ -91,7 +94,7 @@ body {
   font-family: "Inter", sans-serif;
   font-size: 0.46rem; font-weight: 800;
   letter-spacing: 0.22em; text-transform: uppercase;
-  padding: 0.18rem 0.55rem;
+  padding: 0.18rem 0.55rem; border-radius: 4px;
 }
 
 /* hero sidebar nav-link */
@@ -116,7 +119,7 @@ body {
 
 /* product card hover */
 .product-card {
-  border: 1px solid #eee;
+  border: 1px solid #eee; border-radius: 12px; overflow: hidden;
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
 .product-card:hover {

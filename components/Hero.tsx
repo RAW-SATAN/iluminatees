@@ -224,6 +224,7 @@ export function Hero() {
                   fontFamily: "Inter, sans-serif", fontWeight: 800,
                   fontSize: "0.44rem", letterSpacing: "0.28em",
                   padding: "0.2rem 0.6rem", marginBottom: 12,
+                  borderRadius: 6,
                 }}>
                   {s.tag}
                 </div>
@@ -279,7 +280,7 @@ export function Hero() {
                     fontFamily: "Inter, sans-serif", fontWeight: 800,
                     fontSize: "0.62rem", letterSpacing: "0.14em",
                     textTransform: "uppercase", textDecoration: "none",
-                    padding: "0.75rem 1.6rem",
+                    padding: "0.75rem 1.6rem", borderRadius: 24,
                   }}
                 >
                   SHOP NOW →
@@ -314,11 +315,11 @@ export function Hero() {
             style={{
               position: "absolute", top: "50%", transform: "translateY(-50%)",
               left, right,
-              background: "rgba(255,255,255,0.85)", border: "1px solid #ddd",
-              color: "#333", width: 32, height: 32,
+              background: "rgba(255,255,255,0.9)", border: "1px solid #e0e0e0",
+              color: "#333", width: 34, height: 34, borderRadius: "50%",
               display: "flex", alignItems: "center", justifyContent: "center",
               zIndex: 10, cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.10)",
               transition: "background 0.2s",
             }}
           >

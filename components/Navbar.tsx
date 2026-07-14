@@ -124,9 +124,9 @@ export function Navbar() {
           <div style={{
             flex: 1, minWidth: 0,
             display: "flex", alignItems: "center", gap: 10,
-            background: "#fff", border: "1.5px solid #d8d8d8",
-            height: 42, padding: "0 14px",
-            borderRadius: 2,
+            background: "#f5f5f5", border: "1.5px solid #e8e8e8",
+            height: 42, padding: "0 16px",
+            borderRadius: 24,
           }}>
             <Search size={13} color="#aaa" style={{ flexShrink: 0 }} />
             <input
@@ -216,13 +216,13 @@ export function Navbar() {
 
             {/* CTA button */}
             <Link href="/shop" style={{ textDecoration: "none" }} className="hidden sm:block">
-              <div className="btn-black">
+              <div className="btn-black" style={{ borderRadius: 20 }}>
                 <span>🎁</span>
                 <span>CLAIM FREE TEE</span>
                 <span style={{
                   background: "#fff", color: "#111",
                   fontSize: "0.52rem", fontWeight: 800,
-                  padding: "1px 5px", borderRadius: 2,
+                  padding: "1px 7px", borderRadius: 10,
                   letterSpacing: "0.05em",
                 }}>₹999</span>
               </div>
