@@ -82,8 +82,9 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const product = getProductBySlug(slug);
-  if (!product) notFound();
+  const productData = getProductBySlug(slug);
+  if (!productData) notFound();
+  const product = productData!;
 
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
