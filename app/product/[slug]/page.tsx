@@ -150,12 +150,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
         {/* ── LEFT (sticky) ──────────────────────────── */}
         <div style={{ position: "sticky", top: 130, alignSelf: "start" }}>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div className="product-gallery" style={{ display: "flex", gap: 10 }}>
 
             {/* Thumbnails */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div className="product-thumbnails" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[0, 1, 2].map(i => (
-                <div key={i} style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                <div key={i} className="product-thumbnail-item" style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
                   <ProductMockup product={product} size={52} />
                 </div>
               ))}
@@ -177,7 +177,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 </button>
               </div>
 
-              <div style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: "3rem 2rem", position: "relative" }}>
+              <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: "3rem 2rem", position: "relative" }}>
                 <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
                   <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.34rem", color: "#111", letterSpacing: "0.04em", lineHeight: 1.3 }}>
                     AS SEEN ON<br />
@@ -221,7 +221,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           </h1>
 
           {/* Trust badge buttons */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <div className="product-trust-badges" style={{ display: "flex", gap: 8, marginBottom: 16 }}>
             <button style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#e8f5e9", border: "1px solid #c8e6c9", borderRadius: 8, padding: "0.65rem 0.85rem", cursor: "pointer" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#2e7d32", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
