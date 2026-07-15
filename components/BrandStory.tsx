@@ -27,7 +27,7 @@ const CARDS = [
   {
     id: 2,
     kicker: "WE DROPPED, WE SOLD OUT AND",
-    title: "We Illuminated The Culture",
+    title: "We Illuminated The Cult",
     desc:  "Every limited run gone within hours. The vault doesn't restock. Once it's gone, it's classified.",
     accent: "#fff",
     bg:    "linear-gradient(160deg, #111 0%, #0a0a0a 100%)",
@@ -96,7 +96,7 @@ export function BrandStory() {
           textTransform: "uppercase",
         }}>
           We Illuminated{" "}
-          <span style={{ color: "#e8000d" }}>The Culture</span>
+          <span style={{ color: "#e8000d" }}>The Cult</span>
         </h2>
         <p style={{
           fontFamily: "Inter, sans-serif",

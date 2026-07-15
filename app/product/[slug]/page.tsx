@@ -115,7 +115,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const sold = parseInt(product.id) * 97 + 124;
   const otherProducts = products.filter(p => p.id !== product.id);
   const related = otherProducts.slice(0, 6);
-  const byTheCulture = otherProducts.slice(0, 5);
+  const byTheCult = otherProducts.slice(0, 5);
 
   const fbtProducts = otherProducts.slice(0, 2);
   const [fbtSelected, setFbtSelected] = useState<string[]>(fbtProducts.map(p => p.slug));
@@ -523,7 +523,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 20 }}>
               <h2 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 3vw, 2rem)", letterSpacing: "0.04em", color: "#111", textTransform: "uppercase" }}>
-                What The Culture Says
+                What The Cult Says
               </h2>
               <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#aaa" }}>5.8k+ Reviews</span>
             </div>
@@ -614,7 +614,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 20 }}>
               <h2 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 3vw, 2rem)", letterSpacing: "0.04em", color: "#111", textTransform: "uppercase" }}>
-                From The Culture
+                From The Cult
               </h2>
               <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#aaa" }}>5.8k+ Reviews</span>
             </div>
@@ -718,16 +718,16 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       </div>
 
-      {/* ── By The Culture (FULL WIDTH) ── */}
+      {/* ── By The Cult (FULL WIDTH) ── */}
       <div style={{ maxWidth: 1280, margin: "2.5rem auto 0", padding: "0 1.5rem 5rem" }}>
         <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>
           YOU MAY ALSO LIKE
         </div>
         <h3 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 3vw, 2rem)", letterSpacing: "0.04em", color: "#111", textTransform: "uppercase", marginBottom: 20 }}>
-          By The Culture
+          By The Cult
         </h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: 14 }}>
-          {byTheCulture.map(p => (
+          {byTheCult.map(p => (
             <Link key={p.id} href={`/product/${p.slug}`} style={{ textDecoration: "none", border: "1px solid #eee", borderRadius: 12, overflow: "hidden", background: "#fff", display: "flex", flexDirection: "column" }}>
               <div style={{ background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem 1rem", minHeight: 155 }}>
                 <ProductMockup product={p} size={105} />
