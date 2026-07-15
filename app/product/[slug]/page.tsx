@@ -104,7 +104,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const availSizes = SIZES.filter(s => product.sizes.includes(s));
   const [selectedSize, setSelectedSize] = useState<ProductSize>(availSizes[2] ?? availSizes[0]);
   const [added, setAdded] = useState(false);
-  const [bundleQty, setBundleQty] = useState(1);
+  const [bundleSize, setBundleSize] = useState<1 | 2 | 3>(1);
+  const [bundlePicks, setBundlePicks] = useState<string[]>([]);
 
   const wishlisted = isWishlisted(product.slug);
   const discount = product.originalPrice
@@ -112,11 +113,24 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     : null;
   const emi = Math.round(product.price / 9);
   const sold = parseInt(product.id) * 97 + 124;
-  const related = products.filter(p => p.id !== product.id).slice(0, 6);
-  const byTheCulture = products.filter(p => p.id !== product.id).slice(0, 5);
+  const otherProducts = products.filter(p => p.id !== product.id);
+  const related = otherProducts.slice(0, 6);
+  const byTheCulture = otherProducts.slice(0, 5);
+
+  function toggleBundlePick(slug: string) {
+    const slots = bundleSize - 1;
+    setBundlePicks(prev =>
+      prev.includes(slug) ? prev.filter(s => s !== slug) : prev.length < slots ? [...prev, slug] : [...prev.slice(1), slug]
+    );
+  }
 
   function handleAddToCart() {
-    addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: bundleQty, shirtColor: product.shirtColor, symbol: product.symbol });
+    addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
+    const bundleDiscount = bundleSize === 2 ? 0.10 : bundleSize === 3 ? 0.15 : 0;
+    bundlePicks.forEach(s => {
+      const p = products.find(x => x.slug === s);
+      if (p) addItem({ productId: p.id, slug: p.slug, name: p.name, price: Math.round(p.price * (1 - bundleDiscount)), size: selectedSize in p.sizes ? selectedSize : (p.sizes[0] as ProductSize), quantity: 1, shirtColor: p.shirtColor, symbol: p.symbol });
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
   }
@@ -294,7 +308,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </button>
             <button
               onClick={() => {
-                addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: bundleQty, shirtColor: product.shirtColor, symbol: product.symbol });
+                addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
+                const bundleDiscount = bundleSize === 2 ? 0.10 : bundleSize === 3 ? 0.15 : 0;
+                bundlePicks.forEach(s => {
+                  const p = products.find(x => x.slug === s);
+                  if (p) addItem({ productId: p.id, slug: p.slug, name: p.name, price: Math.round(p.price * (1 - bundleDiscount)), size: selectedSize in p.sizes ? selectedSize : (p.sizes[0] as ProductSize), quantity: 1, shirtColor: p.shirtColor, symbol: p.symbol });
+                });
                 router.push("/cart");
               }}
               style={{ flex: 1, padding: "1rem", borderRadius: 10, background: "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
@@ -328,59 +347,84 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           {/* Bundles */}
           <div style={{ border: "1.5px solid #eee", borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
             <div style={{ padding: "0.8rem 1rem", borderBottom: "1px solid #eee" }}>
-              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111" }}>
-                BUNDLE &amp; SAVE
-              </span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111" }}>BUNDLE &amp; SAVE</span>
             </div>
-            <div style={{ padding: "0.85rem 1rem 0.25rem", display: "flex", flexDirection: "column", gap: 10 }}>
+
+            {/* Bundle size selector */}
+            <div style={{ padding: "0.85rem 1rem 0.75rem", display: "flex", flexDirection: "column", gap: 8 }}>
               {([
-                { qty: 1, label: "Buy 1", discount: 0, badge: null },
-                { qty: 2, label: "Buy 2", discount: 10, badge: "MOST POPULAR" },
-                { qty: 3, label: "Buy 3", discount: 15, badge: "BEST VALUE" },
-              ] as const).map(({ qty, label, discount, badge }) => {
-                const unitPrice = Math.round(product.price * (1 - discount / 100));
-                const total = unitPrice * qty;
-                const selected = bundleQty === qty;
+                { size: 1 as const, label: "Just This One", discount: 0, badge: null },
+                { size: 2 as const, label: "Any 2 Shirts", discount: 10, badge: "POPULAR" },
+                { size: 3 as const, label: "Any 3 Shirts", discount: 15, badge: "BEST DEAL" },
+              ]).map(({ size, label, discount: d, badge }) => {
+                const sel = bundleSize === size;
                 return (
                   <button
-                    key={qty}
-                    onClick={() => setBundleQty(qty)}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 0.9rem", borderRadius: 8, border: `1.5px solid ${selected ? "#111" : "#e8e8e8"}`, background: selected ? "#111" : "#fff", cursor: "pointer", textAlign: "left", position: "relative" }}
+                    key={size}
+                    onClick={() => { setBundleSize(size); setBundlePicks([]); }}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.7rem 0.85rem", borderRadius: 8, border: `1.5px solid ${sel ? "#111" : "#e8e8e8"}`, background: sel ? "#111" : "#fafafa", cursor: "pointer", textAlign: "left" }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${selected ? "#fff" : "#ccc"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        {selected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff" }} />}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 16, height: 16, borderRadius: "50%", border: `2px solid ${sel ? "#fff" : "#bbb"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {sel && <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff" }} />}
                       </div>
                       <div>
-                        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: selected ? "#fff" : "#111", display: "flex", alignItems: "center", gap: 6 }}>
+                        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.63rem", color: sel ? "#fff" : "#111", display: "flex", alignItems: "center", gap: 6 }}>
                           {label}
-                          {badge && (
-                            <span style={{ background: selected ? "rgba(255,255,255,0.15)" : "#111", color: selected ? "#fff" : "#fff", borderRadius: 4, padding: "0.06rem 0.4rem", fontSize: "0.42rem", fontWeight: 700, letterSpacing: "0.06em" }}>
-                              {badge}
-                            </span>
-                          )}
+                          {badge && <span style={{ background: sel ? "rgba(255,255,255,0.18)" : "#111", color: "#fff", borderRadius: 4, padding: "0.05rem 0.38rem", fontSize: "0.42rem", fontWeight: 700, letterSpacing: "0.05em" }}>{badge}</span>}
                         </div>
-                        {discount > 0 && (
-                          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: selected ? "rgba(255,255,255,0.65)" : "#888", marginTop: 2 }}>
-                            ₹{unitPrice.toLocaleString("en-IN")} each · {discount}% off
-                          </div>
-                        )}
+                        {d > 0 && <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5rem", color: sel ? "rgba(255,255,255,0.6)" : "#888", marginTop: 1 }}>{d}% off each shirt</div>}
                       </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: selected ? "#fff" : "#111" }}>
-                        ₹{total.toLocaleString("en-IN")}
-                      </div>
-                      {discount > 0 && (
-                        <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.48rem", color: selected ? "rgba(255,255,255,0.5)" : "#bbb", textDecoration: "line-through" }}>
-                          ₹{(product.price * qty).toLocaleString("en-IN")}
-                        </div>
-                      )}
-                    </div>
+                    {d > 0 && (
+                      <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", color: sel ? "#fff" : "#111" }}>
+                        SAVE {d}%
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
+
+            {/* Product picker — shown when bundle size > 1 */}
+            {bundleSize > 1 && (
+              <div style={{ borderTop: "1px solid #f0f0f0", padding: "0.85rem 1rem" }}>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.56rem", color: "#555", marginBottom: 10 }}>
+                  <span style={{ fontWeight: 700, color: "#111" }}>+ Pick {bundleSize - 1} more shirt{bundleSize > 2 ? "s" : ""}</span>
+                  {" "}· {bundlePicks.length}/{bundleSize - 1} selected
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {otherProducts.slice(0, 8).map(p => {
+                    const picked = bundlePicks.includes(p.slug);
+                    return (
+                      <button
+                        key={p.slug}
+                        onClick={() => toggleBundlePick(p.slug)}
+                        style={{ position: "relative", width: 64, height: 80, borderRadius: 8, border: `2px solid ${picked ? "#111" : "#e8e8e8"}`, background: picked ? "#111" : "#f5f5f5", cursor: "pointer", padding: 0, overflow: "hidden", flexShrink: 0 }}
+                        title={p.name}
+                      >
+                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <ProductMockup product={p} size={50} />
+                        </div>
+                        {picked && (
+                          <div style={{ position: "absolute", top: 3, right: 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", border: "1.5px solid #111", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Check size={9} color="#111" strokeWidth={3} />
+                          </div>
+                        )}
+                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: picked ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.3)", padding: "0.2rem 0.3rem", textAlign: "center" }}>
+                          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.38rem", color: "#fff", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                {bundlePicks.length === bundleSize - 1 && (
+                  <div style={{ marginTop: 10, fontFamily: "Inter, sans-serif", fontSize: "0.54rem", color: "#16a34a", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+                    <Check size={11} color="#16a34a" strokeWidth={3} /> Bundle ready! {bundleSize} shirts · {bundleSize === 2 ? "10" : "15"}% off
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Delivery & Services */}
             <div style={{ borderTop: "1px solid #eee", padding: "0.8rem 1rem" }}>
