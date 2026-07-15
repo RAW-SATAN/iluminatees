@@ -104,7 +104,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const availSizes = SIZES.filter(s => product.sizes.includes(s));
   const [selectedSize, setSelectedSize] = useState<ProductSize>(availSizes[2] ?? availSizes[0]);
   const [added, setAdded] = useState(false);
-  const [priceTab, setPriceTab] = useState<"recommended" | "lowest" | "fastest">("fastest");
+  const [bundleQty, setBundleQty] = useState(1);
 
   const wishlisted = isWishlisted(product.slug);
   const discount = product.originalPrice
@@ -116,7 +116,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const byTheCulture = products.filter(p => p.id !== product.id).slice(0, 5);
 
   function handleAddToCart() {
-    addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
+    addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: bundleQty, shirtColor: product.shirtColor, symbol: product.symbol });
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
   }
@@ -294,7 +294,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </button>
             <button
               onClick={() => {
-                addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
+                addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: bundleQty, shirtColor: product.shirtColor, symbol: product.symbol });
                 router.push("/cart");
               }}
               style={{ flex: 1, padding: "1rem", borderRadius: 10, background: "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
@@ -325,64 +325,61 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <span style={{ fontSize: "0.8rem", color: "#555", flexShrink: 0, marginLeft: 8 }}>›</span>
           </div>
 
-          {/* Compare Prices */}
+          {/* Bundles */}
           <div style={{ border: "1.5px solid #eee", borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.8rem 1rem", borderBottom: "1px solid #eee" }}>
+            <div style={{ padding: "0.8rem 1rem", borderBottom: "1px solid #eee" }}>
               <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111" }}>
-                COMPARE PRICES FOR{" "}
-                <span style={{ color: "#0066cc" }}>{selectedSize}</span>
+                BUNDLE &amp; SAVE
               </span>
-              <ChevronDown size={14} color="#555" />
             </div>
-            <div style={{ padding: "0.75rem 1rem 0" }}>
-              <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-                {(["recommended", "lowest", "fastest"] as const).map(tab => (
+            <div style={{ padding: "0.85rem 1rem 0.25rem", display: "flex", flexDirection: "column", gap: 10 }}>
+              {([
+                { qty: 1, label: "Buy 1", discount: 0, badge: null },
+                { qty: 2, label: "Buy 2", discount: 10, badge: "MOST POPULAR" },
+                { qty: 3, label: "Buy 3", discount: 15, badge: "BEST VALUE" },
+              ] as const).map(({ qty, label, discount, badge }) => {
+                const unitPrice = Math.round(product.price * (1 - discount / 100));
+                const total = unitPrice * qty;
+                const selected = bundleQty === qty;
+                return (
                   <button
-                    key={tab}
-                    onClick={() => setPriceTab(tab)}
-                    style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.54rem", padding: "0.32rem 0.65rem", borderRadius: 20, border: "1.5px solid", borderColor: priceTab === tab ? "#111" : "#ddd", background: priceTab === tab ? "#111" : "#fff", color: priceTab === tab ? "#fff" : "#555", cursor: "pointer" }}
+                    key={qty}
+                    onClick={() => setBundleQty(qty)}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 0.9rem", borderRadius: 8, border: `1.5px solid ${selected ? "#111" : "#e8e8e8"}`, background: selected ? "#111" : "#fff", cursor: "pointer", textAlign: "left", position: "relative" }}
                   >
-                    {tab === "recommended" ? "Recommended" : tab === "lowest" ? "Lowest Price" : "Fastest Delivery"}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${selected ? "#fff" : "#ccc"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {selected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: selected ? "#fff" : "#111", display: "flex", alignItems: "center", gap: 6 }}>
+                          {label}
+                          {badge && (
+                            <span style={{ background: selected ? "rgba(255,255,255,0.15)" : "#111", color: selected ? "#fff" : "#fff", borderRadius: 4, padding: "0.06rem 0.4rem", fontSize: "0.42rem", fontWeight: 700, letterSpacing: "0.06em" }}>
+                              {badge}
+                            </span>
+                          )}
+                        </div>
+                        {discount > 0 && (
+                          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: selected ? "rgba(255,255,255,0.65)" : "#888", marginTop: 2 }}>
+                            ₹{unitPrice.toLocaleString("en-IN")} each · {discount}% off
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: selected ? "#fff" : "#111" }}>
+                        ₹{total.toLocaleString("en-IN")}
+                      </div>
+                      {discount > 0 && (
+                        <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.48rem", color: selected ? "rgba(255,255,255,0.5)" : "#bbb", textDecoration: "line-through" }}>
+                          ₹{(product.price * qty).toLocaleString("en-IN")}
+                        </div>
+                      )}
+                    </div>
                   </button>
-                ))}
-              </div>
-              {/* Seller row 1 */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 0", borderTop: "1px solid #f5f5f5" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 8, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.42rem", color: "#fff", letterSpacing: "0.05em" }}>ILMN</span>
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111", display: "flex", alignItems: "center", gap: 5 }}>
-                      ILUMINATEES
-                      <span style={{ background: "#dbeafe", color: "#1d4ed8", borderRadius: 4, padding: "0.08rem 0.32rem", fontSize: "0.48rem", fontWeight: 700 }}>✓ Verified</span>
-                    </div>
-                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#555", display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-                      <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#f5a623", display: "inline-block" }} />
-                      EXPRESS · Free Delivery · Ships Today
-                    </div>
-                  </div>
-                </div>
-                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#111" }}>₹{product.price.toLocaleString("en-IN")}</span>
-              </div>
-              {/* Seller row 2 */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 0", borderTop: "1px solid #f5f5f5" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 8, background: "#e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.4rem", color: "#555", fontWeight: 700 }}>INTL</span>
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111", display: "flex", alignItems: "center", gap: 5 }}>
-                      International Drop
-                      <span style={{ background: "#dbeafe", color: "#1d4ed8", borderRadius: 4, padding: "0.08rem 0.32rem", fontSize: "0.48rem", fontWeight: 700 }}>✓ Verified</span>
-                    </div>
-                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#555", marginTop: 2 }}>
-                      Free Delivery · Sourced In 12 Days · USA
-                    </div>
-                  </div>
-                </div>
-                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#111" }}>₹{(product.price * 12).toLocaleString("en-IN")}</span>
-              </div>
+                );
+              })}
             </div>
 
             {/* Delivery & Services */}
