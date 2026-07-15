@@ -585,7 +585,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 </div>
               </div>
               {/* QR + phone mockup */}
-              <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0 }}>
+              <div className="product-dark-banner-side" style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0 }}>
                 <div style={{ width: 70, height: 70, background: "#fff", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
                   <svg width="58" height="58" viewBox="0 0 58 58">
                     <rect width="58" height="58" fill="#fff"/>
