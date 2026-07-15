@@ -117,6 +117,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const related = otherProducts.slice(0, 6);
   const byTheCulture = otherProducts.slice(0, 5);
 
+  const fbtProducts = otherProducts.slice(0, 2);
+  const [fbtSelected, setFbtSelected] = useState<string[]>(fbtProducts.map(p => p.slug));
+  const fbtTotal = product.price + fbtProducts.filter(p => fbtSelected.includes(p.slug)).reduce((s, p) => s + p.price, 0);
+
   function toggleBundlePick(slug: string) {
     const slots = bundleSize - 1;
     setBundlePicks(prev =>
@@ -444,6 +448,71 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* ── Frequently Bought Together ── */}
+          <div style={{ marginTop: "1.5rem", border: "1.5px solid #eee", borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
+            <div style={{ padding: "0.8rem 1rem", borderBottom: "1px solid #eee" }}>
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111" }}>USUALLY BOUGHT TOGETHER</span>
+            </div>
+            <div style={{ padding: "1rem" }}>
+              {/* Product thumbnails row */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                {[{ p: product, fixed: true }, ...fbtProducts.map(p => ({ p, fixed: false }))].map(({ p, fixed }, idx) => (
+                  <div key={p.slug} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {idx > 0 && <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "1rem", color: "#ccc" }}>+</span>}
+                    <div style={{ position: "relative" }}>
+                      <div style={{ width: 70, height: 84, background: "#f5f5f5", borderRadius: 8, border: `1.5px solid ${!fixed && !fbtSelected.includes(p.slug) ? "#e0e0e0" : "#ddd"}`, display: "flex", alignItems: "center", justifyContent: "center", opacity: !fixed && !fbtSelected.includes(p.slug) ? 0.4 : 1, transition: "opacity 0.15s" }}>
+                        <ProductMockup product={p} size={54} />
+                      </div>
+                      {!fixed && (
+                        <button
+                          onClick={() => setFbtSelected(prev => prev.includes(p.slug) ? prev.filter(s => s !== p.slug) : [...prev, p.slug])}
+                          style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", border: `2px solid ${fbtSelected.includes(p.slug) ? "#111" : "#ccc"}`, background: fbtSelected.includes(p.slug) ? "#111" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                        >
+                          {fbtSelected.includes(p.slug) && <Check size={9} color="#fff" strokeWidth={3} />}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Names + prices list */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
+                {[{ p: product, fixed: true }, ...fbtProducts.map(p => ({ p, fixed: false }))].map(({ p, fixed }) => (
+                  <div key={p.slug} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", opacity: !fixed && !fbtSelected.includes(p.slug) ? 0.4 : 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      {fixed
+                        ? <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", background: "#111", color: "#fff", borderRadius: 3, padding: "0.08rem 0.35rem", fontWeight: 700 }}>THIS</span>
+                        : <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa" }}>+</span>
+                      }
+                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#333", fontWeight: 500 }}>{p.name}</span>
+                    </div>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#111" }}>₹{p.price.toLocaleString("en-IN")}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Total + CTA */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
+                <div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#888" }}>Total for {1 + fbtSelected.length} item{fbtSelected.length > 0 ? "s" : ""}</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "1rem", color: "#111" }}>₹{fbtTotal.toLocaleString("en-IN")}</div>
+                </div>
+                <button
+                  onClick={() => {
+                    addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
+                    fbtProducts.filter(p => fbtSelected.includes(p.slug)).forEach(p => {
+                      addItem({ productId: p.id, slug: p.slug, name: p.name, price: p.price, size: (p.sizes.includes(selectedSize) ? selectedSize : p.sizes[0]) as ProductSize, quantity: 1, shirtColor: p.shirtColor, symbol: p.symbol });
+                    });
+                  }}
+                  style={{ padding: "0.65rem 1.2rem", borderRadius: 8, background: "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", cursor: "pointer" }}
+                >
+                  Add All To Cart
+                </button>
+              </div>
             </div>
           </div>
 
