@@ -1,6 +1,6 @@
 "use client";
 
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { useState, use } from "react";
 import Link from "next/link";
 import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check, Share2 } from "lucide-react";
@@ -97,6 +97,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   if (!productData) notFound();
   const product = productData!;
 
+  const router = useRouter();
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
 
@@ -283,13 +284,24 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#555" }}>Ships Today</span>
           </div>
 
-          {/* Add to cart */}
-          <button
-            onClick={handleAddToCart}
-            style={{ width: "100%", padding: "1rem", borderRadius: 10, background: added ? "#333" : "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", marginBottom: 10, transition: "background 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-          >
-            {added ? <><Check size={15} /> Added To Bag</> : "Add To Cart →"}
-          </button>
+          {/* Button row */}
+          <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+            <button
+              onClick={handleAddToCart}
+              style={{ flex: 1, padding: "1rem", borderRadius: 10, background: added ? "#333" : "#fff", color: added ? "#fff" : "#111", border: "1.5px solid #111", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", transition: "background 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+            >
+              {added ? <><Check size={15} /> Added</> : "Add To Cart"}
+            </button>
+            <button
+              onClick={() => {
+                addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
+                router.push("/cart");
+              }}
+              style={{ flex: 1, padding: "1rem", borderRadius: 10, background: "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+            >
+              Buy Now →
+            </button>
+          </div>
 
           {/* Pay later */}
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#888", textAlign: "center", marginBottom: 12 }}>
