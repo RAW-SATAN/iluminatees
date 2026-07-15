@@ -186,10 +186,11 @@ body {
 
 /* Product image gallery — stacks on mobile */
 @media (max-width: 768px) {
-  .product-gallery { flex-direction: column !important; }
+  .product-sticky-col { position: static !important; }
+  .product-gallery { flex-direction: column-reverse !important; }
   .product-thumbnails { flex-direction: row !important; overflow-x: auto; gap: 6px !important; }
   .product-thumbnail-item { width: 56px !important; height: 70px !important; flex-shrink: 0 !important; }
-  .product-main-img { min-height: 280px !important; padding: 1.5rem 1rem !important; }
+  .product-main-img { min-height: 260px !important; padding: 1.2rem 0.8rem !important; }
   .product-main-img svg { max-width: 100% !important; height: auto !important; }
   .product-trust-badges { flex-direction: column !important; }
 }

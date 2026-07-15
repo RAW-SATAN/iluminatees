@@ -149,7 +149,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       >
 
         {/* ── LEFT (sticky) ──────────────────────────── */}
-        <div style={{ position: "sticky", top: 130, alignSelf: "start" }}>
+        <div className="product-sticky-col" style={{ position: "sticky", top: 130, alignSelf: "start" }}>
           <div className="product-gallery" style={{ display: "flex", gap: 10 }}>
 
             {/* Thumbnails */}
