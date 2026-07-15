@@ -77,13 +77,13 @@ function ShopCard({ product }: { product: Product }) {
 
       {/* Image */}
       <Link href={`/product/${product.slug}`} style={{ textDecoration: "none", display: "flex", flexDirection: "column", flex: 1 }}>
-        <div style={{ background: "#f8f8f8", display: "flex", alignItems: "center", justifyContent: "center", padding: "2.8rem 1rem 1.8rem", minHeight: 230 }}>
+        <div className="card-img" style={{ background: "#f8f8f8", display: "flex", alignItems: "center", justifyContent: "center", padding: "2.8rem 1rem 1.8rem", minHeight: 230 }}>
           <ProductMockup product={product} size={150} />
         </div>
 
         <div style={{ height: 1, background: "#f0f0f0" }} />
 
-        <div style={{ padding: "0.85rem 0.9rem 1rem", flex: 1 }}>
+        <div className="card-info" style={{ padding: "0.85rem 0.9rem 1rem", flex: 1 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.66rem", color: "#111", lineHeight: 1.4, marginBottom: 7, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
             {product.name}
           </div>
@@ -183,7 +183,7 @@ export default function ShopPage() {
             No products in this category yet.
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
+          <div className="grid-products" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
             {filtered.map(p => <ShopCard key={p.id} product={p} />)}
           </div>
         )}

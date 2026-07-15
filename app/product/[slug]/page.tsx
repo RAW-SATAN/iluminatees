@@ -303,7 +303,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           </div>
 
           {/* Button row */}
-          <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+          <div className="product-btn-row" style={{ display: "flex", gap: 10, marginBottom: 10 }}>
             <button
               onClick={handleAddToCart}
               style={{ flex: 1, padding: "1rem", borderRadius: 10, background: added ? "#333" : "#fff", color: added ? "#fff" : "#111", border: "1.5px solid #111", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", transition: "background 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}

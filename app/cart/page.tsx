@@ -4,243 +4,175 @@ import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
 import { ProductMockup } from "@/components/ProductMockup";
 import { getProductBySlug } from "@/lib/products";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-8 px-6">
-        <svg width="80" height="80" viewBox="0 0 100 100" aria-hidden className="opacity-20">
-          <polygon points="50,8 92,80 8,80" fill="none" stroke="#c9a84c" strokeWidth="2" />
-          <ellipse cx="50" cy="52" rx="11" ry="7" fill="none" stroke="#c9a84c" strokeWidth="1.5" />
-          <circle cx="50" cy="52" r="4" fill="#c9a84c" />
-        </svg>
-        <div className="text-center space-y-3">
-          <h1
-            className="text-2xl font-bold tracking-[0.2em]"
-            style={{ fontFamily: "var(--font-cinzel)", color: "var(--color-muted)" }}
-          >
-            YOUR ORDER IS EMPTY
+      <div style={{ minHeight: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: "2rem 1.5rem", textAlign: "center" }}>
+        <ShoppingBag size={56} color="#e0e0e0" strokeWidth={1.2} />
+        <div>
+          <h1 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 4vw, 2rem)", letterSpacing: "0.1em", color: "#111", marginBottom: 8, textTransform: "uppercase" }}>
+            Your Bag Is Empty
           </h1>
-          <p className="text-xs tracking-[0.2em]" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>
-            THE VAULT AWAITS YOUR INITIATION
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.7rem", color: "#aaa" }}>
+            Looks like you haven&apos;t added anything yet.
           </p>
         </div>
-        <Link href="/shop" className="btn-gold inline-block">
-          ENTER THE VAULT
+        <Link href="/shop" style={{ display: "inline-block", background: "#111", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.72rem", letterSpacing: "0.12em", padding: "0.85rem 2rem", borderRadius: 10, textDecoration: "none" }}>
+          SHOP NOW →
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-24">
-      <div className="max-w-5xl mx-auto px-6 py-12">
+    <div style={{ minHeight: "100vh", background: "#fff" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "2rem 1.25rem 5rem" }}>
+
         {/* Header */}
-        <div className="flex items-baseline justify-between mb-10">
-          <div className="space-y-1">
-            <span
-              className="text-[0.5rem] tracking-[0.5em]"
-              style={{ color: "var(--color-gold)", fontFamily: "var(--font-mono)" }}
-            >
-              ORDER MANIFEST
-            </span>
-            <h1
-              className="text-2xl font-bold tracking-[0.15em]"
-              style={{ fontFamily: "var(--font-cinzel)", color: "var(--color-cream)" }}
-            >
-              Your Order
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 8 }}>
+          <div>
+            <h1 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.6rem, 4vw, 2.4rem)", letterSpacing: "0.06em", color: "#111", textTransform: "uppercase" }}>
+              Your Bag
             </h1>
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#aaa" }}>
+              {items.reduce((s, i) => s + i.quantity, 0)} item{items.reduce((s, i) => s + i.quantity, 0) !== 1 ? "s" : ""}
+            </span>
           </div>
-          <button
-            onClick={clearCart}
-            className="text-[0.5rem] tracking-[0.3em] transition-colors hover:text-[var(--color-crimson)]"
-            style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}
-          >
-            CLEAR ALL
+          <button onClick={clearCart} style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#bbb", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+            Clear All
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* ── Items ───────────────────────────────── */}
-          <div className="lg:col-span-2 space-y-px" style={{ background: "rgba(201,168,76,0.04)" }}>
+        {/* Two-column on desktop, stacked on mobile */}
+        <div style={{ display: "grid", gap: 20 }} className="cart-grid">
+
+          {/* ── Items ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {items.map((item) => {
               const product = getProductBySlug(item.slug);
               return (
                 <div
                   key={`${item.productId}-${item.size}`}
-                  className="flex items-center gap-5 p-5"
-                  style={{ background: "var(--color-onyx)", border: "1px solid rgba(201,168,76,0.08)" }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "0.9rem 1rem", border: "1px solid #eee", borderRadius: 12, background: "#fff" }}
                 >
-                  {/* Mockup thumbnail */}
-                  <div
-                    className="w-20 h-24 flex-shrink-0 flex items-center justify-center"
-                    style={{
-                      background: product
-                        ? `radial-gradient(circle, ${product.shirtColor}cc, #030303)`
-                        : "var(--color-obsidian)",
-                    }}
-                  >
-                    {product && (
-                      <ProductMockup product={product} size={64} />
-                    )}
+                  {/* Thumbnail */}
+                  <div style={{ width: 68, height: 84, flexShrink: 0, background: "#f5f5f5", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                    {product && <ProductMockup product={product} size={54} />}
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <span
-                      className="text-[0.45rem] tracking-[0.35em]"
-                      style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}
-                    >
-                      {item.productId.padStart(2, "0")} · {item.size}
-                    </span>
-                    <h3
-                      className="text-sm font-semibold truncate"
-                      style={{ fontFamily: "var(--font-cinzel)", color: "var(--color-cream)" }}
-                    >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#111", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {item.name}
-                    </h3>
-                    <p
-                      className="text-xs font-bold"
-                      style={{ fontFamily: "var(--font-mono)", color: "var(--color-gold)" }}
-                    >
+                    </div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.55rem", color: "#aaa", marginBottom: 6 }}>
+                      Size: {item.size}
+                    </div>
+                    <div style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "0.82rem", color: "#111" }}>
                       ₹{item.price.toLocaleString("en-IN")}
-                    </p>
+                    </div>
                   </div>
 
-                  {/* Qty controls */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Qty + remove */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid #e8e8e8", borderRadius: 8, padding: "0.28rem 0.55rem" }}>
+                      <button
+                        onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
+                        style={{ background: "none", border: "none", cursor: "pointer", padding: 3, display: "flex", alignItems: "center", color: "#555" }}
+                      >
+                        <Minus size={11} />
+                      </button>
+                      <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.78rem", color: "#111", minWidth: 18, textAlign: "center" }}>
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
+                        style={{ background: "none", border: "none", cursor: "pointer", padding: 3, display: "flex", alignItems: "center", color: "#555" }}
+                      >
+                        <Plus size={11} />
+                      </button>
+                    </div>
                     <button
-                      onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
-                      className="w-7 h-7 flex items-center justify-center transition-all duration-200"
-                      style={{
-                        border: "1px solid rgba(201,168,76,0.2)",
-                        color: "var(--color-muted)",
-                      }}
+                      onClick={() => removeItem(item.productId, item.size)}
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "#ccc" }}
                     >
-                      <Minus size={10} />
-                    </button>
-                    <span
-                      className="w-8 text-center text-sm font-bold"
-                      style={{ fontFamily: "var(--font-mono)", color: "var(--color-cream)" }}
-                    >
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
-                      className="w-7 h-7 flex items-center justify-center transition-all duration-200"
-                      style={{
-                        border: "1px solid rgba(201,168,76,0.2)",
-                        color: "var(--color-muted)",
-                      }}
-                    >
-                      <Plus size={10} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
 
-                  {/* Line total */}
-                  <div className="text-right flex-shrink-0 hidden sm:block">
-                    <p
-                      className="text-sm font-bold"
-                      style={{ fontFamily: "var(--font-mono)", color: "var(--color-gold)" }}
-                    >
+                  {/* Line total — hidden on mobile via CSS */}
+                  <div className="cart-line-total" style={{ textAlign: "right", flexShrink: 0, minWidth: 72 }}>
+                    <span style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "0.82rem", color: "#111" }}>
                       ₹{(item.price * item.quantity).toLocaleString("en-IN")}
-                    </p>
+                    </span>
                   </div>
-
-                  {/* Remove */}
-                  <button
-                    onClick={() => removeItem(item.productId, item.size)}
-                    className="transition-colors hover:text-[var(--color-crimson)] flex-shrink-0"
-                    style={{ color: "var(--color-dim)" }}
-                  >
-                    <Trash2 size={14} />
-                  </button>
                 </div>
               );
             })}
+
+            {/* Trust badges */}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+              {["🔄 Easy Returns", "📦 Cash on Delivery", "⚡ Fast Shipping"].map(b => (
+                <span key={b} style={{ fontFamily: "Inter, sans-serif", fontSize: "0.56rem", color: "#888", background: "#f9f9f9", border: "1px solid #eee", borderRadius: 6, padding: "0.3rem 0.7rem" }}>{b}</span>
+              ))}
+            </div>
           </div>
 
-          {/* ── Summary ─────────────────────────────── */}
-          <div className="lg:col-span-1">
-            <div
-              className="p-6 space-y-5 sticky top-24"
-              style={{ background: "var(--color-onyx)", border: "1px solid rgba(201,168,76,0.15)" }}
-            >
-              <span
-                className="text-[0.5rem] tracking-[0.5em] block"
-                style={{ color: "var(--color-gold)", fontFamily: "var(--font-mono)" }}
-              >
-                ORDER SUMMARY
-              </span>
+          {/* ── Summary ── */}
+          <div>
+            <div style={{ border: "1px solid #eee", borderRadius: 12, padding: "1.4rem", background: "#fafafa", position: "sticky", top: 142 }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", letterSpacing: "0.18em", color: "#aaa", textTransform: "uppercase", marginBottom: 16 }}>
+                Order Summary
+              </div>
 
-              <div className="space-y-3">
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
                 {items.map((item) => (
-                  <div
-                    key={`${item.productId}-${item.size}`}
-                    className="flex justify-between text-xs"
-                  >
-                    <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-body)" }}>
-                      {item.name} ×{item.quantity}
+                  <div key={`${item.productId}-${item.size}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#555", flex: 1 }}>
+                      {item.name} <span style={{ color: "#aaa" }}>×{item.quantity}</span>
                     </span>
-                    <span style={{ fontFamily: "var(--font-mono)", color: "var(--color-cream)" }}>
+                    <span style={{ fontFamily: "Space Mono, monospace", fontSize: "0.62rem", fontWeight: 700, color: "#111", flexShrink: 0 }}>
                       ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div
-                className="pt-4 border-t"
-                style={{ borderColor: "rgba(201,168,76,0.1)" }}
-              >
-                <div className="flex justify-between items-baseline">
-                  <span
-                    className="text-[0.55rem] tracking-[0.3em]"
-                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
-                  >
-                    TOTAL (INCL. TAXES)
-                  </span>
-                  <span
-                    className="text-xl font-bold"
-                    style={{ fontFamily: "var(--font-mono)", color: "var(--color-gold)" }}
-                  >
-                    ₹{total.toLocaleString("en-IN")}
-                  </span>
-                </div>
+              <div style={{ borderTop: "1px solid #eee", paddingTop: 12, marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#555" }}>Delivery</span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", fontWeight: 700, color: "#16a34a" }}>FREE</span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20, paddingBottom: 14, borderBottom: "1px solid #eee" }}>
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.72rem", color: "#111" }}>Total</span>
+                <span style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "1.25rem", color: "#111" }}>
+                  ₹{total.toLocaleString("en-IN")}
+                </span>
               </div>
 
               <button
-                className="btn-gold w-full"
-                onClick={() => alert("Checkout coming soon. The Order is being assembled.")}
+                onClick={() => alert("Checkout coming soon!")}
+                style={{ width: "100%", padding: "1rem", background: "#111", color: "#fff", border: "none", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.78rem", letterSpacing: "0.1em", cursor: "pointer", marginBottom: 10, textTransform: "uppercase" }}
               >
-                PROCEED TO INITIATION
+                Proceed To Checkout →
               </button>
 
-              <Link
-                href="/shop"
-                className="block text-center text-[0.55rem] tracking-[0.25em] transition-colors hover:text-[var(--color-gold)]"
-                style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}
-              >
-                ← CONTINUE BROWSING
+              <Link href="/shop" style={{ display: "block", textAlign: "center", fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#aaa", textDecoration: "none" }}>
+                ← Continue Shopping
               </Link>
 
-              {/* Security note */}
-              <div
-                className="pt-3 border-t"
-                style={{ borderColor: "rgba(201,168,76,0.06)" }}
-              >
-                <p
-                  className="text-[0.45rem] tracking-[0.2em] leading-relaxed"
-                  style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}
-                >
-                  ⬡ ENCRYPTED TRANSMISSION · SECURE CHECKOUT · YOUR DATA IS SACRED
+              <div style={{ marginTop: 16, padding: "0.8rem", background: "#f5f5f5", borderRadius: 8 }}>
+                <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5rem", color: "#bbb", textAlign: "center", letterSpacing: "0.06em", lineHeight: 1.7 }}>
+                  🔒 SECURE CHECKOUT · YOUR DATA IS SAFE
                 </p>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

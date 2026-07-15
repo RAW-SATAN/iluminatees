@@ -150,7 +150,7 @@ export function DropsCarousel() {
       </div>
 
       {/* ── Info card ─────────────────────────────── */}
-      <div style={{
+      <div className="drops-info-card" style={{
         maxWidth: 390, margin: "1.8rem auto 0",
         background: "#fff",
         border: "1px solid #e4e4e4",

@@ -142,7 +142,7 @@ export function Footer() {
       <div style={{ height: 1, background: "#1e1e1e", margin: "0 1.5rem" }} />
 
       {/* ── Bottom bar ────────────────────────────── */}
-      <div style={{
+      <div className="footer-bottom" style={{
         maxWidth: 1280, margin: "0 auto",
         padding: "1.4rem 1.5rem",
         display: "flex", flexWrap: "wrap",
@@ -201,18 +201,20 @@ export function Footer() {
           </div>
           <form
             onSubmit={(e) => e.preventDefault()}
+            className="footer-newsletter-form"
             style={{ display: "flex", gap: 0 }}
           >
             <input
               type="email"
               placeholder="Enter your email address"
+              className="footer-newsletter-input"
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontSize: "0.62rem", color: "#fff",
                 background: "#1a1a1a", border: "1px solid #2a2a2a",
                 borderRight: "none",
                 padding: "0.55rem 0.9rem",
-                outline: "none", width: 220,
+                outline: "none", width: "100%", maxWidth: 220,
                 borderRadius: "6px 0 0 6px",
               }}
             />

@@ -110,7 +110,7 @@ function ProductTile({ product }: { product: Product }) {
 
       {/* Product image */}
       <Link href={`/product/${product.slug}`} style={{ textDecoration: "none", flex: 1 }}>
-        <div style={{
+        <div className="card-img" style={{
           background: "#f9f9f9",
           display: "flex", alignItems: "center", justifyContent: "center",
           padding: "2.4rem 1rem 1.2rem",
@@ -120,7 +120,7 @@ function ProductTile({ product }: { product: Product }) {
         </div>
 
         {/* Info */}
-        <div style={{ padding: "0.85rem 1rem 1rem", borderTop: "1px solid #f5f5f5" }}>
+        <div className="card-info" style={{ padding: "0.85rem 1rem 1rem", borderTop: "1px solid #f5f5f5" }}>
           <div style={{
             fontFamily: "Inter, sans-serif",
             fontSize: "0.64rem", fontWeight: 600,
@@ -276,7 +276,7 @@ export function TrendingSection() {
             No products in this category yet.
           </div>
         ) : (
-          <div style={{
+          <div className="grid-products" style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
             gap: "14px",
