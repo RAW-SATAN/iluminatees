@@ -8,16 +8,15 @@ datasource db {
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  orderNo   Int      @default(autoincrement())
+  id        String   @id
   customer  String
   phone     String
   address   String
   city      String
-  items     Json // Array of { name, size, qty, price }
+  items     Json
   total     Float
-  status    String   @default("pending") // pending | confirmed | shipped | delivered | cancelled
-  payment   String   @default("unpaid") // paid | unpaid | cod
+  status    String   @default("pending")
+  payment   String   @default("unpaid")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

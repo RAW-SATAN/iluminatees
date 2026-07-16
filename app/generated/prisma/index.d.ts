@@ -879,18 +879,15 @@ export namespace Prisma {
   }
 
   export type OrderAvgAggregateOutputType = {
-    orderNo: number | null
     total: number | null
   }
 
   export type OrderSumAggregateOutputType = {
-    orderNo: number | null
     total: number | null
   }
 
   export type OrderMinAggregateOutputType = {
     id: string | null
-    orderNo: number | null
     customer: string | null
     phone: string | null
     address: string | null
@@ -904,7 +901,6 @@ export namespace Prisma {
 
   export type OrderMaxAggregateOutputType = {
     id: string | null
-    orderNo: number | null
     customer: string | null
     phone: string | null
     address: string | null
@@ -918,7 +914,6 @@ export namespace Prisma {
 
   export type OrderCountAggregateOutputType = {
     id: number
-    orderNo: number
     customer: number
     phone: number
     address: number
@@ -934,18 +929,15 @@ export namespace Prisma {
 
 
   export type OrderAvgAggregateInputType = {
-    orderNo?: true
     total?: true
   }
 
   export type OrderSumAggregateInputType = {
-    orderNo?: true
     total?: true
   }
 
   export type OrderMinAggregateInputType = {
     id?: true
-    orderNo?: true
     customer?: true
     phone?: true
     address?: true
@@ -959,7 +951,6 @@ export namespace Prisma {
 
   export type OrderMaxAggregateInputType = {
     id?: true
-    orderNo?: true
     customer?: true
     phone?: true
     address?: true
@@ -973,7 +964,6 @@ export namespace Prisma {
 
   export type OrderCountAggregateInputType = {
     id?: true
-    orderNo?: true
     customer?: true
     phone?: true
     address?: true
@@ -1075,7 +1065,6 @@ export namespace Prisma {
 
   export type OrderGroupByOutputType = {
     id: string
-    orderNo: number
     customer: string
     phone: string
     address: string
@@ -1109,7 +1098,6 @@ export namespace Prisma {
 
   export type OrderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    orderNo?: boolean
     customer?: boolean
     phone?: boolean
     address?: boolean
@@ -1124,7 +1112,6 @@ export namespace Prisma {
 
   export type OrderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    orderNo?: boolean
     customer?: boolean
     phone?: boolean
     address?: boolean
@@ -1139,7 +1126,6 @@ export namespace Prisma {
 
   export type OrderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    orderNo?: boolean
     customer?: boolean
     phone?: boolean
     address?: boolean
@@ -1154,7 +1140,6 @@ export namespace Prisma {
 
   export type OrderSelectScalar = {
     id?: boolean
-    orderNo?: boolean
     customer?: boolean
     phone?: boolean
     address?: boolean
@@ -1167,14 +1152,13 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNo" | "customer" | "phone" | "address" | "city" | "items" | "total" | "status" | "payment" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customer" | "phone" | "address" | "city" | "items" | "total" | "status" | "payment" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 
   export type $OrderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Order"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      orderNo: number
       customer: string
       phone: string
       address: string
@@ -1609,7 +1593,6 @@ export namespace Prisma {
    */
   interface OrderFieldRefs {
     readonly id: FieldRef<"Order", 'String'>
-    readonly orderNo: FieldRef<"Order", 'Int'>
     readonly customer: FieldRef<"Order", 'String'>
     readonly phone: FieldRef<"Order", 'String'>
     readonly address: FieldRef<"Order", 'String'>
@@ -2007,7 +1990,6 @@ export namespace Prisma {
 
   export const OrderScalarFieldEnum: {
     id: 'id',
-    orderNo: 'orderNo',
     customer: 'customer',
     phone: 'phone',
     address: 'address',
@@ -2075,20 +2057,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -2128,6 +2096,20 @@ export namespace Prisma {
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
   /**
    * Deep Input Types
    */
@@ -2138,7 +2120,6 @@ export namespace Prisma {
     OR?: OrderWhereInput[]
     NOT?: OrderWhereInput | OrderWhereInput[]
     id?: StringFilter<"Order"> | string
-    orderNo?: IntFilter<"Order"> | number
     customer?: StringFilter<"Order"> | string
     phone?: StringFilter<"Order"> | string
     address?: StringFilter<"Order"> | string
@@ -2153,7 +2134,6 @@ export namespace Prisma {
 
   export type OrderOrderByWithRelationInput = {
     id?: SortOrder
-    orderNo?: SortOrder
     customer?: SortOrder
     phone?: SortOrder
     address?: SortOrder
@@ -2171,7 +2151,6 @@ export namespace Prisma {
     AND?: OrderWhereInput | OrderWhereInput[]
     OR?: OrderWhereInput[]
     NOT?: OrderWhereInput | OrderWhereInput[]
-    orderNo?: IntFilter<"Order"> | number
     customer?: StringFilter<"Order"> | string
     phone?: StringFilter<"Order"> | string
     address?: StringFilter<"Order"> | string
@@ -2186,7 +2165,6 @@ export namespace Prisma {
 
   export type OrderOrderByWithAggregationInput = {
     id?: SortOrder
-    orderNo?: SortOrder
     customer?: SortOrder
     phone?: SortOrder
     address?: SortOrder
@@ -2209,7 +2187,6 @@ export namespace Prisma {
     OR?: OrderScalarWhereWithAggregatesInput[]
     NOT?: OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Order"> | string
-    orderNo?: IntWithAggregatesFilter<"Order"> | number
     customer?: StringWithAggregatesFilter<"Order"> | string
     phone?: StringWithAggregatesFilter<"Order"> | string
     address?: StringWithAggregatesFilter<"Order"> | string
@@ -2223,8 +2200,7 @@ export namespace Prisma {
   }
 
   export type OrderCreateInput = {
-    id?: string
-    orderNo?: number
+    id: string
     customer: string
     phone: string
     address: string
@@ -2238,8 +2214,7 @@ export namespace Prisma {
   }
 
   export type OrderUncheckedCreateInput = {
-    id?: string
-    orderNo?: number
+    id: string
     customer: string
     phone: string
     address: string
@@ -2254,7 +2229,6 @@ export namespace Prisma {
 
   export type OrderUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    orderNo?: IntFieldUpdateOperationsInput | number
     customer?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -2269,7 +2243,6 @@ export namespace Prisma {
 
   export type OrderUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    orderNo?: IntFieldUpdateOperationsInput | number
     customer?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -2283,8 +2256,7 @@ export namespace Prisma {
   }
 
   export type OrderCreateManyInput = {
-    id?: string
-    orderNo?: number
+    id: string
     customer: string
     phone: string
     address: string
@@ -2299,7 +2271,6 @@ export namespace Prisma {
 
   export type OrderUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    orderNo?: IntFieldUpdateOperationsInput | number
     customer?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -2314,7 +2285,6 @@ export namespace Prisma {
 
   export type OrderUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    orderNo?: IntFieldUpdateOperationsInput | number
     customer?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -2340,17 +2310,6 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -2400,7 +2359,6 @@ export namespace Prisma {
 
   export type OrderCountOrderByAggregateInput = {
     id?: SortOrder
-    orderNo?: SortOrder
     customer?: SortOrder
     phone?: SortOrder
     address?: SortOrder
@@ -2414,13 +2372,11 @@ export namespace Prisma {
   }
 
   export type OrderAvgOrderByAggregateInput = {
-    orderNo?: SortOrder
     total?: SortOrder
   }
 
   export type OrderMaxOrderByAggregateInput = {
     id?: SortOrder
-    orderNo?: SortOrder
     customer?: SortOrder
     phone?: SortOrder
     address?: SortOrder
@@ -2434,7 +2390,6 @@ export namespace Prisma {
 
   export type OrderMinOrderByAggregateInput = {
     id?: SortOrder
-    orderNo?: SortOrder
     customer?: SortOrder
     phone?: SortOrder
     address?: SortOrder
@@ -2447,7 +2402,6 @@ export namespace Prisma {
   }
 
   export type OrderSumOrderByAggregateInput = {
-    orderNo?: SortOrder
     total?: SortOrder
   }
 
@@ -2467,22 +2421,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -2545,14 +2483,6 @@ export namespace Prisma {
     set?: string
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type FloatFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -2577,17 +2507,6 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringFilter<$PrismaModel> | string
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedFloatFilter<$PrismaModel = never> = {
@@ -2629,7 +2548,7 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+  export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -2637,12 +2556,7 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
