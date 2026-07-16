@@ -1,5 +1,7 @@
 {
-  "heroBanners": {},
+  "heroBanners": {
+    "0": "/site/hero-0.jpg?v=1784209061114"
+  },
   "carouselMockups": {
     "the-katana": "/site/mockups/the-katana.png?v=1784208597270",
     "the-black-samurai": "/site/mockups/the-black-samurai.png?v=1784208646144",
