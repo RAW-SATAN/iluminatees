@@ -697,6 +697,7 @@ export default function AdminPage() {
         }
         const pid = panelProduct.id;
         const pname = panelProduct.name;
+        const pslug = panelProduct.slug;
         async function savePanel() {
           let finalImages = [...panelDraft.customImages];
 
@@ -709,7 +710,7 @@ export default function AdminPage() {
               const res = await fetch("/api/save-images", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slug: panelProduct.slug, images: finalImages }),
+                body: JSON.stringify({ slug: pslug, images: finalImages }),
               });
               const data = await res.json();
               if (data.success) {
@@ -729,7 +730,7 @@ export default function AdminPage() {
               await fetch("/api/save-images", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slug: panelProduct.slug, images: finalImages }),
+                body: JSON.stringify({ slug: pslug, images: finalImages }),
               });
             } catch {}
           }
