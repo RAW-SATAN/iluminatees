@@ -38,7 +38,23 @@ export function useProducts(): Product[] {
         customImage:   e.customImages?.[0] || e.customImage || base.customImage,
       });
 
-      const staticMapped = staticProducts.map(p => applyEdit(p, edits[p.id] ?? {}));
+      // Collect images from custom products that duplicate static ones (by slug)
+      const customImageBySlug: Record<string, string> = {};
+      added.forEach(cp => {
+        const ce = edits[cp.id] ?? {};
+        const img = ce.customImages?.[0] || ce.customImage;
+        if (img) customImageBySlug[cp.slug] = img;
+      });
+
+      const staticMapped = staticProducts.map(p => {
+        const e = edits[p.id] ?? {};
+        const result = applyEdit(p, e);
+        // If no image set on static product, inherit from matching custom product
+        if (!result.customImage && customImageBySlug[p.slug]) {
+          return { ...result, customImage: customImageBySlug[p.slug] };
+        }
+        return result;
+      });
 
       // Deduplicate: skip custom products whose slug matches a static product
       const staticSlugs = new Set(staticMapped.map(p => p.slug));

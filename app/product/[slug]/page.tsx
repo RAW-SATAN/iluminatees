@@ -4,7 +4,8 @@ import { notFound, useRouter } from "next/navigation";
 import { useState, use } from "react";
 import Link from "next/link";
 import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check, Share2 } from "lucide-react";
-import { getProductBySlug, products, type ProductSize } from "@/lib/products";
+import { getProductBySlug, products as staticProducts, type ProductSize } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { ProductMockup } from "@/components/ProductMockup";
 import { useCart } from "@/components/CartProvider";
 import { useWishlist } from "@/components/WishlistProvider";
@@ -93,7 +94,10 @@ function StarRow({ rating }: { rating: number }) {
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const productData = getProductBySlug(slug);
+  const allProducts = useProducts();
+
+  // Use merged product (with localStorage edits/images) if available, else static
+  const productData = allProducts.find(p => p.slug === slug) ?? getProductBySlug(slug);
   if (!productData) notFound();
   const product = productData!;
 
@@ -114,8 +118,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null;
   const emi = Math.round(product.price / 9);
-  const sold = parseInt(product.id) * 97 + 124;
-  const otherProducts = products.filter(p => p.id !== product.id);
+  const sold = parseInt(product.id.replace("custom-", "")) % 500 + 124;
+  const otherProducts = allProducts.filter(p => p.id !== product.id);
   const related = otherProducts.slice(0, 6);
   const byTheCult = otherProducts.slice(0, 5);
 
@@ -134,7 +138,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
     const bundleDiscount = bundleSize === 2 ? 0.10 : bundleSize === 3 ? 0.15 : 0;
     bundlePicks.forEach(s => {
-      const p = products.find(x => x.slug === s);
+      const p = allProducts.find(x => x.slug === s);
       if (p) addItem({ productId: p.id, slug: p.slug, name: p.name, price: Math.round(p.price * (1 - bundleDiscount)), size: selectedSize in p.sizes ? selectedSize : (p.sizes[0] as ProductSize), quantity: 1, shirtColor: p.shirtColor, symbol: p.symbol });
     });
     setAdded(true);
@@ -157,8 +161,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             {/* Thumbnails */}
             <div className="product-thumbnails" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[0, 1, 2].map(i => (
-                <div key={i} className="product-thumbnail-item" style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                  <ProductMockup product={product} size={52} colorOverride={selectedColor} />
+                <div key={i} className="product-thumbnail-item" style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, overflow: "hidden" }}>
+                  {product.customImage
+                    ? <img src={product.customImage} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <ProductMockup product={product} size={52} colorOverride={selectedColor} />
+                  }
                 </div>
               ))}
             </div>
@@ -179,14 +186,20 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 </button>
               </div>
 
-              <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: "3rem 2rem", position: "relative" }}>
-                <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
-                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.34rem", color: "#111", letterSpacing: "0.04em", lineHeight: 1.3 }}>
-                    AS SEEN ON<br />
-                    <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em" }}>SHARK TANK</span>
-                  </div>
-                </div>
-                <ProductMockup product={product} size={340} colorOverride={selectedColor} />
+              <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: product.customImage ? 0 : "3rem 2rem", position: "relative", overflow: "hidden" }}>
+                {product.customImage ? (
+                  <img src={product.customImage} alt={product.name} style={{ width: "100%", height: "100%", minHeight: 500, objectFit: "cover", borderRadius: 12 }} />
+                ) : (
+                  <>
+                    <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
+                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.34rem", color: "#111", letterSpacing: "0.04em", lineHeight: 1.3 }}>
+                        AS SEEN ON<br />
+                        <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em" }}>SHARK TANK</span>
+                      </div>
+                    </div>
+                    <ProductMockup product={product} size={340} colorOverride={selectedColor} />
+                  </>
+                )}
               </div>
 
               {/* Sold + rating bar */}
@@ -355,7 +368,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 addItem({ productId: product.id, slug: product.slug, name: product.name, price: product.price, size: selectedSize, quantity: 1, shirtColor: product.shirtColor, symbol: product.symbol });
                 const bundleDiscount = bundleSize === 2 ? 0.10 : bundleSize === 3 ? 0.15 : 0;
                 bundlePicks.forEach(s => {
-                  const p = products.find(x => x.slug === s);
+                  const p = allProducts.find(x => x.slug === s);
                   if (p) addItem({ productId: p.id, slug: p.slug, name: p.name, price: Math.round(p.price * (1 - bundleDiscount)), size: selectedSize in p.sizes ? selectedSize : (p.sizes[0] as ProductSize), quantity: 1, shirtColor: p.shirtColor, symbol: p.symbol });
                 });
                 router.push("/cart");
@@ -660,7 +673,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               {REVIEWS.map(rev => {
-                const revProduct = products.find(p => p.slug === rev.slug);
+                const revProduct = allProducts.find(p => p.slug === rev.slug);
                 return (
                   <div key={rev.name} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "1.1rem 0", borderBottom: "1px solid #f0f0f0" }}>
                     <div style={{ flex: 1 }}>
