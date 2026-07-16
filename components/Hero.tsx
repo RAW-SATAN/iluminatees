@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useProducts } from "@/lib/useProducts";
+import { useSiteAssets } from "@/lib/useSiteAssets";
 import { ProductMockup } from "./ProductMockup";
 
 /* ── Carousel slides ────────────────────────────────────── */
@@ -60,6 +61,7 @@ const EXTRA_CATS = [
 /* ── Component ──────────────────────────────────────────── */
 export function Hero() {
   const products = useProducts();
+  const { heroBanners } = useSiteAssets();
   const [slide,      setSlide]      = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -189,6 +191,31 @@ export function Hero() {
         {SLIDES.map((s, i) => {
           const prod = products.find((p) => p.slug === s.slug)!;
           const active = slide === i;
+          const banner = heroBanners[String(i)];
+
+          /* Custom uploaded banner replaces the whole slide design */
+          if (banner) {
+            return (
+              <Link
+                key={s.slug}
+                href={`/product/${prod.slug}`}
+                style={{
+                  position: "absolute", inset: 0,
+                  opacity: active ? 1 : 0,
+                  transition: "opacity 0.55s ease",
+                  pointerEvents: active ? "auto" : "none",
+                  display: "block",
+                }}
+              >
+                <img
+                  src={banner}
+                  alt={prod.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              </Link>
+            );
+          }
+
           return (
             <div
               key={s.slug}

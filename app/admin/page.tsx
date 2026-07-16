@@ -87,7 +87,7 @@ export default function AdminPage() {
   const [authed, setAuthed]         = useState(false);
   const [pw, setPw]                 = useState("");
   const [pwErr, setPwErr]           = useState(false);
-  const [tab, setTab]               = useState<"home"|"orders"|"products">("home");
+  const [tab, setTab]               = useState<"home"|"orders"|"products"|"homepage">("home");
   const [orders, setOrders]         = useLS<Order[]>(ORDER_KEY, DEMO_ORDERS);
   const [edits, setEdits]           = useLS<Record<string, ProductEdit>>(EDITS_KEY, {});
   const [search, setSearch]         = useState("");
@@ -111,10 +111,75 @@ export default function AdminPage() {
   const [publishing, setPublishing] = useState(false);
   const [savingImages, setSavingImages] = useState(false);
   const [toast, setToast]           = useState<string|null>(null);
+  const [siteAssets, setSiteAssets] = useState<{ heroBanners: Record<string,string>; carouselMockups: Record<string,string> }>({ heroBanners: {}, carouselMockups: {} });
+  const [assetBusy, setAssetBusy]   = useState<string|null>(null);
+
+  useEffect(() => {
+    fetch("/site-assets.json", { cache: "no-store" })
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (d) setSiteAssets({ heroBanners: d.heroBanners ?? {}, carouselMockups: d.carouselMockups ?? {} }); })
+      .catch(() => {});
+  }, []);
 
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  }
+
+  /* Resize an image client-side. PNG keeps transparency (for 3D mockups); JPEG for banners. */
+  function resizeImage(dataUrl: string, max: number, asPng: boolean): Promise<string> {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > max || h > max) {
+          if (w > h) { h = Math.round(h * max / w); w = max; }
+          else { w = Math.round(w * max / h); h = max; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+        resolve(asPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  }
+
+  async function saveSiteAsset(kind: "hero"|"mockup", key: string, file: File | null) {
+    const busyKey = `${kind}:${key}`;
+    setAssetBusy(busyKey);
+    try {
+      let image: string | null = null;
+      if (file) {
+        const dataUrl: string = await new Promise((res, rej) => {
+          const reader = new FileReader();
+          reader.onload = ev => typeof ev.target?.result === "string" ? res(ev.target.result) : rej();
+          reader.onerror = rej;
+          reader.readAsDataURL(file);
+        });
+        /* Banners stay wide (1920px JPEG); mockups keep transparency (900px PNG) */
+        image = kind === "hero" ? await resizeImage(dataUrl, 1920, false) : await resizeImage(dataUrl, 900, true);
+      }
+      const res = await fetch("/api/save-site-assets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind, key, image }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "upload failed");
+      setSiteAssets(prev => {
+        const next = { heroBanners: { ...prev.heroBanners }, carouselMockups: { ...prev.carouselMockups } };
+        const map = kind === "hero" ? next.heroBanners : next.carouselMockups;
+        if (data.url) map[key] = data.url; else delete map[key];
+        return next;
+      });
+      showToast(file ? "✅ Saved — live in ~1 min" : "🗑️ Removed — live in ~1 min");
+    } catch (e) {
+      showToast(`❌ ${e instanceof Error ? e.message : "Upload failed"}`);
+    } finally {
+      setAssetBusy(null);
+    }
   }
 
   const staticMapped: Product[] = staticProducts.map(p => {
@@ -247,6 +312,7 @@ export default function AdminPage() {
     { key: "home"     as const, label: "Home",     icon: "🏠" },
     { key: "orders"   as const, label: "Orders",   icon: "🛍️", badge: pending },
     { key: "products" as const, label: "Products", icon: "📦" },
+    { key: "homepage" as const, label: "Homepage", icon: "🖼️" },
   ];
 
   /* ══════ MAIN LAYOUT ══════ */
@@ -679,6 +745,94 @@ export default function AdminPage() {
                   <button style={{ padding: "0.3rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.6rem", background: S.card, color: S.muted, cursor: "pointer" }}>← Previous</button>
                   <button style={{ padding: "0.3rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.6rem", background: S.card, color: S.muted, cursor: "pointer" }}>Next →</button>
                 </div>
+              </div>
+            </div>
+          </>)}
+
+          {/* ══════ HOMEPAGE TAB ══════ */}
+          {tab === "homepage" && (<>
+            <div style={{ marginBottom: 16 }}>
+              <h1 style={{ fontSize: "1.05rem", fontWeight: 700, color: S.text, marginBottom: 4 }}>Homepage</h1>
+              <div style={{ fontSize: "0.62rem", color: S.muted }}>Hero banners aur carousel ke 3D mockups yahan se upload karo — save hote hi site par live ho jaate hain (~1 min).</div>
+            </div>
+
+            {/* ── Hero Banners ── */}
+            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, marginBottom: 20, overflow: "hidden" }}>
+              <div style={{ padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
+                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>Hero Banners</div>
+                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Banner upload karne par us slide ka default design replace ho jaata hai. Recommended: 1600×460px (wide) JPG/PNG.</div>
+              </div>
+              {[
+                { key: "0", label: "Slide 1 — the KATANA" },
+                { key: "1", label: "Slide 2 — The Black. Samurai" },
+                { key: "2", label: "Slide 3 — The Bankai" },
+              ].map(({ key, label }) => {
+                const banner = siteAssets.heroBanners[key];
+                const busy = assetBusy === `hero:${key}`;
+                return (
+                  <div key={key} style={{ display: "flex", alignItems: "center", gap: 14, padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
+                    <div style={{ width: 180, height: 52, borderRadius: 8, border: `1px solid ${S.border}`, background: "#f0f0f0", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {banner
+                        ? <img src={banner} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <span style={{ fontSize: "0.52rem", color: S.muted }}>Default design</span>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: "0.66rem", fontWeight: 600, color: S.text }}>{label}</div>
+                      <div style={{ fontSize: "0.54rem", color: S.muted, marginTop: 2 }}>{banner ? "Custom banner active" : "Site ka built-in design dikh raha hai"}</div>
+                    </div>
+                    <label style={{ padding: "0.4rem 0.9rem", background: S.green, color: "#fff", borderRadius: 6, fontSize: "0.6rem", fontWeight: 600, cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}>
+                      {busy ? "Saving…" : banner ? "Replace" : "Upload"}
+                      <input type="file" accept="image/*" disabled={busy} style={{ display: "none" }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) saveSiteAsset("hero", key, f); e.target.value = ""; }} />
+                    </label>
+                    {banner && (
+                      <button disabled={busy} onClick={() => saveSiteAsset("hero", key, null)}
+                        style={{ padding: "0.4rem 0.9rem", background: S.card, color: S.red, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.6rem", fontWeight: 600, cursor: busy ? "wait" : "pointer" }}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ── Carousel 3D Mockups ── */}
+            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, overflow: "hidden" }}>
+              <div style={{ padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
+                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>Drops Carousel — 3D Mockups</div>
+                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Har product ke liye 3D mockup (transparent PNG best) upload karo — homepage ke DROPS carousel mein wahi dikhega. Nahi hoga to product photo/drawing dikhti hai.</div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12, padding: "1rem" }}>
+                {products.map(p => {
+                  const mock = siteAssets.carouselMockups[p.slug];
+                  const busy = assetBusy === `mockup:${p.slug}`;
+                  return (
+                    <div key={p.slug} style={{ border: `1px solid ${S.border}`, borderRadius: 10, padding: "0.75rem", display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 54, height: 64, borderRadius: 6, background: "#f5f5f5", border: `1px solid ${S.border}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                        {mock
+                          ? <img src={mock} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                          : <ProductMockup product={p} size={40} />}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: "0.6rem", fontWeight: 600, color: S.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                        <div style={{ fontSize: "0.5rem", color: mock ? S.green : S.muted, marginTop: 2 }}>{mock ? "3D mockup active" : "No mockup"}</div>
+                        <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                          <label style={{ padding: "0.28rem 0.65rem", background: S.green, color: "#fff", borderRadius: 5, fontSize: "0.52rem", fontWeight: 600, cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}>
+                            {busy ? "Saving…" : mock ? "Replace" : "Upload"}
+                            <input type="file" accept="image/*" disabled={busy} style={{ display: "none" }}
+                              onChange={e => { const f = e.target.files?.[0]; if (f) saveSiteAsset("mockup", p.slug, f); e.target.value = ""; }} />
+                          </label>
+                          {mock && (
+                            <button disabled={busy} onClick={() => saveSiteAsset("mockup", p.slug, null)}
+                              style={{ padding: "0.28rem 0.65rem", background: S.card, color: S.red, border: `1px solid ${S.border}`, borderRadius: 5, fontSize: "0.52rem", fontWeight: 600, cursor: busy ? "wait" : "pointer" }}>
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </>)}

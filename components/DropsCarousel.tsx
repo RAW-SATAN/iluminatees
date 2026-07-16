@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { useProducts } from "@/lib/useProducts";
+import { useSiteAssets } from "@/lib/useSiteAssets";
 import { ProductMockup } from "./ProductMockup";
 import { useWishlist } from "./WishlistProvider";
 
@@ -45,6 +46,7 @@ function getTag(p: Product) {
 
 export function DropsCarousel() {
   const products = useProducts();
+  const { carouselMockups } = useSiteAssets();
   const [idx, setIdx] = useState(0);
   const { toggleItem, isWishlisted } = useWishlist();
 
@@ -144,7 +146,20 @@ export function DropsCarousel() {
                 border:     isCenter ? "1px solid #eee" : "none",
                 transition: "box-shadow 0.4s ease, border-color 0.4s ease",
               }}>
-                <ProductMockup product={prod} size={isCenter ? 175 : 135} />
+                {carouselMockups[prod.slug] ? (
+                  <img
+                    src={carouselMockups[prod.slug]}
+                    alt={prod.name}
+                    style={{
+                      width:  isCenter ? 175 : 135,
+                      height: (isCenter ? 175 : 135) * 1.2,
+                      objectFit: "contain",
+                      pointerEvents: "none",
+                    }}
+                  />
+                ) : (
+                  <ProductMockup product={prod} size={isCenter ? 175 : 135} />
+                )}
               </div>
             </div>
           );
