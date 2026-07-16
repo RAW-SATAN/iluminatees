@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 const COL1 = [
@@ -44,6 +45,23 @@ const HEAD_STYLE = {
 };
 
 export function Footer() {
+  const [nlEmail, setNlEmail] = useState("");
+  const [nlDone, setNlDone] = useState(false);
+
+  async function subscribe(e: React.FormEvent) {
+    e.preventDefault();
+    const clean = nlEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) return;
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: clean }),
+      });
+      if (res.ok) setNlDone(true);
+    } catch {}
+  }
+
   return (
     <footer style={{ background: "#0d0d0d", borderTop: "1px solid #1a1a1a" }}>
 
@@ -160,38 +178,46 @@ export function Footer() {
           }}>
             SUBSCRIBE TO OUR NEWSLETTER
           </div>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="footer-newsletter-form"
-            style={{ display: "flex", gap: 0 }}
-          >
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="footer-newsletter-input"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "0.62rem", color: "#fff",
-                background: "#1a1a1a", border: "1px solid #2a2a2a",
-                borderRight: "none",
-                padding: "0.55rem 0.9rem",
-                outline: "none", width: "100%", maxWidth: 220,
-                borderRadius: "6px 0 0 6px",
-              }}
-            />
-            <button
-              type="submit"
-              style={{
-                background: "#fff", color: "#111",
-                border: "none", padding: "0.55rem 0.9rem",
-                cursor: "pointer", fontWeight: 700,
-                fontSize: "0.72rem",
-                borderRadius: "0 6px 6px 0",
-              }}
+          {nlDone ? (
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#4ade80", fontWeight: 600 }}>
+              ✓ You&apos;re in — welcome to the inner circle.
+            </div>
+          ) : (
+            <form
+              onSubmit={subscribe}
+              className="footer-newsletter-form"
+              style={{ display: "flex", gap: 0 }}
             >
-              →
-            </button>
-          </form>
+              <input
+                type="email"
+                value={nlEmail}
+                onChange={e => setNlEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="footer-newsletter-input"
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "0.62rem", color: "#fff",
+                  background: "#1a1a1a", border: "1px solid #2a2a2a",
+                  borderRight: "none",
+                  padding: "0.55rem 0.9rem",
+                  outline: "none", width: "100%", maxWidth: 220,
+                  borderRadius: "6px 0 0 6px",
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  background: "#fff", color: "#111",
+                  border: "none", padding: "0.55rem 0.9rem",
+                  cursor: "pointer", fontWeight: 700,
+                  fontSize: "0.72rem",
+                  borderRadius: "0 6px 6px 0",
+                }}
+              >
+                →
+              </button>
+            </form>
+          )}
         </div>
       </div>
 

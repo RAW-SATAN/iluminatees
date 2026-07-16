@@ -121,6 +121,14 @@ export default function AdminPage() {
       .catch(() => {});
   }, []);
 
+  const [subscribers, setSubscribers] = useState<{ email: string; date: string }[]>([]);
+  useEffect(() => {
+    fetch("/api/subscribe")
+      .then(r => r.ok ? r.json() : [])
+      .then(d => { if (Array.isArray(d)) setSubscribers(d); })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     fetch("/api/orders")
       .then(r => r.ok ? r.json() : [])
@@ -463,6 +471,32 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Newsletter subscribers */}
+            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, overflow: "hidden", marginTop: 20 }}>
+              <div style={{ padding: "1rem 1.25rem", borderBottom: `1px solid ${S.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "0.8rem", fontWeight: 700, color: S.text }}>Newsletter subscribers ({subscribers.length})</span>
+                {subscribers.length > 0 && (
+                  <button
+                    onClick={() => { navigator.clipboard?.writeText(subscribers.map(s => s.email).join(", ")); showToast("📋 Emails copied"); }}
+                    style={{ fontSize: "0.62rem", color: S.green, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
+                    Copy all emails
+                  </button>
+                )}
+              </div>
+              {subscribers.length === 0 ? (
+                <div style={{ padding: "1.25rem", fontSize: "0.64rem", color: S.muted }}>Abhi koi subscriber nahi — site ke newsletter form se emails yahan aayengi.</div>
+              ) : (
+                <div style={{ maxHeight: 260, overflowY: "auto" }}>
+                  {subscribers.slice().reverse().map((s, i) => (
+                    <div key={s.email} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "0.6rem 1.25rem", borderBottom: i < subscribers.length - 1 ? `1px solid ${S.border}` : "none" }}>
+                      <span style={{ fontSize: "0.66rem", color: S.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis" }}>{s.email}</span>
+                      <span style={{ fontSize: "0.58rem", color: S.muted, flexShrink: 0 }}>{new Date(s.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </>)}
           {tab === "settings" && (<>
