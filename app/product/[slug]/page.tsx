@@ -817,6 +817,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       <style>{`
         @media (max-width: 768px) {
           .product-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+          .product-sticky-col { position: static !important; }
+          .product-gallery { flex-direction: column-reverse !important; }
+          .product-thumbnails { flex-direction: row !important; overflow-x: auto; gap: 8px !important; }
+          .product-thumbnail-item { flex-shrink: 0 !important; }
+          .product-main-img { min-height: 340px !important; }
         }
       `}</style>
     </div>

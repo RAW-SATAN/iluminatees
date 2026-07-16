@@ -41,11 +41,6 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["apex", "heavyweight", "oversized"],
-    colors: [
-      { name: "Void Black", hex: "#080808" },
-      { name: "Steel Grey", hex: "#6e6e6e" },
-      { name: "Deep Navy", hex: "#0d1b2a" },
-    ],
   },
   {
     id: "14",
@@ -64,11 +59,6 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["apex", "heavyweight", "oversized"],
-    colors: [
-      { name: "Obsidian", hex: "#0a0a0a" },
-      { name: "Ash Grey", hex: "#9e9e9e" },
-      { name: "Maroon", hex: "#5c0a14" },
-    ],
   },
   {
     id: "15",
@@ -87,12 +77,6 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["apex", "heavyweight", "oversized"],
-    colors: [
-      { name: "Soul Black", hex: "#05050a" },
-      { name: "Void Black", hex: "#0d0d0d" },
-      { name: "Deep Navy", hex: "#0d1b2a" },
-      { name: "Ash Grey", hex: "#9e9e9e" },
-    ],
   },
 ];
 
