@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { products as staticProducts, type Product } from "@/lib/products";
 import { ProductMockup } from "@/components/ProductMockup";
 
@@ -21,12 +21,12 @@ interface Order {
 interface ProductEdit {
   price?: number; originalPrice?: number | null; inStock?: boolean;
   name?: string; description?: string; category?: "APEX"|"SACRED"|"CIPHER";
-  sizes?: string; limited?: boolean; customImage?: string;
+  sizes?: string; limited?: boolean; customImage?: string; customImages?: string[];
 }
 interface PanelDraft {
   name: string; description: string; price: string; mrp: string;
   category: "APEX"|"SACRED"|"CIPHER"; sizes: string[]; inStock: boolean;
-  limited: boolean; customImage: string;
+  limited: boolean; customImages: string[];
 }
 interface CustomProduct {
   id: string; slug: string; name: string; category: "APEX"|"SACRED"|"CIPHER";
@@ -101,7 +101,9 @@ export default function AdminPage() {
   const [showAdd, setShowAdd]       = useState(false);
   const [addForm, setAddForm]       = useState({ name: "", price: "", mrp: "", category: "APEX" as "APEX"|"SACRED"|"CIPHER", sizes: "S,M,L,XL" });
   const [panelProduct, setPanelProduct] = useState<Product|null>(null);
-  const [panelDraft, setPanelDraft] = useState<PanelDraft>({ name: "", description: "", price: "", mrp: "", category: "APEX", sizes: ["S","M","L","XL"], inStock: true, limited: false, customImage: "" });
+  const [panelDraft, setPanelDraft] = useState<PanelDraft>({ name: "", description: "", price: "", mrp: "", category: "APEX", sizes: ["S","M","L","XL"], inStock: true, limited: false, customImages: [] });
+  const [imgUrlInput, setImgUrlInput] = useState("");
+  const descRef = useRef<HTMLTextAreaElement>(null);
   const [addedProducts, setAddedProducts] = useLS<CustomProduct[]>(ADDED_KEY, []);
   const [deletedIds, setDeletedIds] = useLS<string[]>(DELETED_KEY, []);
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null);
@@ -623,7 +625,7 @@ export default function AdminPage() {
                                   sizes: e.sizes ? e.sizes.split(",").map(s=>s.trim()) : [...(p.sizes as string[])],
                                   inStock: e.inStock ?? p.inStock,
                                   limited: e.limited ?? p.limited,
-                                  customImage: e.customImage ?? "",
+                                  customImages: e.customImages ?? (e.customImage ? [e.customImage] : []),
                                 });
                               }}
                               style={{ padding: "0.35rem 0.85rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.58rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>
@@ -673,23 +675,43 @@ export default function AdminPage() {
             sizes: panelDraft.sizes.join(","),
             inStock: panelDraft.inStock,
             limited: panelDraft.limited,
-            customImage: panelDraft.customImage.trim() || undefined,
+            customImage: panelDraft.customImages[0] || undefined,
+            customImages: panelDraft.customImages.length > 0 ? panelDraft.customImages : undefined,
           };
           setEdits({ ...edits, [pid]: newEdit });
           setPanelProduct(null);
           showToast(`✅ "${panelDraft.name || pname}" saved`);
         }
-        function handleImageFile(e: React.ChangeEvent<HTMLInputElement>) {
-          const file = e.target.files?.[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = ev => {
-            if (typeof ev.target?.result === "string")
-              setPanelDraft(d => ({ ...d, customImage: ev.target!.result as string }));
-          };
-          reader.readAsDataURL(file);
+        function handleImageFiles(e: React.ChangeEvent<HTMLInputElement>) {
+          const files = Array.from(e.target.files ?? []);
+          files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if (typeof ev.target?.result === "string")
+                setPanelDraft(d => ({ ...d, customImages: [...d.customImages, ev.target!.result as string] }));
+            };
+            reader.readAsDataURL(file);
+          });
         }
-        const previewImg = panelDraft.customImage || (edits[panelProduct.id]?.customImage);
+        function insertDesc(prefix: string, suffix = "") {
+          const el = descRef.current;
+          if (!el) { setPanelDraft(d => ({ ...d, description: d.description + prefix })); return; }
+          const start = el.selectionStart ?? el.value.length;
+          const end   = el.selectionEnd   ?? el.value.length;
+          const sel   = el.value.slice(start, end);
+          const newVal = el.value.slice(0, start) + prefix + sel + suffix + el.value.slice(end);
+          setPanelDraft(d => ({ ...d, description: newVal }));
+          setTimeout(() => { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length + sel.length); }, 0);
+        }
+        const DESC_TEMPLATE = `Premium 240 GSM heavyweight cotton, crafted for those who move through the world differently.
+
+• 100% ring-spun cotton — butter-soft, zero compromise
+• Oversized drop-shoulder cut — structured, not sloppy
+• Pre-shrunk fabric — what you buy is what stays
+• Ribbed crew neck — holds shape, wash after wash
+• Reactive dye print — the symbol does not fade, does not conform
+
+⚠️ Limited vault drop. Once it sells out, it does not return.`;
 
         return (
           <div style={{ position: "absolute", inset: 0, zIndex: 150, display: "flex", alignItems: "stretch" }}>
@@ -723,41 +745,107 @@ export default function AdminPage() {
                     <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 5 }}>Title</label>
                     <input value={panelDraft.name} onChange={e => setPanelDraft(d=>({...d, name: e.target.value}))}
                       style={{ width: "100%", padding: "0.6rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.78rem", color: S.text, outline: "none", marginBottom: 14, boxSizing: "border-box" }} />
-                    <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 5 }}>Description</label>
-                    <textarea value={panelDraft.description} onChange={e => setPanelDraft(d=>({...d, description: e.target.value}))}
-                      rows={5}
-                      style={{ width: "100%", padding: "0.6rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.72rem", color: S.text, outline: "none", resize: "vertical", fontFamily: "Inter, sans-serif", lineHeight: 1.6, boxSizing: "border-box" }} />
+
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                      <label style={{ fontSize: "0.62rem", fontWeight: 500, color: S.text }}>Description</label>
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {[
+                          { label: "• Bullet", ins: "\n• ", suf: "" },
+                          { label: "→", ins: "→ ", suf: "" },
+                          { label: "★", ins: "★ ", suf: "" },
+                          { label: "⚠️", ins: "\n⚠️ ", suf: "" },
+                          { label: "B", ins: "**", suf: "**", title: "Bold" },
+                          { label: "I", ins: "_", suf: "_", title: "Italic" },
+                        ].map(({ label, ins, suf, title }) => (
+                          <button key={label} title={title} onClick={() => insertDesc(ins, suf)}
+                            style={{ padding: "0.18rem 0.48rem", border: `1px solid ${S.border}`, borderRadius: 5, fontSize: label === "B" ? "0.7rem" : "0.62rem", fontWeight: label === "B" ? 800 : label === "I" ? 400 : 500, fontStyle: label === "I" ? "italic" : "normal", color: S.text, background: S.bg, cursor: "pointer" }}>
+                            {label}
+                          </button>
+                        ))}
+                        <button onClick={() => setPanelDraft(d => ({ ...d, description: DESC_TEMPLATE }))}
+                          style={{ padding: "0.18rem 0.6rem", border: `1px solid ${S.green}`, borderRadius: 5, fontSize: "0.55rem", color: S.green, background: "#F0FBF7", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>
+                          Use template
+                        </button>
+                      </div>
+                    </div>
+                    <textarea
+                      ref={descRef}
+                      value={panelDraft.description}
+                      onChange={e => setPanelDraft(d=>({...d, description: e.target.value}))}
+                      rows={9}
+                      placeholder={"Premium 240 GSM heavyweight cotton...\n\n• Oversized drop-shoulder cut\n• Pre-shrunk fabric\n\n⚠️ Limited vault drop."}
+                      style={{ width: "100%", padding: "0.65rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.72rem", color: S.text, outline: "none", resize: "vertical", fontFamily: "Inter, sans-serif", lineHeight: 1.7, boxSizing: "border-box" }} />
+                    <div style={{ textAlign: "right", fontSize: "0.52rem", color: S.muted, marginTop: 4 }}>
+                      {panelDraft.description.length} chars
+                    </div>
                   </div>
 
                   {/* Media */}
                   <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1.1rem" }}>
-                    <div style={{ fontSize: "0.72rem", fontWeight: 600, color: S.text, marginBottom: 12 }}>Media</div>
-                    <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
-                      {/* Current image preview */}
-                      <div style={{ width: 100, height: 120, background: S.bg, border: `1px solid ${S.border}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-                        {previewImg
-                          ? <img src={previewImg} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                          : <ProductMockup product={panelProduct} size={76} />
-                        }
-                      </div>
-                      <div style={{ flex: 1, minWidth: 180 }}>
-                        <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 6 }}>Upload image</label>
-                        <label style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 0.9rem", border: `1px dashed ${S.border}`, borderRadius: 8, fontSize: "0.62rem", color: S.muted, cursor: "pointer", marginBottom: 10 }}>
-                          📁 Choose file
-                          <input type="file" accept="image/*" onChange={handleImageFile} style={{ display: "none" }} />
-                        </label>
-                        <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 5 }}>Or paste URL</label>
-                        <input value={panelDraft.customImage} onChange={e => setPanelDraft(d=>({...d, customImage: e.target.value}))}
-                          placeholder="https://..."
-                          style={{ width: "100%", padding: "0.5rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, outline: "none", boxSizing: "border-box" }} />
-                        {panelDraft.customImage && (
-                          <button onClick={() => setPanelDraft(d=>({...d, customImage: ""}))}
-                            style={{ marginTop: 6, fontSize: "0.56rem", color: S.red, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                            ✕ Remove image
-                          </button>
-                        )}
-                      </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                      <div style={{ fontSize: "0.72rem", fontWeight: 600, color: S.text }}>Media</div>
+                      <span style={{ fontSize: "0.55rem", color: S.muted }}>{panelDraft.customImages.length} photo{panelDraft.customImages.length !== 1 ? "s" : ""}</span>
                     </div>
+
+                    {/* Image grid */}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+                      {panelDraft.customImages.length === 0 && (
+                        <div style={{ width: 90, height: 108, background: S.bg, border: `1px solid ${S.border}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <ProductMockup product={panelProduct} size={68} />
+                        </div>
+                      )}
+                      {panelDraft.customImages.map((img, idx) => (
+                        <div key={idx} style={{ position: "relative", width: 90, height: 108, borderRadius: 8, overflow: "hidden", border: `2px solid ${idx === 0 ? S.green : S.border}`, flexShrink: 0 }}>
+                          <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          {idx === 0 && (
+                            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,128,96,0.88)", fontSize: "0.4rem", color: "#fff", textAlign: "center", padding: "0.22rem", fontWeight: 700, letterSpacing: "0.06em" }}>MAIN</div>
+                          )}
+                          <button
+                            onClick={() => setPanelDraft(d => ({ ...d, customImages: d.customImages.filter((_, i) => i !== idx) }))}
+                            style={{ position: "absolute", top: 4, right: 4, width: 20, height: 20, borderRadius: "50%", background: "rgba(0,0,0,0.65)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", lineHeight: 1 }}>
+                            ✕
+                          </button>
+                          {idx > 0 && (
+                            <button
+                              onClick={() => {
+                                const imgs = [...panelDraft.customImages];
+                                [imgs[0], imgs[idx]] = [imgs[idx], imgs[0]];
+                                setPanelDraft(d => ({ ...d, customImages: imgs }));
+                              }}
+                              style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.55)", border: "none", cursor: "pointer", fontSize: "0.42rem", color: "#fff", padding: "0.2rem", fontWeight: 700, textAlign: "center" }}>
+                              Set main
+                            </button>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* Upload placeholder */}
+                      <label style={{ width: 90, height: 108, border: `2px dashed ${S.border}`, borderRadius: 8, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", gap: 5, flexShrink: 0, background: S.bg }}>
+                        <span style={{ fontSize: 22, opacity: 0.35 }}>+</span>
+                        <span style={{ fontSize: "0.46rem", color: S.muted, textAlign: "center", lineHeight: 1.4 }}>Upload<br/>photo</span>
+                        <input type="file" accept="image/*" multiple onChange={handleImageFiles} style={{ display: "none" }} />
+                      </label>
+                    </div>
+
+                    {/* URL input */}
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input
+                        value={imgUrlInput}
+                        onChange={e => setImgUrlInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter" && imgUrlInput.trim()) { setPanelDraft(d => ({ ...d, customImages: [...d.customImages, imgUrlInput.trim()] })); setImgUrlInput(""); }}}
+                        placeholder="Paste image URL and press Add →"
+                        style={{ flex: 1, padding: "0.5rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.62rem", color: S.text, outline: "none" }} />
+                      <button
+                        onClick={() => { if (imgUrlInput.trim()) { setPanelDraft(d => ({ ...d, customImages: [...d.customImages, imgUrlInput.trim()] })); setImgUrlInput(""); }}}
+                        style={{ padding: "0.5rem 0.85rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.62rem", color: "#fff", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>
+                        Add →
+                      </button>
+                    </div>
+                    {panelDraft.customImages.length > 1 && (
+                      <div style={{ marginTop: 8, fontSize: "0.55rem", color: S.muted }}>
+                        Tip: click "Set main" on any photo to make it the primary display image.
+                      </div>
+                    )}
                   </div>
 
                   {/* Pricing */}
