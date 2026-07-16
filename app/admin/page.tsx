@@ -130,21 +130,39 @@ export default function AdminPage() {
       inStock: e.inStock ?? p.inStock,
     };
   });
-  const customMapped: Product[] = addedProducts.map(cp => {
-    const e = edits[cp.id] ?? {};
-    return {
-      id: cp.id, slug: cp.slug, name: cp.name, codename: cp.id.toUpperCase(),
-      category: cp.category,
-      price: e.price ?? cp.price,
-      originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? cp.originalPrice),
-      description: "", lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
-      sizes: (cp.sizes.split(",").map(s => s.trim()) as Product["sizes"]),
-      inStock: e.inStock ?? cp.inStock, limited: cp.limited, tags: ["custom"],
-    };
-  });
-  const products: Product[] = [...staticMapped, ...customMapped].filter(p => !deletedIds.includes(p.id));
+  const staticIds = new Set(staticProducts.map(p => p.id));
+  const staticSlugs = new Set(staticMapped.map(p => p.slug));
+
+  const customMapped: Product[] = addedProducts
+    .filter(cp => !staticSlugs.has(cp.slug))
+    .map(cp => {
+      const e = edits[cp.id] ?? {};
+      return {
+        id: cp.id, slug: cp.slug, name: cp.name, codename: cp.id.toUpperCase(),
+        category: cp.category,
+        price: e.price ?? cp.price,
+        originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? cp.originalPrice),
+        description: "", lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
+        sizes: (cp.sizes.split(",").map(s => s.trim()) as Product["sizes"]),
+        inStock: e.inStock ?? cp.inStock, limited: cp.limited, tags: ["custom"],
+      };
+    });
+
+  // Static products are never hidden by deletedIds — only custom products can be deleted
+  const products: Product[] = [
+    ...staticMapped,
+    ...customMapped.filter(p => !deletedIds.includes(p.id)),
+  ];
 
   function deleteProduct(id: string, name: string) {
+    if (staticIds.has(id)) {
+      // Static products cannot be deleted — mark out of stock instead
+      setEdits({ ...edits, [id]: { ...(edits[id] ?? {}), inStock: false } });
+      setPanelProduct(null);
+      setConfirmDelete(null);
+      showToast(`⚠️ "${name}" marked as Out of Stock`);
+      return;
+    }
     setDeletedIds([...deletedIds, id]);
     setAddedProducts(addedProducts.filter(p => p.id !== id));
     setPanelProduct(null);
@@ -154,11 +172,20 @@ export default function AdminPage() {
 
   function bulkDeleteProducts() {
     const ids = Array.from(selProds);
-    setDeletedIds([...deletedIds, ...ids]);
+    const customIds  = ids.filter(id => !staticIds.has(id));
+    const staticSelected = ids.filter(id => staticIds.has(id));
+    // Static products → mark out of stock
+    if (staticSelected.length > 0) {
+      const newEdits = { ...edits };
+      staticSelected.forEach(id => { newEdits[id] = { ...(newEdits[id] ?? {}), inStock: false }; });
+      setEdits(newEdits);
+    }
+    // Custom products → delete
+    setDeletedIds([...deletedIds, ...customIds]);
     setAddedProducts(addedProducts.filter(p => !selProds.has(p.id)));
     setSelProds(new Set());
     setConfirmBulkDelete(false);
-    showToast(`🗑️ ${ids.length} product${ids.length > 1 ? "s" : ""} deleted`);
+    showToast(`🗑️ ${ids.length} product${ids.length > 1 ? "s" : ""} removed`);
   }
 
   const revenue  = orders.filter(o => o.payment === "paid").reduce((s, o) => s + o.total, 0);

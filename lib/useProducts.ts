@@ -38,28 +38,33 @@ export function useProducts(): Product[] {
         customImage:   e.customImages?.[0] || e.customImage || base.customImage,
       });
 
-      const staticMapped  = staticProducts.map(p  => applyEdit(p, edits[p.id] ?? {}));
+      const staticMapped = staticProducts.map(p => applyEdit(p, edits[p.id] ?? {}));
 
-      const customMapped: Product[] = added.map(cp => {
-        const e = edits[cp.id] ?? {};
-        const base: Product = {
-          id: cp.id, slug: cp.slug,
-          name:          cp.name,
-          codename:      cp.id.toUpperCase(),
-          category:      cp.category,
-          price:         cp.price,
-          originalPrice: cp.originalPrice,
-          description:   "",
-          lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
-          sizes: cp.sizes.split(",").map(s => s.trim()) as Product["sizes"],
-          inStock: cp.inStock,
-          limited: cp.limited,
-          tags: ["custom"],
-        };
-        return applyEdit(base, e);
-      });
+      // Deduplicate: skip custom products whose slug matches a static product
+      const staticSlugs = new Set(staticMapped.map(p => p.slug));
+      const customMapped: Product[] = added
+        .filter(cp => !staticSlugs.has(cp.slug))
+        .map(cp => {
+          const e = edits[cp.id] ?? {};
+          const base: Product = {
+            id: cp.id, slug: cp.slug,
+            name:          cp.name,
+            codename:      cp.id.toUpperCase(),
+            category:      cp.category,
+            price:         cp.price,
+            originalPrice: cp.originalPrice,
+            description:   "",
+            lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
+            sizes: cp.sizes.split(",").map(s => s.trim()) as Product["sizes"],
+            inStock: cp.inStock,
+            limited: cp.limited,
+            tags: ["custom"],
+          };
+          return applyEdit(base, e);
+        });
 
-      setAll([...staticMapped, ...customMapped].filter(p => !deleted.includes(p.id)));
+      // Static products are never deleted via localStorage — only custom products filter by deletedIds
+      setAll([...staticMapped, ...customMapped.filter(p => !deleted.includes(p.id))]);
     } catch {}
   }, []);
 
