@@ -8,6 +8,7 @@ const ADMIN_PASSWORD = "ILUM2026";
 const ORDER_KEY      = "iluminatees_orders";
 const EDITS_KEY      = "iluminatees_product_edits";
 const ADDED_KEY      = "iluminatees_added_products";
+const DELETED_KEY    = "iluminatees_deleted_products";
 
 /* ── Types ── */
 type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
@@ -102,6 +103,8 @@ export default function AdminPage() {
   const [panelProduct, setPanelProduct] = useState<Product|null>(null);
   const [panelDraft, setPanelDraft] = useState<PanelDraft>({ name: "", description: "", price: "", mrp: "", category: "APEX", sizes: ["S","M","L","XL"], inStock: true, limited: false, customImage: "" });
   const [addedProducts, setAddedProducts] = useLS<CustomProduct[]>(ADDED_KEY, []);
+  const [deletedIds, setDeletedIds] = useLS<string[]>(DELETED_KEY, []);
+  const [confirmDelete, setConfirmDelete] = useState<string|null>(null);
   const [toast, setToast]           = useState<string|null>(null);
 
   function showToast(msg: string) {
@@ -135,7 +138,15 @@ export default function AdminPage() {
       inStock: e.inStock ?? cp.inStock, limited: cp.limited, tags: ["custom"],
     };
   });
-  const products: Product[] = [...staticMapped, ...customMapped];
+  const products: Product[] = [...staticMapped, ...customMapped].filter(p => !deletedIds.includes(p.id));
+
+  function deleteProduct(id: string, name: string) {
+    setDeletedIds([...deletedIds, id]);
+    setAddedProducts(addedProducts.filter(p => p.id !== id));
+    setPanelProduct(null);
+    setConfirmDelete(null);
+    showToast(`🗑️ "${name}" deleted`);
+  }
 
   const revenue  = orders.filter(o => o.payment === "paid").reduce((s, o) => s + o.total, 0);
   const pending  = orders.filter(o => o.status === "pending").length;
@@ -538,8 +549,23 @@ export default function AdminPage() {
 
                           {/* Actions */}
                           <td style={{ padding: "0.75rem 0.85rem" }}>
+                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                            {confirmDelete === p.id ? (
+                              <>
+                                <span style={{ fontSize: "0.56rem", color: S.red, fontWeight: 600 }}>Delete?</span>
+                                <button onClick={() => deleteProduct(p.id, p.name)}
+                                  style={{ padding: "0.3rem 0.65rem", background: S.red, border: "none", borderRadius: 6, fontSize: "0.56rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>Yes</button>
+                                <button onClick={() => setConfirmDelete(null)}
+                                  style={{ padding: "0.3rem 0.65rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.56rem", color: S.text, cursor: "pointer" }}>No</button>
+                              </>
+                            ) : (
+                              <button onClick={() => setConfirmDelete(p.id)}
+                                style={{ padding: "0.35rem 0.6rem", background: "none", border: `1px solid #F8D7DA`, borderRadius: 6, fontSize: "0.62rem", color: S.red, cursor: "pointer", lineHeight: 1 }}
+                                title="Delete product">🗑️</button>
+                            )}
                             <button
                               onClick={() => {
+                                setConfirmDelete(null);
                                 const e = edits[p.id] ?? {};
                                 setPanelProduct(p);
                                 setPanelDraft({
@@ -557,6 +583,7 @@ export default function AdminPage() {
                               style={{ padding: "0.35rem 0.85rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.58rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>
                               Edit
                             </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -769,6 +796,31 @@ export default function AdminPage() {
                         <div style={{ position: "absolute", top: 3, left: panelDraft.limited ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.15)" }} />
                       </div>
                     </label>
+                  </div>
+
+                  {/* Delete */}
+                  <div style={{ background: "#FFF5F5", border: `1px solid #FEB2B2`, borderRadius: 10, padding: "1rem" }}>
+                    <div style={{ fontSize: "0.68rem", fontWeight: 600, color: S.red, marginBottom: 8 }}>Danger zone</div>
+                    {confirmDelete === pid ? (
+                      <div>
+                        <div style={{ fontSize: "0.6rem", color: S.text, marginBottom: 10 }}>Are you sure? This cannot be undone.</div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <button onClick={() => deleteProduct(pid, panelDraft.name || pname)}
+                            style={{ padding: "0.5rem 1rem", background: S.red, border: "none", borderRadius: 8, fontSize: "0.65rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>
+                            Yes, delete
+                          </button>
+                          <button onClick={() => setConfirmDelete(null)}
+                            style={{ padding: "0.5rem 1rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer" }}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button onClick={() => setConfirmDelete(pid)}
+                        style={{ width: "100%", padding: "0.55rem", background: "none", border: `1px solid #FEB2B2`, borderRadius: 8, fontSize: "0.65rem", color: S.red, cursor: "pointer", fontWeight: 600 }}>
+                        🗑️ Delete product
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
