@@ -13,5 +13,11 @@
   "the-sakura": [
     "/products/the-sakura/0.jpg",
     "/products/the-sakura/1.jpg"
+  ],
+  "the-katana": [
+    "/products/the-katana/0.jpg",
+    "/products/the-katana/1.jpg",
+    "/products/the-katana/2.jpg",
+    "/products/the-katana/3.jpg"
   ]
 }
