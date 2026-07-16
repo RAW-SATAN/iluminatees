@@ -187,6 +187,7 @@ export function ProductMockup({ product, size = 260, className, colorOverride }:
       height={size * 1.2}
       className={className}
       aria-hidden
+      style={{ pointerEvents: "none" }}
     >
       <defs>
         <filter id={`glow-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
