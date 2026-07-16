@@ -33,19 +33,22 @@ export function useProducts(): Product[] {
         const added: CustomProduct[]             = JSON.parse(localStorage.getItem(ADDED_KEY)   ?? "[]");
         const deleted: string[]                  = JSON.parse(localStorage.getItem(DELETED_KEY) ?? "[]");
 
-        const applyEdit = (base: Product, e: ProductEdit, slug: string): Product => ({
-          ...base,
-          name:          e.name          ?? base.name,
-          description:   e.description   ?? base.description,
-          category:      e.category      ?? base.category,
-          sizes:         e.sizes ? (e.sizes.split(",").map(s => s.trim()) as Product["sizes"]) : base.sizes,
-          limited:       e.limited       ?? base.limited,
-          price:         e.price         ?? base.price,
-          originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? base.originalPrice),
-          inStock:       e.inStock       ?? base.inStock,
-          /* Permanent images (from GitHub/Vercel) take priority over localStorage */
-          customImage:   permanentImages[slug]?.[0] || e.customImages?.[0] || e.customImage || base.customImage,
-        });
+        const applyEdit = (base: Product, e: ProductEdit, slug: string): Product => {
+          const imgs = permanentImages[slug] || e.customImages || (e.customImage ? [e.customImage] : undefined);
+          return {
+            ...base,
+            name:          e.name          ?? base.name,
+            description:   e.description   ?? base.description,
+            category:      e.category      ?? base.category,
+            sizes:         e.sizes ? (e.sizes.split(",").map(s => s.trim()) as Product["sizes"]) : base.sizes,
+            limited:       e.limited       ?? base.limited,
+            price:         e.price         ?? base.price,
+            originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? base.originalPrice),
+            inStock:       e.inStock       ?? base.inStock,
+            customImage:   imgs?.[0] || base.customImage,
+            customImages:  imgs || base.customImages,
+          };
+        };
 
         /* Collect images from custom products that duplicate static ones (by slug) */
         const customImageBySlug: Record<string, string> = {};

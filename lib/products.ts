@@ -20,6 +20,7 @@ export interface Product {
   tags: string[];
   colors?: { name: string; hex: string }[];
   customImage?: string;
+  customImages?: string[];
 }
 
 export const products: Product[] = [

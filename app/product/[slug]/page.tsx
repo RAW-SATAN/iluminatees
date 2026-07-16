@@ -110,6 +110,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const availColors = product.colors ?? [];
   const [selectedColor, setSelectedColor] = useState<string>(availColors[0]?.hex ?? product.shirtColor);
   const [added, setAdded] = useState(false);
+  const [activeImgIdx, setActiveImgIdx] = useState(0);
   const [bundleSize, setBundleSize] = useState<1 | 2 | 3>(1);
   const [bundlePicks, setBundlePicks] = useState<string[]>([]);
 
@@ -159,64 +160,78 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           <div className="product-gallery" style={{ display: "flex", gap: 10 }}>
 
             {/* Thumbnails */}
-            <div className="product-thumbnails" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[0, 1, 2].map(i => (
-                <div key={i} className="product-thumbnail-item" style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, overflow: "hidden" }}>
-                  {product.customImage
-                    ? <img src={product.customImage} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    : <ProductMockup product={product} size={52} colorOverride={selectedColor} />
-                  }
+            {(() => {
+              const imgs = product.customImages ?? (product.customImage ? [product.customImage] : []);
+              const thumbs = imgs.length > 0 ? imgs : [null, null, null];
+              return (
+                <div className="product-thumbnails" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {thumbs.map((img, i) => (
+                    <div key={i} onClick={() => img && setActiveImgIdx(i)}
+                      className="product-thumbnail-item"
+                      style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: `1.5px solid ${activeImgIdx === i && img ? "#111" : "#e8e8e8"}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: img ? "pointer" : "default", flexShrink: 0, overflow: "hidden" }}>
+                      {img
+                        ? <img src={img} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <ProductMockup product={product} size={52} colorOverride={selectedColor} />
+                      }
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              );
+            })()}
 
             {/* Main image */}
-            <div style={{ flex: 1 }}>
-              {/* Icons row */}
-              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-                  <Share2 size={16} color="#555" />
-                </button>
-                <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8"><path d="M18 21l-6-3-6 3V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z" /></svg>
-                </button>
-                <button onClick={() => toggleItem(product.slug)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", alignItems: "center", gap: 4 }}>
-                  <Heart size={16} color={wishlisted ? "#e8000d" : "#555"} fill={wishlisted ? "#e8000d" : "none"} />
-                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555" }}>53.0k</span>
-                </button>
-              </div>
+            {(() => {
+              const imgs = product.customImages ?? (product.customImage ? [product.customImage] : []);
+              const activeImg = imgs[activeImgIdx] ?? imgs[0] ?? null;
+              return (
+                <div style={{ flex: 1 }}>
+                  {/* Icons row */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+                      <Share2 size={16} color="#555" />
+                    </button>
+                    <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8"><path d="M18 21l-6-3-6 3V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z" /></svg>
+                    </button>
+                    <button onClick={() => toggleItem(product.slug)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                      <Heart size={16} color={wishlisted ? "#e8000d" : "#555"} fill={wishlisted ? "#e8000d" : "none"} />
+                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555" }}>53.0k</span>
+                    </button>
+                  </div>
 
-              <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: product.customImage ? 0 : "3rem 2rem", position: "relative", overflow: "hidden" }}>
-                {product.customImage ? (
-                  <img src={product.customImage} alt={product.name} style={{ width: "100%", height: "100%", minHeight: 500, objectFit: "cover", borderRadius: 12 }} />
-                ) : (
-                  <>
-                    <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.34rem", color: "#111", letterSpacing: "0.04em", lineHeight: 1.3 }}>
-                        AS SEEN ON<br />
-                        <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em" }}>SHARK TANK</span>
-                      </div>
+                  <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: activeImg ? 0 : "3rem 2rem", position: "relative", overflow: "hidden" }}>
+                    {activeImg ? (
+                      <img src={activeImg} alt={product.name} style={{ width: "100%", height: "100%", minHeight: 500, objectFit: "cover", borderRadius: 12 }} />
+                    ) : (
+                      <>
+                        <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
+                          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.34rem", color: "#111", letterSpacing: "0.04em", lineHeight: 1.3 }}>
+                            AS SEEN ON<br />
+                            <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em" }}>SHARK TANK</span>
+                          </div>
+                        </div>
+                        <ProductMockup product={product} size={340} colorOverride={selectedColor} />
+                      </>
+                    )}
+                  </div>
+
+                  {/* Sold + rating bar */}
+                  <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.55rem 0.85rem", background: "#fff", border: "1px solid #eee", borderRadius: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <TrendingUp size={12} color="#e8000d" />
+                      <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#333" }}>
+                        {sold} Sold In The Last 7 Days
+                      </span>
                     </div>
-                    <ProductMockup product={product} size={340} colorOverride={selectedColor} />
-                  </>
-                )}
-              </div>
-
-              {/* Sold + rating bar */}
-              <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.55rem 0.85rem", background: "#fff", border: "1px solid #eee", borderRadius: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <TrendingUp size={12} color="#e8000d" />
-                  <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#333" }}>
-                    {sold} Sold In The Last 7 Days
-                  </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      <Star size={11} color="#f5a623" fill="#f5a623" />
+                      <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#333" }}>4.3</span>
+                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa" }}>4.4K</span>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <Star size={11} color="#f5a623" fill="#f5a623" />
-                  <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#333" }}>4.3</span>
-                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa" }}>4.4K</span>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
         </div>
 
