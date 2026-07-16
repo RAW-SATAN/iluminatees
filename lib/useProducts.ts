@@ -25,39 +25,38 @@ export function useProducts(): Product[] {
       const added: CustomProduct[]             = JSON.parse(localStorage.getItem(ADDED_KEY)   ?? "[]");
       const deleted: string[]                  = JSON.parse(localStorage.getItem(DELETED_KEY) ?? "[]");
 
-      const staticMapped = staticProducts.map(p => {
-        const e = edits[p.id] ?? {};
-        return {
-          ...p,
-          name:          e.name          ?? p.name,
-          description:   e.description   ?? p.description,
-          category:      e.category      ?? p.category,
-          sizes:         e.sizes ? (e.sizes.split(",").map(s => s.trim()) as Product["sizes"]) : p.sizes,
-          limited:       e.limited       ?? p.limited,
-          price:         e.price         ?? p.price,
-          originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? p.originalPrice),
-          inStock:       e.inStock       ?? p.inStock,
-        };
+      const applyEdit = (base: Product, e: ProductEdit): Product => ({
+        ...base,
+        name:          e.name          ?? base.name,
+        description:   e.description   ?? base.description,
+        category:      e.category      ?? base.category,
+        sizes:         e.sizes ? (e.sizes.split(",").map(s => s.trim()) as Product["sizes"]) : base.sizes,
+        limited:       e.limited       ?? base.limited,
+        price:         e.price         ?? base.price,
+        originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? base.originalPrice),
+        inStock:       e.inStock       ?? base.inStock,
+        customImage:   e.customImages?.[0] || e.customImage || base.customImage,
       });
+
+      const staticMapped  = staticProducts.map(p  => applyEdit(p, edits[p.id] ?? {}));
 
       const customMapped: Product[] = added.map(cp => {
         const e = edits[cp.id] ?? {};
-        return {
+        const base: Product = {
           id: cp.id, slug: cp.slug,
-          name:          e.name        ?? cp.name,
+          name:          cp.name,
           codename:      cp.id.toUpperCase(),
-          category:      e.category   ?? cp.category,
-          price:         e.price      ?? cp.price,
-          originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? cp.originalPrice),
-          description:   e.description ?? "",
+          category:      cp.category,
+          price:         cp.price,
+          originalPrice: cp.originalPrice,
+          description:   "",
           lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
-          sizes: (e.sizes
-            ? e.sizes.split(",").map(s => s.trim())
-            : cp.sizes.split(",").map(s => s.trim())) as Product["sizes"],
-          inStock: e.inStock ?? cp.inStock,
-          limited: e.limited ?? cp.limited,
+          sizes: cp.sizes.split(",").map(s => s.trim()) as Product["sizes"],
+          inStock: cp.inStock,
+          limited: cp.limited,
           tags: ["custom"],
         };
+        return applyEdit(base, e);
       });
 
       setAll([...staticMapped, ...customMapped].filter(p => !deleted.includes(p.id)));

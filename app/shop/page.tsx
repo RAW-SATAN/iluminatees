@@ -78,8 +78,11 @@ function ShopCard({ product }: { product: Product }) {
 
       {/* Image */}
       <Link href={`/product/${product.slug}`} style={{ textDecoration: "none", display: "flex", flexDirection: "column", flex: 1 }}>
-        <div className="card-img" style={{ background: "#f8f8f8", display: "flex", alignItems: "center", justifyContent: "center", padding: "2.8rem 1rem 1.8rem", minHeight: 230 }}>
-          <ProductMockup product={product} size={150} />
+        <div className="card-img" style={{ background: "#f8f8f8", display: "flex", alignItems: "center", justifyContent: "center", padding: product.customImage ? 0 : "2.8rem 1rem 1.8rem", minHeight: 230, overflow: "hidden" }}>
+          {product.customImage
+            ? <img src={product.customImage} alt={product.name} style={{ width: "100%", height: 230, objectFit: "cover" }} />
+            : <ProductMockup product={product} size={150} />
+          }
         </div>
 
         <div style={{ height: 1, background: "#f0f0f0" }} />

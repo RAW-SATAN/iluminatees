@@ -114,10 +114,13 @@ function ProductTile({ product }: { product: Product }) {
         <div className="card-img" style={{
           background: "#f9f9f9",
           display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "2.4rem 1rem 1.2rem",
-          minHeight: 210,
+          padding: product.customImage ? 0 : "2.4rem 1rem 1.2rem",
+          minHeight: 210, overflow: "hidden",
         }}>
-          <ProductMockup product={product} size={140} />
+          {product.customImage
+            ? <img src={product.customImage} alt={product.name} style={{ width: "100%", height: 210, objectFit: "cover" }} />
+            : <ProductMockup product={product} size={140} />
+          }
         </div>
 
         {/* Info */}
