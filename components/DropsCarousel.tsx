@@ -3,7 +3,8 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
-import { products } from "@/lib/products";
+import type { Product } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { ProductMockup } from "./ProductMockup";
 import { useWishlist } from "./WishlistProvider";
 
@@ -37,17 +38,18 @@ const TAG_MAP: Record<string, string> = {
   premium:    "APEX PREMIUM",
   classic:    "CLASSIC DROP",
 };
-function getTag(p: (typeof products)[0]) {
+function getTag(p: Product) {
   for (const t of p.tags) if (TAG_MAP[t]) return TAG_MAP[t];
   return p.limited ? "LIMITED EDITION" : "NEW ARRIVAL";
 }
 
 export function DropsCarousel() {
+  const products = useProducts();
   const [idx, setIdx] = useState(0);
   const { toggleItem, isWishlisted } = useWishlist();
 
-  const prev = useCallback(() => setIdx((i) => (i - 1 + products.length) % products.length), []);
-  const next = useCallback(() => setIdx((i) => (i + 1) % products.length), []);
+  const prev = useCallback(() => setIdx((i) => (i - 1 + products.length) % products.length), [products.length]);
+  const next = useCallback(() => setIdx((i) => (i + 1) % products.length), [products.length]);
 
   const center = products[idx];
   const emi    = Math.round(center.price / 9);

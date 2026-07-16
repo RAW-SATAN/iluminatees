@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { products } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { ProductMockup } from "./ProductMockup";
 
 /* ── Carousel slides ────────────────────────────────────── */
@@ -59,6 +59,7 @@ const EXTRA_CATS = [
 
 /* ── Component ──────────────────────────────────────────── */
 export function Hero() {
+  const products = useProducts();
   const [slide,      setSlide]      = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
