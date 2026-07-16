@@ -557,7 +557,10 @@ export default function AdminPage() {
                           <td style={{ padding: "0.75rem 0.85rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                               <div style={{ width: 40, height: 48, background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-                                <ProductMockup product={p} size={32} />
+                                {(edits[p.id]?.customImages?.[0] || edits[p.id]?.customImage)
+                                  ? <img src={edits[p.id]?.customImages?.[0] || edits[p.id]?.customImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                  : <ProductMockup product={p} size={32} />
+                                }
                               </div>
                               <div>
                                 <div style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>{p.name}</div>

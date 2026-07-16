@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SlidersHorizontal, Plus, Check, Heart } from "lucide-react";
-import { products, type Product } from "@/lib/products";
+import { type Product } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { ProductMockup } from "@/components/ProductMockup";
 import { useCart } from "@/components/CartProvider";
 import { useWishlist } from "@/components/WishlistProvider";
@@ -20,7 +21,7 @@ const FILTERS = [
   { key: "NEW",        label: "New Arrivals"   },
 ];
 
-function filterProducts(key: string): Product[] {
+function filterProducts(key: string, products: Product[]): Product[] {
   switch (key) {
     case "APEX":       return products.filter(p => p.category === "APEX");
     case "SACRED":     return products.filter(p => p.category === "SACRED");
@@ -113,8 +114,9 @@ function ShopCard({ product }: { product: Product }) {
 
 /* ── Page ───────────────────────────────────────────────── */
 export default function ShopPage() {
+  const products = useProducts();
   const [activeFilter, setActiveFilter] = useState("ALL");
-  const filtered = filterProducts(activeFilter);
+  const filtered = filterProducts(activeFilter, products);
 
   const catLabel = FILTERS.find(f => f.key === activeFilter)?.label ?? "All";
 

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Plus, TrendingUp, Heart, Check } from "lucide-react";
-import { products, type Product } from "@/lib/products";
+import { type Product } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { ProductMockup } from "./ProductMockup";
 import { useWishlist } from "./WishlistProvider";
 import { useCart } from "./CartProvider";
@@ -19,7 +20,7 @@ const CATS = [
   { key: "SALE",       label: "SALE" },
 ];
 
-function filterProducts(cat: string): Product[] {
+function filterProducts(cat: string, products: Product[]): Product[] {
   switch (cat) {
     case "APEX":       return products.filter((p) => p.category === "APEX");
     case "SACRED":     return products.filter((p) => p.category === "SACRED");
@@ -193,8 +194,9 @@ function ProductTile({ product }: { product: Product }) {
 
 /* ── Main component ─────────────────────────────────────── */
 export function TrendingSection() {
+  const products = useProducts();
   const [activeCat, setActiveCat] = useState("ALL");
-  const filtered = filterProducts(activeCat);
+  const filtered = filterProducts(activeCat, products);
 
   return (
     <section style={{ background: "#fff", padding: "3rem 0" }}>
