@@ -17,7 +17,16 @@ interface Order {
   items: OrderItem[]; total: number; status: OrderStatus;
   payment: "paid" | "unpaid" | "cod"; date: string;
 }
-interface ProductEdit { price?: number; originalPrice?: number | null; inStock?: boolean }
+interface ProductEdit {
+  price?: number; originalPrice?: number | null; inStock?: boolean;
+  name?: string; description?: string; category?: "APEX"|"SACRED"|"CIPHER";
+  sizes?: string; limited?: boolean; customImage?: string;
+}
+interface PanelDraft {
+  name: string; description: string; price: string; mrp: string;
+  category: "APEX"|"SACRED"|"CIPHER"; sizes: string[]; inStock: boolean;
+  limited: boolean; customImage: string;
+}
 interface CustomProduct {
   id: string; slug: string; name: string; category: "APEX"|"SACRED"|"CIPHER";
   price: number; originalPrice?: number; sizes: string; inStock: boolean; limited: boolean;
@@ -90,6 +99,8 @@ export default function AdminPage() {
   const [expandedOrder, setExpandedOrder] = useState<string|null>(null);
   const [showAdd, setShowAdd]       = useState(false);
   const [addForm, setAddForm]       = useState({ name: "", price: "", mrp: "", category: "APEX" as "APEX"|"SACRED"|"CIPHER", sizes: "S,M,L,XL" });
+  const [panelProduct, setPanelProduct] = useState<Product|null>(null);
+  const [panelDraft, setPanelDraft] = useState<PanelDraft>({ name: "", description: "", price: "", mrp: "", category: "APEX", sizes: ["S","M","L","XL"], inStock: true, limited: false, customImage: "" });
   const [addedProducts, setAddedProducts] = useLS<CustomProduct[]>(ADDED_KEY, []);
   const [toast, setToast]           = useState<string|null>(null);
 
@@ -98,10 +109,20 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 3000);
   }
 
-  const staticMapped: Product[] = staticProducts.map(p => ({
-    ...p, ...(edits[p.id] ?? {}),
-    originalPrice: edits[p.id]?.originalPrice === null ? undefined : (edits[p.id]?.originalPrice ?? p.originalPrice),
-  }));
+  const staticMapped: Product[] = staticProducts.map(p => {
+    const e = edits[p.id] ?? {};
+    return {
+      ...p,
+      name: e.name ?? p.name,
+      description: e.description ?? p.description,
+      category: e.category ?? p.category,
+      sizes: e.sizes ? (e.sizes.split(",").map(s=>s.trim()) as Product["sizes"]) : p.sizes,
+      limited: e.limited ?? p.limited,
+      price: e.price ?? p.price,
+      originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? p.originalPrice),
+      inStock: e.inStock ?? p.inStock,
+    };
+  });
   const customMapped: Product[] = addedProducts.map(cp => {
     const e = edits[cp.id] ?? {};
     return {
@@ -494,61 +515,48 @@ export default function AdminPage() {
 
                           {/* Price */}
                           <td style={{ padding: "0.75rem 0.85rem" }}>
-                            {isEditing ? (
-                              <input type="number" value={draft.price ?? p.price}
-                                onChange={e => setDraft(d => ({ ...d, price: Number(e.target.value) }))}
-                                style={{ width: 80, padding: "0.3rem 0.5rem", border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.65rem", outline: "none", color: S.text }} />
-                            ) : (
-                              <span style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>₹{p.price.toLocaleString("en-IN")}</span>
-                            )}
+                            <span style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>₹{p.price.toLocaleString("en-IN")}</span>
                           </td>
 
                           {/* MRP */}
                           <td style={{ padding: "0.75rem 0.85rem" }}>
-                            {isEditing ? (
-                              <input type="number" value={draft.originalPrice ?? (p.originalPrice ?? 0)}
-                                onChange={e => setDraft(d => ({ ...d, originalPrice: Number(e.target.value) || null }))}
-                                style={{ width: 80, padding: "0.3rem 0.5rem", border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.65rem", outline: "none", color: S.text }} />
-                            ) : (
-                              <span style={{ fontSize: "0.65rem", color: p.originalPrice ? S.muted : "#C9CCCF", textDecoration: p.originalPrice ? "line-through" : "none" }}>
-                                {p.originalPrice ? `₹${p.originalPrice.toLocaleString("en-IN")}` : "—"}
-                              </span>
-                            )}
+                            <span style={{ fontSize: "0.65rem", color: p.originalPrice ? S.muted : "#C9CCCF", textDecoration: p.originalPrice ? "line-through" : "none" }}>
+                              {p.originalPrice ? `₹${p.originalPrice.toLocaleString("en-IN")}` : "—"}
+                            </span>
                           </td>
 
                           {/* Stock */}
                           <td style={{ padding: "0.75rem 0.85rem" }}>
-                            {isEditing ? (
-                              <select value={(draft.inStock ?? p.inStock) ? "1" : "0"}
-                                onChange={e => setDraft(d => ({ ...d, inStock: e.target.value === "1" }))}
-                                style={{ fontSize: "0.62rem", border: `1px solid ${S.border}`, borderRadius: 6, padding: "0.3rem 0.5rem", outline: "none", color: S.text }}>
-                                <option value="1">In stock</option>
-                                <option value="0">Out of stock</option>
-                              </select>
-                            ) : (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.58rem", fontWeight: 600,
-                                color: p.inStock ? "#155724" : "#721C24",
-                                background: p.inStock ? "#D4EDDA" : "#F8D7DA",
-                                borderRadius: 20, padding: "0.2rem 0.65rem" }}>
-                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: p.inStock ? "#28A745" : "#DC3545" }} />
-                                {p.inStock ? "In stock" : "Out of stock"}
-                              </span>
-                            )}
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.58rem", fontWeight: 600,
+                              color: p.inStock ? "#155724" : "#721C24",
+                              background: p.inStock ? "#D4EDDA" : "#F8D7DA",
+                              borderRadius: 20, padding: "0.2rem 0.65rem" }}>
+                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: p.inStock ? "#28A745" : "#DC3545" }} />
+                              {p.inStock ? "In stock" : "Out of stock"}
+                            </span>
                           </td>
 
                           {/* Actions */}
                           <td style={{ padding: "0.75rem 0.85rem" }}>
-                            {isEditing ? (
-                              <div style={{ display: "flex", gap: 6 }}>
-                                <button onClick={() => saveEdit(p.id)}
-                                  style={{ padding: "0.35rem 0.75rem", background: S.green, border: "none", borderRadius: 6, fontSize: "0.58rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>Save</button>
-                                <button onClick={() => setEditId(null)}
-                                  style={{ padding: "0.35rem 0.75rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.58rem", color: S.text, cursor: "pointer" }}>Cancel</button>
-                              </div>
-                            ) : (
-                              <button onClick={() => { setEditId(p.id); setDraft({ price: p.price, originalPrice: p.originalPrice ?? null, inStock: p.inStock }); }}
-                                style={{ padding: "0.35rem 0.85rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.58rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Edit</button>
-                            )}
+                            <button
+                              onClick={() => {
+                                const e = edits[p.id] ?? {};
+                                setPanelProduct(p);
+                                setPanelDraft({
+                                  name: e.name ?? p.name,
+                                  description: e.description ?? p.description ?? "",
+                                  price: String(e.price ?? p.price),
+                                  mrp: e.originalPrice != null ? String(e.originalPrice) : (p.originalPrice ? String(p.originalPrice) : ""),
+                                  category: e.category ?? p.category,
+                                  sizes: e.sizes ? e.sizes.split(",").map(s=>s.trim()) : [...(p.sizes as string[])],
+                                  inStock: e.inStock ?? p.inStock,
+                                  limited: e.limited ?? p.limited,
+                                  customImage: e.customImage ?? "",
+                                });
+                              }}
+                              style={{ padding: "0.35rem 0.85rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.58rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>
+                              Edit
+                            </button>
                           </td>
                         </tr>
                       );
@@ -570,6 +578,204 @@ export default function AdminPage() {
 
         </div>
       </div>
+
+      {/* ── Full Edit Panel ── */}
+      {panelProduct && (() => {
+        const ALL_SIZES = ["XS","S","M","L","XL","XXL"];
+        function toggleSize(s: string) {
+          setPanelDraft(d => ({
+            ...d,
+            sizes: d.sizes.includes(s) ? d.sizes.filter(x=>x!==s) : [...d.sizes, s]
+          }));
+        }
+        const pid = panelProduct.id;
+        const pname = panelProduct.name;
+        function savePanel() {
+          const newEdit: ProductEdit = {
+            name: panelDraft.name.trim() || undefined,
+            description: panelDraft.description.trim() || undefined,
+            price: panelDraft.price ? parseInt(panelDraft.price) : undefined,
+            originalPrice: panelDraft.mrp ? parseInt(panelDraft.mrp) : null,
+            category: panelDraft.category,
+            sizes: panelDraft.sizes.join(","),
+            inStock: panelDraft.inStock,
+            limited: panelDraft.limited,
+            customImage: panelDraft.customImage.trim() || undefined,
+          };
+          setEdits({ ...edits, [pid]: newEdit });
+          setPanelProduct(null);
+          showToast(`✅ "${panelDraft.name || pname}" saved`);
+        }
+        function handleImageFile(e: React.ChangeEvent<HTMLInputElement>) {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            if (typeof ev.target?.result === "string")
+              setPanelDraft(d => ({ ...d, customImage: ev.target!.result as string }));
+          };
+          reader.readAsDataURL(file);
+        }
+        const previewImg = panelDraft.customImage || (edits[panelProduct.id]?.customImage);
+
+        return (
+          <div style={{ position: "absolute", inset: 0, zIndex: 150, display: "flex", alignItems: "stretch" }}>
+            {/* Backdrop */}
+            <div style={{ flex: 1, background: "rgba(32,34,35,0.5)" }} onClick={() => setPanelProduct(null)} />
+
+            {/* Drawer */}
+            <div style={{ width: "min(720px, 100%)", background: S.bg, display: "flex", flexDirection: "column", overflowY: "auto", boxShadow: "-4px 0 32px rgba(0,0,0,0.18)" }}>
+
+              {/* Header */}
+              <div style={{ background: S.card, borderBottom: `1px solid ${S.border}`, padding: "0.9rem 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
+                <div>
+                  <div style={{ fontSize: "1rem", fontWeight: 700, color: S.text }}>{panelDraft.name || panelProduct.name}</div>
+                  <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>{panelProduct.codename}</div>
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <button onClick={() => setPanelProduct(null)} style={{ padding: "0.5rem 1rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.68rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Discard</button>
+                  <button onClick={savePanel} style={{ padding: "0.5rem 1.2rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.68rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>Save</button>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div style={{ padding: "1.25rem", display: "grid", gridTemplateColumns: "1fr 260px", gap: "1.25rem", alignItems: "start" }}>
+
+                {/* ── LEFT COL ── */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+
+                  {/* Title & Description */}
+                  <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1.1rem" }}>
+                    <div style={{ fontSize: "0.72rem", fontWeight: 600, color: S.text, marginBottom: 12 }}>Product details</div>
+                    <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 5 }}>Title</label>
+                    <input value={panelDraft.name} onChange={e => setPanelDraft(d=>({...d, name: e.target.value}))}
+                      style={{ width: "100%", padding: "0.6rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.78rem", color: S.text, outline: "none", marginBottom: 14, boxSizing: "border-box" }} />
+                    <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 5 }}>Description</label>
+                    <textarea value={panelDraft.description} onChange={e => setPanelDraft(d=>({...d, description: e.target.value}))}
+                      rows={5}
+                      style={{ width: "100%", padding: "0.6rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.72rem", color: S.text, outline: "none", resize: "vertical", fontFamily: "Inter, sans-serif", lineHeight: 1.6, boxSizing: "border-box" }} />
+                  </div>
+
+                  {/* Media */}
+                  <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1.1rem" }}>
+                    <div style={{ fontSize: "0.72rem", fontWeight: 600, color: S.text, marginBottom: 12 }}>Media</div>
+                    <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
+                      {/* Current image preview */}
+                      <div style={{ width: 100, height: 120, background: S.bg, border: `1px solid ${S.border}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                        {previewImg
+                          ? <img src={previewImg} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          : <ProductMockup product={panelProduct} size={76} />
+                        }
+                      </div>
+                      <div style={{ flex: 1, minWidth: 180 }}>
+                        <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 6 }}>Upload image</label>
+                        <label style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 0.9rem", border: `1px dashed ${S.border}`, borderRadius: 8, fontSize: "0.62rem", color: S.muted, cursor: "pointer", marginBottom: 10 }}>
+                          📁 Choose file
+                          <input type="file" accept="image/*" onChange={handleImageFile} style={{ display: "none" }} />
+                        </label>
+                        <label style={{ display: "block", fontSize: "0.62rem", fontWeight: 500, color: S.text, marginBottom: 5 }}>Or paste URL</label>
+                        <input value={panelDraft.customImage} onChange={e => setPanelDraft(d=>({...d, customImage: e.target.value}))}
+                          placeholder="https://..."
+                          style={{ width: "100%", padding: "0.5rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, outline: "none", boxSizing: "border-box" }} />
+                        {panelDraft.customImage && (
+                          <button onClick={() => setPanelDraft(d=>({...d, customImage: ""}))}
+                            style={{ marginTop: 6, fontSize: "0.56rem", color: S.red, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                            ✕ Remove image
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pricing */}
+                  <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1.1rem" }}>
+                    <div style={{ fontSize: "0.72rem", fontWeight: 600, color: S.text, marginBottom: 12 }}>Pricing</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      {[
+                        { label: "Price (₹)", key: "price" as const },
+                        { label: "Compare at price / MRP (₹)", key: "mrp" as const },
+                      ].map(({ label, key }) => (
+                        <div key={key}>
+                          <label style={{ display: "block", fontSize: "0.6rem", fontWeight: 500, color: S.text, marginBottom: 5 }}>{label}</label>
+                          <div style={{ position: "relative" }}>
+                            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: "0.72rem", color: S.muted }}>₹</span>
+                            <input type="number" value={panelDraft[key]}
+                              onChange={e => setPanelDraft(d=>({...d, [key]: e.target.value}))}
+                              placeholder="0"
+                              style={{ width: "100%", padding: "0.6rem 0.75rem 0.6rem 1.4rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.75rem", color: S.text, outline: "none", boxSizing: "border-box" }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {panelDraft.price && panelDraft.mrp && parseInt(panelDraft.mrp) > parseInt(panelDraft.price) && (
+                      <div style={{ marginTop: 10, fontSize: "0.58rem", color: S.green, fontWeight: 600 }}>
+                        {Math.round((1 - parseInt(panelDraft.price)/parseInt(panelDraft.mrp))*100)}% discount applied
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* ── RIGHT COL ── */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+
+                  {/* Status */}
+                  <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1rem" }}>
+                    <div style={{ fontSize: "0.68rem", fontWeight: 600, color: S.text, marginBottom: 10 }}>Status</div>
+                    <select value={panelDraft.inStock ? "1" : "0"} onChange={e => setPanelDraft(d=>({...d, inStock: e.target.value==="1"}))}
+                      style={{ width: "100%", padding: "0.55rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.68rem", color: S.text, outline: "none", background: "#fff" }}>
+                      <option value="1">Active (In stock)</option>
+                      <option value="0">Draft (Out of stock)</option>
+                    </select>
+                  </div>
+
+                  {/* Category */}
+                  <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1rem" }}>
+                    <div style={{ fontSize: "0.68rem", fontWeight: 600, color: S.text, marginBottom: 10 }}>Category</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {(["APEX","SACRED","CIPHER"] as const).map(cat => (
+                        <label key={cat} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                          <input type="radio" name="cat" checked={panelDraft.category===cat} onChange={() => setPanelDraft(d=>({...d, category: cat}))} />
+                          <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "#5A2D91", background: "#E2D9F3", borderRadius: 20, padding: "0.18rem 0.6rem" }}>{cat}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sizes */}
+                  <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1rem" }}>
+                    <div style={{ fontSize: "0.68rem", fontWeight: 600, color: S.text, marginBottom: 10 }}>Sizes available</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {ALL_SIZES.map(sz => {
+                        const on = panelDraft.sizes.includes(sz);
+                        return (
+                          <button key={sz} onClick={() => toggleSize(sz)}
+                            style={{ padding: "0.3rem 0.65rem", borderRadius: 6, border: `1.5px solid ${on ? S.green : S.border}`, background: on ? "#D4EDDA" : S.bg, color: on ? "#155724" : S.muted, fontSize: "0.6rem", fontWeight: 700, cursor: "pointer" }}>
+                            {sz}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Limited */}
+                  <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1rem" }}>
+                    <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                      <div>
+                        <div style={{ fontSize: "0.68rem", fontWeight: 600, color: S.text }}>Limited edition</div>
+                        <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Shows "LIMITED" badge</div>
+                      </div>
+                      <div onClick={() => setPanelDraft(d=>({...d, limited: !d.limited}))}
+                        style={{ width: 38, height: 22, borderRadius: 11, background: panelDraft.limited ? S.green : "#C4CDD5", position: "relative", cursor: "pointer", transition: "background 0.2s", flexShrink: 0 }}>
+                        <div style={{ position: "absolute", top: 3, left: panelDraft.limited ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.15)" }} />
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Toast ── */}
       {toast && (
