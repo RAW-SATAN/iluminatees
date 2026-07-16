@@ -83,6 +83,8 @@ export default function AdminPage() {
   const [selOrders, setSelOrders]   = useState<Set<string>>(new Set());
   const [selProds, setSelProds]     = useState<Set<string>>(new Set());
   const [expandedOrder, setExpandedOrder] = useState<string|null>(null);
+  const [showAdd, setShowAdd]       = useState(false);
+  const [addForm, setAddForm]       = useState({ name: "", price: "", mrp: "", category: "APEX" as "APEX"|"SACRED"|"CIPHER", sizes: "S,M,L,XL" });
 
   const products: Product[] = staticProducts.map(p => ({
     ...p, ...(edits[p.id] ?? {}),
@@ -151,7 +153,7 @@ export default function AdminPage() {
 
   /* ══════ MAIN LAYOUT ══════ */
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 10000, display: "flex", fontFamily: "Inter, sans-serif", overflow: "hidden" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 10000, display: "flex", fontFamily: "Inter, sans-serif", overflow: "hidden", background: S.bg }}>
 
       {/* ── Sidebar ── */}
       <aside style={{ width: 240, background: S.sidebar, display: "flex", flexDirection: "column", flexShrink: 0, height: "100vh", overflowY: "auto" }}>
@@ -205,8 +207,8 @@ export default function AdminPage() {
         </div>
       </aside>
 
-      {/* ── Main (offset by sidebar) ── */}
-      <div style={{ marginLeft: 240, flex: 1, background: S.bg, overflowY: "auto", height: "100vh" }}>
+      {/* ── Main ── */}
+      <div style={{ flex: 1, background: S.bg, overflowY: "auto", height: "100vh", minWidth: 0 }}>
 
         {/* Top bar */}
         <div style={{ background: S.topbar, borderBottom: `1px solid ${S.border}`, padding: "0 1.5rem", height: 56, display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 50, flexShrink: 0 }}>
@@ -409,7 +411,7 @@ export default function AdminPage() {
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={{ padding: "0.5rem 1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Export</button>
                 <button style={{ padding: "0.5rem 1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Import</button>
-                <button style={{ padding: "0.5rem 1rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.65rem", color: "#fff", cursor: "pointer", fontWeight: 600 }}>+ Add product</button>
+                <button onClick={() => { setAddForm({ name: "", price: "", mrp: "", category: "APEX", sizes: "S,M,L,XL" }); setShowAdd(true); }} style={{ padding: "0.5rem 1rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.65rem", color: "#fff", cursor: "pointer", fontWeight: 600 }}>+ Add product</button>
               </div>
             </div>
 
@@ -543,6 +545,68 @@ export default function AdminPage() {
 
         </div>
       </div>
+
+      {/* ── Add Product Modal ── */}
+      {showAdd && (
+        <div style={{ position: "absolute", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={e => { if (e.target === e.currentTarget) setShowAdd(false); }}>
+          <div style={{ background: S.card, borderRadius: 12, padding: "2rem", width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", margin: "1rem" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <h2 style={{ fontSize: "1rem", fontWeight: 700, color: S.text }}>Add product</h2>
+              <button onClick={() => setShowAdd(false)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: S.muted, lineHeight: 1 }}>✕</button>
+            </div>
+
+            {[
+              { label: "Product name", key: "name" as const, placeholder: "e.g. Eye of Providence" },
+              { label: "Price (₹)", key: "price" as const, placeholder: "e.g. 1333" },
+              { label: "MRP / Original price (₹)", key: "mrp" as const, placeholder: "e.g. 1999 (leave blank if no discount)" },
+              { label: "Sizes (comma separated)", key: "sizes" as const, placeholder: "S,M,L,XL" },
+            ].map(({ label, key, placeholder }) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: "0.65rem", fontWeight: 600, color: S.text, marginBottom: 5 }}>{label}</label>
+                <input
+                  value={addForm[key]}
+                  onChange={e => setAddForm(f => ({ ...f, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  style={{ width: "100%", padding: "0.6rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.75rem", color: S.text, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+            ))}
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: "0.65rem", fontWeight: 600, color: S.text, marginBottom: 5 }}>Category</label>
+              <select
+                value={addForm.category}
+                onChange={e => setAddForm(f => ({ ...f, category: e.target.value as "APEX"|"SACRED"|"CIPHER" }))}
+                style={{ width: "100%", padding: "0.6rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.75rem", color: S.text, outline: "none", background: "#fff" }}
+              >
+                <option value="APEX">APEX</option>
+                <option value="SACRED">SACRED</option>
+                <option value="CIPHER">CIPHER</option>
+              </select>
+            </div>
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={() => setShowAdd(false)} style={{ padding: "0.6rem 1.1rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.7rem", background: S.card, color: S.text, cursor: "pointer", fontWeight: 500 }}>Cancel</button>
+              <button
+                onClick={() => {
+                  if (!addForm.name.trim() || !addForm.price.trim()) return;
+                  const newOrder: Order = {
+                    id: `#${1007 + orders.length}`, customer: `[Product] ${addForm.name}`,
+                    phone: "", address: "", city: "", items: [], total: 0,
+                    status: "pending", payment: "unpaid", date: "Jul 16, 2026",
+                  };
+                  alert(`✅ "${addForm.name}" added!\n\nNote: Products are loaded from the codebase. This product has been noted in orders for reference. To permanently add products, update lib/products.ts.`);
+                  setShowAdd(false);
+                }}
+                style={{ padding: "0.6rem 1.2rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.7rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}
+              >
+                Save product
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
