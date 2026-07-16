@@ -78,6 +78,24 @@ export const products: Product[] = [
     limited: false,
     tags: ["apex", "heavyweight", "oversized"],
   },
+  {
+    id: "custom-1784201245342",
+    slug: "the-sakura",
+    name: "The Sakura",
+    codename: "DOSSIER-1784201245342",
+    category: "APEX",
+    price: 2899,
+    originalPrice: 4399,
+    description: "",
+    lore: "",
+    symbol: "eye",
+    shirtColor: "#111111",
+    accentColor: "#c9a84c",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: [],
+  },
 ];
 
 export function getProductBySlug(slug: string): Product | undefined {
