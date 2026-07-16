@@ -727,13 +727,34 @@ export default function AdminPage() {
             }).catch(() => {});
           }
         }
+        function compressImage(dataUrl: string): Promise<string> {
+          return new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => {
+              const MAX = 900;
+              let w = img.width, h = img.height;
+              if (w > MAX || h > MAX) {
+                if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                else { w = Math.round(w * MAX / h); h = MAX; }
+              }
+              const canvas = document.createElement("canvas");
+              canvas.width = w; canvas.height = h;
+              canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+              resolve(canvas.toDataURL("image/jpeg", 0.72));
+            };
+            img.onerror = () => resolve(dataUrl);
+            img.src = dataUrl;
+          });
+        }
         function handleImageFiles(e: React.ChangeEvent<HTMLInputElement>) {
           const files = Array.from(e.target.files ?? []);
           files.forEach(file => {
             const reader = new FileReader();
-            reader.onload = ev => {
-              if (typeof ev.target?.result === "string")
-                setPanelDraft(d => ({ ...d, customImages: [...d.customImages, ev.target!.result as string] }));
+            reader.onload = async ev => {
+              if (typeof ev.target?.result === "string") {
+                const compressed = await compressImage(ev.target.result as string);
+                setPanelDraft(d => ({ ...d, customImages: [...d.customImages, compressed] }));
+              }
             };
             reader.readAsDataURL(file);
           });
