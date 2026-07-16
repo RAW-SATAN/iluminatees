@@ -166,7 +166,8 @@ const symbols: Record<string, (color: string) => React.ReactNode> = {
 };
 
 interface Props {
-  product: Pick<Product, "shirtColor" | "accentColor" | "symbol" | "slug">;
+  product: Pick<Product, "shirtColor" | "accentColor" | "symbol" | "slug"> &
+    Partial<Pick<Product, "name" | "customImage" | "customImages">>;
   size?: number;
   className?: string;
   colorOverride?: string;
@@ -175,6 +176,21 @@ interface Props {
 export function ProductMockup({ product, size = 260, className, colorOverride }: Props) {
   const { accentColor, symbol, slug } = product;
   const shirtColor = colorOverride ?? product.shirtColor;
+
+  /* Real product photo wins over the drawn mockup wherever this component is used */
+  const photo = product.customImage ?? product.customImages?.[0];
+  if (photo) {
+    return (
+      <img
+        src={photo}
+        alt={product.name}
+        className={className}
+        width={size}
+        height={size * 1.2}
+        style={{ width: size, height: size * 1.2, objectFit: "cover", pointerEvents: "none" }}
+      />
+    );
+  }
   const SymbolEl = symbols[symbol] ?? symbols.eye;
   /* Use slug (unique per product) as the SVG ID prefix so multiple
      ProductMockup instances with the same symbol never share gradient IDs. */
