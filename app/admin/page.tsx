@@ -105,6 +105,7 @@ export default function AdminPage() {
   const [addedProducts, setAddedProducts] = useLS<CustomProduct[]>(ADDED_KEY, []);
   const [deletedIds, setDeletedIds] = useLS<string[]>(DELETED_KEY, []);
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [toast, setToast]           = useState<string|null>(null);
 
   function showToast(msg: string) {
@@ -146,6 +147,15 @@ export default function AdminPage() {
     setPanelProduct(null);
     setConfirmDelete(null);
     showToast(`🗑️ "${name}" deleted`);
+  }
+
+  function bulkDeleteProducts() {
+    const ids = Array.from(selProds);
+    setDeletedIds([...deletedIds, ...ids]);
+    setAddedProducts(addedProducts.filter(p => !selProds.has(p.id)));
+    setSelProds(new Set());
+    setConfirmBulkDelete(false);
+    showToast(`🗑️ ${ids.length} product${ids.length > 1 ? "s" : ""} deleted`);
   }
 
   const revenue  = orders.filter(o => o.payment === "paid").reduce((s, o) => s + o.total, 0);
@@ -483,6 +493,42 @@ export default function AdminPage() {
                 <button style={{ padding: "0.4rem 0.85rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>Category ⌄</button>
                 <button style={{ padding: "0.4rem 0.85rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>Stock ⌄</button>
               </div>
+
+              {/* Bulk action bar */}
+              {selProds.size > 0 && (
+                <div style={{ padding: "0.65rem 1rem", borderBottom: `1px solid ${S.border}`, background: "#EAF4FF", display: "flex", alignItems: "center", gap: 12 }}>
+                  <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "#004085" }}>
+                    {selProds.size} product{selProds.size > 1 ? "s" : ""} selected
+                  </span>
+                  <div style={{ flex: 1 }} />
+                  {confirmBulkDelete ? (
+                    <>
+                      <span style={{ fontSize: "0.62rem", color: S.red, fontWeight: 600 }}>
+                        Delete {selProds.size} product{selProds.size > 1 ? "s" : ""}?
+                      </span>
+                      <button onClick={bulkDeleteProducts}
+                        style={{ padding: "0.38rem 0.9rem", background: S.red, border: "none", borderRadius: 7, fontSize: "0.62rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>
+                        Confirm
+                      </button>
+                      <button onClick={() => setConfirmBulkDelete(false)}
+                        style={{ padding: "0.38rem 0.9rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 7, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => setConfirmBulkDelete(true)}
+                        style={{ padding: "0.38rem 0.9rem", background: S.red, border: "none", borderRadius: 7, fontSize: "0.62rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>
+                        🗑️ Delete selected
+                      </button>
+                      <button onClick={() => setSelProds(new Set())}
+                        style={{ padding: "0.38rem 0.9rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 7, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>
+                        Clear selection
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
 
               {/* Table */}
               <div style={{ overflowX: "auto" }}>
