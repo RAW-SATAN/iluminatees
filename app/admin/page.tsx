@@ -7,6 +7,7 @@ import { ProductMockup } from "@/components/ProductMockup";
 const ADMIN_PASSWORD = "ILUM2026";
 const ORDER_KEY      = "iluminatees_orders";
 const EDITS_KEY      = "iluminatees_product_edits";
+const ADDED_KEY      = "iluminatees_added_products";
 
 /* ── Types ── */
 type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
@@ -17,6 +18,10 @@ interface Order {
   payment: "paid" | "unpaid" | "cod"; date: string;
 }
 interface ProductEdit { price?: number; originalPrice?: number | null; inStock?: boolean }
+interface CustomProduct {
+  id: string; slug: string; name: string; category: "APEX"|"SACRED"|"CIPHER";
+  price: number; originalPrice?: number; sizes: string; inStock: boolean; limited: boolean;
+}
 
 function useLS<T>(key: string, init: T) {
   const [v, setV] = useState<T>(init);
@@ -85,11 +90,31 @@ export default function AdminPage() {
   const [expandedOrder, setExpandedOrder] = useState<string|null>(null);
   const [showAdd, setShowAdd]       = useState(false);
   const [addForm, setAddForm]       = useState({ name: "", price: "", mrp: "", category: "APEX" as "APEX"|"SACRED"|"CIPHER", sizes: "S,M,L,XL" });
+  const [addedProducts, setAddedProducts] = useLS<CustomProduct[]>(ADDED_KEY, []);
+  const [toast, setToast]           = useState<string|null>(null);
 
-  const products: Product[] = staticProducts.map(p => ({
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }
+
+  const staticMapped: Product[] = staticProducts.map(p => ({
     ...p, ...(edits[p.id] ?? {}),
     originalPrice: edits[p.id]?.originalPrice === null ? undefined : (edits[p.id]?.originalPrice ?? p.originalPrice),
   }));
+  const customMapped: Product[] = addedProducts.map(cp => {
+    const e = edits[cp.id] ?? {};
+    return {
+      id: cp.id, slug: cp.slug, name: cp.name, codename: cp.id.toUpperCase(),
+      category: cp.category,
+      price: e.price ?? cp.price,
+      originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? cp.originalPrice),
+      description: "", lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
+      sizes: (cp.sizes.split(",").map(s => s.trim()) as Product["sizes"]),
+      inStock: e.inStock ?? cp.inStock, limited: cp.limited, tags: ["custom"],
+    };
+  });
+  const products: Product[] = [...staticMapped, ...customMapped];
 
   const revenue  = orders.filter(o => o.payment === "paid").reduce((s, o) => s + o.total, 0);
   const pending  = orders.filter(o => o.status === "pending").length;
@@ -546,6 +571,13 @@ export default function AdminPage() {
         </div>
       </div>
 
+      {/* ── Toast ── */}
+      {toast && (
+        <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 300, background: "#1a2e1a", color: "#fff", padding: "0.75rem 1.4rem", borderRadius: 10, fontSize: "0.72rem", fontWeight: 600, boxShadow: "0 8px 30px rgba(0,0,0,0.25)", whiteSpace: "nowrap", pointerEvents: "none" }}>
+          {toast}
+        </div>
+      )}
+
       {/* ── Add Product Modal ── */}
       {showAdd && (
         <div style={{ position: "absolute", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}
@@ -591,13 +623,19 @@ export default function AdminPage() {
               <button
                 onClick={() => {
                   if (!addForm.name.trim() || !addForm.price.trim()) return;
-                  const newOrder: Order = {
-                    id: `#${1007 + orders.length}`, customer: `[Product] ${addForm.name}`,
-                    phone: "", address: "", city: "", items: [], total: 0,
-                    status: "pending", payment: "unpaid", date: "Jul 16, 2026",
+                  const id = `custom-${Date.now()}`;
+                  const slug = addForm.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+                  const newP: CustomProduct = {
+                    id, slug, name: addForm.name.trim(),
+                    category: addForm.category,
+                    price: parseInt(addForm.price) || 0,
+                    originalPrice: addForm.mrp.trim() ? (parseInt(addForm.mrp) || undefined) : undefined,
+                    sizes: addForm.sizes || "S,M,L,XL",
+                    inStock: true, limited: false,
                   };
-                  alert(`✅ "${addForm.name}" added!\n\nNote: Products are loaded from the codebase. This product has been noted in orders for reference. To permanently add products, update lib/products.ts.`);
+                  setAddedProducts([...addedProducts, newP]);
                   setShowAdd(false);
+                  showToast(`✅ "${newP.name}" added to products`);
                 }}
                 style={{ padding: "0.6rem 1.2rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.7rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}
               >
