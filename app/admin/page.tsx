@@ -766,6 +766,7 @@ export default function AdminPage() {
                 { key: "0", label: "Slide 1 — the KATANA" },
                 { key: "1", label: "Slide 2 — The Black. Samurai" },
                 { key: "2", label: "Slide 3 — The Bankai" },
+                { key: "3", label: "Slide 4 — The Sakura" },
               ].map(({ key, label }) => {
                 const banner = siteAssets.heroBanners[key];
                 const busy = assetBusy === `hero:${key}`;

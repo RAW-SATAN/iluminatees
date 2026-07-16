@@ -48,14 +48,19 @@ const SLIDES = [
     sideActiveBg:"rgba(144,144,255,0.16)",
     sideActive:  "#7070ee",
   },
-];
-
-const EXTRA_CATS = [
-  { label: "CIPHER",      emoji: "◈", href: "/shop?cat=CIPHER", sideBg: "rgba(0,160,200,0.10)", sideActive: "#0090bb" },
-  { label: "OVERSIZED",   emoji: "□", href: "/shop",            sideBg: "rgba(80,100,120,0.10)", sideActive: "#607080" },
-  { label: "HEAVYWEIGHT", emoji: "▣", href: "/shop",            sideBg: "rgba(100,70,50,0.10)",  sideActive: "#7a5040" },
-  { label: "MENS",        emoji: "▲", href: "/shop",            sideBg: "rgba(40,55,70,0.10)",   sideActive: "#405060" },
-  { label: "SALE",        emoji: "%", href: "/shop",            sideBg: "rgba(232,0,13,0.10)",   sideActive: "#e8000d" },
+  {
+    slug:        "the-sakura",
+    tag:         "NEW DROP",
+    subtext:     "240 GSM · Oversized · Pre-shrunk Cotton",
+    bg:          "linear-gradient(135deg, #1a0a0a10 0%, #e39bb018 100%), radial-gradient(ellipse 80% 70% at 35% 55%, rgba(227,155,176,0.20) 0%, transparent 65%), #fdf5f7",
+    accentColor: "#e39bb0",
+    textColor:   "#111",
+    sideLabel:   "SAKURA",
+    sideEmoji:   "🌸",
+    sideBg:      "rgba(227,155,176,0.10)",
+    sideActiveBg:"rgba(227,155,176,0.18)",
+    sideActive:  "#d98aa2",
+  },
 ];
 
 /* ── Component ──────────────────────────────────────────── */
@@ -145,41 +150,6 @@ export function Hero() {
           );
         })}
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "#222", margin: "3px 0" }} />
-
-        {/* Extra cats */}
-        {EXTRA_CATS.map(({ label, emoji, href, sideBg, sideActive }) => (
-          <Link
-            key={label}
-            href={href}
-            style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "10px 13px",
-              borderLeft: "3px solid transparent",
-              borderBottom: "1px solid #1e1e1e",
-              textDecoration: "none",
-              transition: "background 0.15s",
-            }}
-          >
-            <div style={{
-              width: 36, height: 36, borderRadius: 3, flexShrink: 0,
-              background: sideBg,
-              border: "1px solid rgba(255,255,255,0.07)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 13,
-            }}>
-              {emoji}
-            </div>
-            <span style={{
-              fontFamily: "Inter, sans-serif", fontSize: "0.55rem",
-              fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
-              color: "rgba(255,255,255,0.35)",
-            }}>
-              {label}
-            </span>
-          </Link>
-        ))}
       </div>
 
       {/* ── Center Carousel ───────────────────────────── */}
