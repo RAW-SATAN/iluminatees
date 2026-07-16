@@ -20,68 +20,78 @@ export function useProducts(): Product[] {
   const [all, setAll] = useState<Product[]>(staticProducts);
 
   useEffect(() => {
-    try {
-      const edits: Record<string, ProductEdit> = JSON.parse(localStorage.getItem(EDITS_KEY) ?? "{}");
-      const added: CustomProduct[]             = JSON.parse(localStorage.getItem(ADDED_KEY)   ?? "[]");
-      const deleted: string[]                  = JSON.parse(localStorage.getItem(DELETED_KEY) ?? "[]");
+    async function load() {
+      try {
+        /* ── Permanent images from server (overrides localStorage) ── */
+        let permanentImages: Record<string, string[]> = {};
+        try {
+          const res = await fetch("/product-images.json", { cache: "no-store" });
+          if (res.ok) permanentImages = await res.json();
+        } catch {}
 
-      const applyEdit = (base: Product, e: ProductEdit): Product => ({
-        ...base,
-        name:          e.name          ?? base.name,
-        description:   e.description   ?? base.description,
-        category:      e.category      ?? base.category,
-        sizes:         e.sizes ? (e.sizes.split(",").map(s => s.trim()) as Product["sizes"]) : base.sizes,
-        limited:       e.limited       ?? base.limited,
-        price:         e.price         ?? base.price,
-        originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? base.originalPrice),
-        inStock:       e.inStock       ?? base.inStock,
-        customImage:   e.customImages?.[0] || e.customImage || base.customImage,
-      });
+        const edits: Record<string, ProductEdit> = JSON.parse(localStorage.getItem(EDITS_KEY) ?? "{}");
+        const added: CustomProduct[]             = JSON.parse(localStorage.getItem(ADDED_KEY)   ?? "[]");
+        const deleted: string[]                  = JSON.parse(localStorage.getItem(DELETED_KEY) ?? "[]");
 
-      // Collect images from custom products that duplicate static ones (by slug)
-      const customImageBySlug: Record<string, string> = {};
-      added.forEach(cp => {
-        const ce = edits[cp.id] ?? {};
-        const img = ce.customImages?.[0] || ce.customImage;
-        if (img) customImageBySlug[cp.slug] = img;
-      });
-
-      const staticMapped = staticProducts.map(p => {
-        const e = edits[p.id] ?? {};
-        const result = applyEdit(p, e);
-        // If no image set on static product, inherit from matching custom product
-        if (!result.customImage && customImageBySlug[p.slug]) {
-          return { ...result, customImage: customImageBySlug[p.slug] };
-        }
-        return result;
-      });
-
-      // Deduplicate: skip custom products whose slug matches a static product
-      const staticSlugs = new Set(staticMapped.map(p => p.slug));
-      const customMapped: Product[] = added
-        .filter(cp => !staticSlugs.has(cp.slug))
-        .map(cp => {
-          const e = edits[cp.id] ?? {};
-          const base: Product = {
-            id: cp.id, slug: cp.slug,
-            name:          cp.name,
-            codename:      cp.id.toUpperCase(),
-            category:      cp.category,
-            price:         cp.price,
-            originalPrice: cp.originalPrice,
-            description:   "",
-            lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
-            sizes: cp.sizes.split(",").map(s => s.trim()) as Product["sizes"],
-            inStock: cp.inStock,
-            limited: cp.limited,
-            tags: ["custom"],
-          };
-          return applyEdit(base, e);
+        const applyEdit = (base: Product, e: ProductEdit, slug: string): Product => ({
+          ...base,
+          name:          e.name          ?? base.name,
+          description:   e.description   ?? base.description,
+          category:      e.category      ?? base.category,
+          sizes:         e.sizes ? (e.sizes.split(",").map(s => s.trim()) as Product["sizes"]) : base.sizes,
+          limited:       e.limited       ?? base.limited,
+          price:         e.price         ?? base.price,
+          originalPrice: e.originalPrice === null ? undefined : (e.originalPrice ?? base.originalPrice),
+          inStock:       e.inStock       ?? base.inStock,
+          /* Permanent images (from GitHub/Vercel) take priority over localStorage */
+          customImage:   permanentImages[slug]?.[0] || e.customImages?.[0] || e.customImage || base.customImage,
         });
 
-      // Static products are never deleted via localStorage — only custom products filter by deletedIds
-      setAll([...staticMapped, ...customMapped.filter(p => !deleted.includes(p.id))]);
-    } catch {}
+        /* Collect images from custom products that duplicate static ones (by slug) */
+        const customImageBySlug: Record<string, string> = {};
+        added.forEach(cp => {
+          const ce = edits[cp.id] ?? {};
+          const img = permanentImages[cp.slug]?.[0] || ce.customImages?.[0] || ce.customImage;
+          if (img) customImageBySlug[cp.slug] = img;
+        });
+
+        const staticMapped = staticProducts.map(p => {
+          const e = edits[p.id] ?? {};
+          const result = applyEdit(p, e, p.slug);
+          if (!result.customImage && customImageBySlug[p.slug]) {
+            return { ...result, customImage: customImageBySlug[p.slug] };
+          }
+          return result;
+        });
+
+        /* Deduplicate: skip custom products whose slug matches a static product */
+        const staticSlugs = new Set(staticMapped.map(p => p.slug));
+        const customMapped: Product[] = added
+          .filter(cp => !staticSlugs.has(cp.slug))
+          .map(cp => {
+            const e = edits[cp.id] ?? {};
+            const base: Product = {
+              id: cp.id, slug: cp.slug,
+              name:          cp.name,
+              codename:      cp.id.toUpperCase(),
+              category:      cp.category,
+              price:         cp.price,
+              originalPrice: cp.originalPrice,
+              description:   "",
+              lore: "", symbol: "eye" as const, shirtColor: "#111", accentColor: "#c9a84c",
+              sizes: cp.sizes.split(",").map(s => s.trim()) as Product["sizes"],
+              inStock: cp.inStock,
+              limited: cp.limited,
+              tags: ["custom"],
+            };
+            return applyEdit(base, e, cp.slug);
+          });
+
+        /* Static products are never deleted via localStorage */
+        setAll([...staticMapped, ...customMapped.filter(p => !deleted.includes(p.id))]);
+      } catch {}
+    }
+    load();
   }, []);
 
   return all;
