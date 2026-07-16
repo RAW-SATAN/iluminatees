@@ -18,6 +18,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type Order = $Result.DefaultSelection<Prisma.$OrderPayload>
+/**
+ * Model StoreSetting
+ * 
+ */
+export type StoreSetting = $Result.DefaultSelection<Prisma.$StoreSettingPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -149,6 +154,16 @@ export class PrismaClient<
     * ```
     */
   get order(): Prisma.OrderDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.storeSetting`: Exposes CRUD operations for the **StoreSetting** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StoreSettings
+    * const storeSettings = await prisma.storeSetting.findMany()
+    * ```
+    */
+  get storeSetting(): Prisma.StoreSettingDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -583,7 +598,8 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    Order: 'Order'
+    Order: 'Order',
+    StoreSetting: 'StoreSetting'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -599,7 +615,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "order"
+      modelProps: "order" | "storeSetting"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -674,6 +690,80 @@ export namespace Prisma {
           count: {
             args: Prisma.OrderCountArgs<ExtArgs>
             result: $Utils.Optional<OrderCountAggregateOutputType> | number
+          }
+        }
+      }
+      StoreSetting: {
+        payload: Prisma.$StoreSettingPayload<ExtArgs>
+        fields: Prisma.StoreSettingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StoreSettingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StoreSettingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>
+          }
+          findFirst: {
+            args: Prisma.StoreSettingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StoreSettingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>
+          }
+          findMany: {
+            args: Prisma.StoreSettingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>[]
+          }
+          create: {
+            args: Prisma.StoreSettingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>
+          }
+          createMany: {
+            args: Prisma.StoreSettingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StoreSettingCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>[]
+          }
+          delete: {
+            args: Prisma.StoreSettingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>
+          }
+          update: {
+            args: Prisma.StoreSettingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>
+          }
+          deleteMany: {
+            args: Prisma.StoreSettingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StoreSettingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.StoreSettingUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>[]
+          }
+          upsert: {
+            args: Prisma.StoreSettingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StoreSettingPayload>
+          }
+          aggregate: {
+            args: Prisma.StoreSettingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStoreSetting>
+          }
+          groupBy: {
+            args: Prisma.StoreSettingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StoreSettingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StoreSettingCountArgs<ExtArgs>
+            result: $Utils.Optional<StoreSettingCountAggregateOutputType> | number
           }
         }
       }
@@ -786,6 +876,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     order?: OrderOmit
+    storeSetting?: StoreSettingOmit
   }
 
   /* Types for Logging */
@@ -1975,6 +2066,967 @@ export namespace Prisma {
 
 
   /**
+   * Model StoreSetting
+   */
+
+  export type AggregateStoreSetting = {
+    _count: StoreSettingCountAggregateOutputType | null
+    _min: StoreSettingMinAggregateOutputType | null
+    _max: StoreSettingMaxAggregateOutputType | null
+  }
+
+  export type StoreSettingMinAggregateOutputType = {
+    key: string | null
+    value: string | null
+  }
+
+  export type StoreSettingMaxAggregateOutputType = {
+    key: string | null
+    value: string | null
+  }
+
+  export type StoreSettingCountAggregateOutputType = {
+    key: number
+    value: number
+    _all: number
+  }
+
+
+  export type StoreSettingMinAggregateInputType = {
+    key?: true
+    value?: true
+  }
+
+  export type StoreSettingMaxAggregateInputType = {
+    key?: true
+    value?: true
+  }
+
+  export type StoreSettingCountAggregateInputType = {
+    key?: true
+    value?: true
+    _all?: true
+  }
+
+  export type StoreSettingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StoreSetting to aggregate.
+     */
+    where?: StoreSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StoreSettings to fetch.
+     */
+    orderBy?: StoreSettingOrderByWithRelationInput | StoreSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StoreSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StoreSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StoreSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StoreSettings
+    **/
+    _count?: true | StoreSettingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StoreSettingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StoreSettingMaxAggregateInputType
+  }
+
+  export type GetStoreSettingAggregateType<T extends StoreSettingAggregateArgs> = {
+        [P in keyof T & keyof AggregateStoreSetting]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStoreSetting[P]>
+      : GetScalarType<T[P], AggregateStoreSetting[P]>
+  }
+
+
+
+
+  export type StoreSettingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StoreSettingWhereInput
+    orderBy?: StoreSettingOrderByWithAggregationInput | StoreSettingOrderByWithAggregationInput[]
+    by: StoreSettingScalarFieldEnum[] | StoreSettingScalarFieldEnum
+    having?: StoreSettingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StoreSettingCountAggregateInputType | true
+    _min?: StoreSettingMinAggregateInputType
+    _max?: StoreSettingMaxAggregateInputType
+  }
+
+  export type StoreSettingGroupByOutputType = {
+    key: string
+    value: string
+    _count: StoreSettingCountAggregateOutputType | null
+    _min: StoreSettingMinAggregateOutputType | null
+    _max: StoreSettingMaxAggregateOutputType | null
+  }
+
+  type GetStoreSettingGroupByPayload<T extends StoreSettingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StoreSettingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StoreSettingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StoreSettingGroupByOutputType[P]>
+            : GetScalarType<T[P], StoreSettingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StoreSettingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    value?: boolean
+  }, ExtArgs["result"]["storeSetting"]>
+
+  export type StoreSettingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    value?: boolean
+  }, ExtArgs["result"]["storeSetting"]>
+
+  export type StoreSettingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    value?: boolean
+  }, ExtArgs["result"]["storeSetting"]>
+
+  export type StoreSettingSelectScalar = {
+    key?: boolean
+    value?: boolean
+  }
+
+  export type StoreSettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"key" | "value", ExtArgs["result"]["storeSetting"]>
+
+  export type $StoreSettingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StoreSetting"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      key: string
+      value: string
+    }, ExtArgs["result"]["storeSetting"]>
+    composites: {}
+  }
+
+  type StoreSettingGetPayload<S extends boolean | null | undefined | StoreSettingDefaultArgs> = $Result.GetResult<Prisma.$StoreSettingPayload, S>
+
+  type StoreSettingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<StoreSettingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: StoreSettingCountAggregateInputType | true
+    }
+
+  export interface StoreSettingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StoreSetting'], meta: { name: 'StoreSetting' } }
+    /**
+     * Find zero or one StoreSetting that matches the filter.
+     * @param {StoreSettingFindUniqueArgs} args - Arguments to find a StoreSetting
+     * @example
+     * // Get one StoreSetting
+     * const storeSetting = await prisma.storeSetting.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StoreSettingFindUniqueArgs>(args: SelectSubset<T, StoreSettingFindUniqueArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one StoreSetting that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {StoreSettingFindUniqueOrThrowArgs} args - Arguments to find a StoreSetting
+     * @example
+     * // Get one StoreSetting
+     * const storeSetting = await prisma.storeSetting.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StoreSettingFindUniqueOrThrowArgs>(args: SelectSubset<T, StoreSettingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StoreSetting that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StoreSettingFindFirstArgs} args - Arguments to find a StoreSetting
+     * @example
+     * // Get one StoreSetting
+     * const storeSetting = await prisma.storeSetting.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StoreSettingFindFirstArgs>(args?: SelectSubset<T, StoreSettingFindFirstArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StoreSetting that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StoreSettingFindFirstOrThrowArgs} args - Arguments to find a StoreSetting
+     * @example
+     * // Get one StoreSetting
+     * const storeSetting = await prisma.storeSetting.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StoreSettingFindFirstOrThrowArgs>(args?: SelectSubset<T, StoreSettingFindFirstOrThrowArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more StoreSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StoreSettingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StoreSettings
+     * const storeSettings = await prisma.storeSetting.findMany()
+     * 
+     * // Get first 10 StoreSettings
+     * const storeSettings = await prisma.storeSetting.findMany({ take: 10 })
+     * 
+     * // Only select the `key`
+     * const storeSettingWithKeyOnly = await prisma.storeSetting.findMany({ select: { key: true } })
+     * 
+     */
+    findMany<T extends StoreSettingFindManyArgs>(args?: SelectSubset<T, StoreSettingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a StoreSetting.
+     * @param {StoreSettingCreateArgs} args - Arguments to create a StoreSetting.
+     * @example
+     * // Create one StoreSetting
+     * const StoreSetting = await prisma.storeSetting.create({
+     *   data: {
+     *     // ... data to create a StoreSetting
+     *   }
+     * })
+     * 
+     */
+    create<T extends StoreSettingCreateArgs>(args: SelectSubset<T, StoreSettingCreateArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many StoreSettings.
+     * @param {StoreSettingCreateManyArgs} args - Arguments to create many StoreSettings.
+     * @example
+     * // Create many StoreSettings
+     * const storeSetting = await prisma.storeSetting.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StoreSettingCreateManyArgs>(args?: SelectSubset<T, StoreSettingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StoreSettings and returns the data saved in the database.
+     * @param {StoreSettingCreateManyAndReturnArgs} args - Arguments to create many StoreSettings.
+     * @example
+     * // Create many StoreSettings
+     * const storeSetting = await prisma.storeSetting.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StoreSettings and only return the `key`
+     * const storeSettingWithKeyOnly = await prisma.storeSetting.createManyAndReturn({
+     *   select: { key: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StoreSettingCreateManyAndReturnArgs>(args?: SelectSubset<T, StoreSettingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a StoreSetting.
+     * @param {StoreSettingDeleteArgs} args - Arguments to delete one StoreSetting.
+     * @example
+     * // Delete one StoreSetting
+     * const StoreSetting = await prisma.storeSetting.delete({
+     *   where: {
+     *     // ... filter to delete one StoreSetting
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StoreSettingDeleteArgs>(args: SelectSubset<T, StoreSettingDeleteArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one StoreSetting.
+     * @param {StoreSettingUpdateArgs} args - Arguments to update one StoreSetting.
+     * @example
+     * // Update one StoreSetting
+     * const storeSetting = await prisma.storeSetting.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StoreSettingUpdateArgs>(args: SelectSubset<T, StoreSettingUpdateArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more StoreSettings.
+     * @param {StoreSettingDeleteManyArgs} args - Arguments to filter StoreSettings to delete.
+     * @example
+     * // Delete a few StoreSettings
+     * const { count } = await prisma.storeSetting.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StoreSettingDeleteManyArgs>(args?: SelectSubset<T, StoreSettingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StoreSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StoreSettingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StoreSettings
+     * const storeSetting = await prisma.storeSetting.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StoreSettingUpdateManyArgs>(args: SelectSubset<T, StoreSettingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StoreSettings and returns the data updated in the database.
+     * @param {StoreSettingUpdateManyAndReturnArgs} args - Arguments to update many StoreSettings.
+     * @example
+     * // Update many StoreSettings
+     * const storeSetting = await prisma.storeSetting.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more StoreSettings and only return the `key`
+     * const storeSettingWithKeyOnly = await prisma.storeSetting.updateManyAndReturn({
+     *   select: { key: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends StoreSettingUpdateManyAndReturnArgs>(args: SelectSubset<T, StoreSettingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one StoreSetting.
+     * @param {StoreSettingUpsertArgs} args - Arguments to update or create a StoreSetting.
+     * @example
+     * // Update or create a StoreSetting
+     * const storeSetting = await prisma.storeSetting.upsert({
+     *   create: {
+     *     // ... data to create a StoreSetting
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StoreSetting we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StoreSettingUpsertArgs>(args: SelectSubset<T, StoreSettingUpsertArgs<ExtArgs>>): Prisma__StoreSettingClient<$Result.GetResult<Prisma.$StoreSettingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of StoreSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StoreSettingCountArgs} args - Arguments to filter StoreSettings to count.
+     * @example
+     * // Count the number of StoreSettings
+     * const count = await prisma.storeSetting.count({
+     *   where: {
+     *     // ... the filter for the StoreSettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends StoreSettingCountArgs>(
+      args?: Subset<T, StoreSettingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StoreSettingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StoreSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StoreSettingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StoreSettingAggregateArgs>(args: Subset<T, StoreSettingAggregateArgs>): Prisma.PrismaPromise<GetStoreSettingAggregateType<T>>
+
+    /**
+     * Group by StoreSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StoreSettingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StoreSettingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StoreSettingGroupByArgs['orderBy'] }
+        : { orderBy?: StoreSettingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StoreSettingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStoreSettingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StoreSetting model
+   */
+  readonly fields: StoreSettingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StoreSetting.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StoreSettingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StoreSetting model
+   */
+  interface StoreSettingFieldRefs {
+    readonly key: FieldRef<"StoreSetting", 'String'>
+    readonly value: FieldRef<"StoreSetting", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StoreSetting findUnique
+   */
+  export type StoreSettingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which StoreSetting to fetch.
+     */
+    where: StoreSettingWhereUniqueInput
+  }
+
+  /**
+   * StoreSetting findUniqueOrThrow
+   */
+  export type StoreSettingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which StoreSetting to fetch.
+     */
+    where: StoreSettingWhereUniqueInput
+  }
+
+  /**
+   * StoreSetting findFirst
+   */
+  export type StoreSettingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which StoreSetting to fetch.
+     */
+    where?: StoreSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StoreSettings to fetch.
+     */
+    orderBy?: StoreSettingOrderByWithRelationInput | StoreSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StoreSettings.
+     */
+    cursor?: StoreSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StoreSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StoreSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StoreSettings.
+     */
+    distinct?: StoreSettingScalarFieldEnum | StoreSettingScalarFieldEnum[]
+  }
+
+  /**
+   * StoreSetting findFirstOrThrow
+   */
+  export type StoreSettingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which StoreSetting to fetch.
+     */
+    where?: StoreSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StoreSettings to fetch.
+     */
+    orderBy?: StoreSettingOrderByWithRelationInput | StoreSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StoreSettings.
+     */
+    cursor?: StoreSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StoreSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StoreSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StoreSettings.
+     */
+    distinct?: StoreSettingScalarFieldEnum | StoreSettingScalarFieldEnum[]
+  }
+
+  /**
+   * StoreSetting findMany
+   */
+  export type StoreSettingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which StoreSettings to fetch.
+     */
+    where?: StoreSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StoreSettings to fetch.
+     */
+    orderBy?: StoreSettingOrderByWithRelationInput | StoreSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StoreSettings.
+     */
+    cursor?: StoreSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StoreSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StoreSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StoreSettings.
+     */
+    distinct?: StoreSettingScalarFieldEnum | StoreSettingScalarFieldEnum[]
+  }
+
+  /**
+   * StoreSetting create
+   */
+  export type StoreSettingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to create a StoreSetting.
+     */
+    data: XOR<StoreSettingCreateInput, StoreSettingUncheckedCreateInput>
+  }
+
+  /**
+   * StoreSetting createMany
+   */
+  export type StoreSettingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StoreSettings.
+     */
+    data: StoreSettingCreateManyInput | StoreSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StoreSetting createManyAndReturn
+   */
+  export type StoreSettingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * The data used to create many StoreSettings.
+     */
+    data: StoreSettingCreateManyInput | StoreSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StoreSetting update
+   */
+  export type StoreSettingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to update a StoreSetting.
+     */
+    data: XOR<StoreSettingUpdateInput, StoreSettingUncheckedUpdateInput>
+    /**
+     * Choose, which StoreSetting to update.
+     */
+    where: StoreSettingWhereUniqueInput
+  }
+
+  /**
+   * StoreSetting updateMany
+   */
+  export type StoreSettingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StoreSettings.
+     */
+    data: XOR<StoreSettingUpdateManyMutationInput, StoreSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which StoreSettings to update
+     */
+    where?: StoreSettingWhereInput
+    /**
+     * Limit how many StoreSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StoreSetting updateManyAndReturn
+   */
+  export type StoreSettingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * The data used to update StoreSettings.
+     */
+    data: XOR<StoreSettingUpdateManyMutationInput, StoreSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which StoreSettings to update
+     */
+    where?: StoreSettingWhereInput
+    /**
+     * Limit how many StoreSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StoreSetting upsert
+   */
+  export type StoreSettingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * The filter to search for the StoreSetting to update in case it exists.
+     */
+    where: StoreSettingWhereUniqueInput
+    /**
+     * In case the StoreSetting found by the `where` argument doesn't exist, create a new StoreSetting with this data.
+     */
+    create: XOR<StoreSettingCreateInput, StoreSettingUncheckedCreateInput>
+    /**
+     * In case the StoreSetting was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StoreSettingUpdateInput, StoreSettingUncheckedUpdateInput>
+  }
+
+  /**
+   * StoreSetting delete
+   */
+  export type StoreSettingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+    /**
+     * Filter which StoreSetting to delete.
+     */
+    where: StoreSettingWhereUniqueInput
+  }
+
+  /**
+   * StoreSetting deleteMany
+   */
+  export type StoreSettingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StoreSettings to delete
+     */
+    where?: StoreSettingWhereInput
+    /**
+     * Limit how many StoreSettings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * StoreSetting without action
+   */
+  export type StoreSettingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StoreSetting
+     */
+    select?: StoreSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StoreSetting
+     */
+    omit?: StoreSettingOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -2003,6 +3055,14 @@ export namespace Prisma {
   };
 
   export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+  export const StoreSettingScalarFieldEnum: {
+    key: 'key',
+    value: 'value'
+  };
+
+  export type StoreSettingScalarFieldEnum = (typeof StoreSettingScalarFieldEnum)[keyof typeof StoreSettingScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -2199,6 +3259,43 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
   }
 
+  export type StoreSettingWhereInput = {
+    AND?: StoreSettingWhereInput | StoreSettingWhereInput[]
+    OR?: StoreSettingWhereInput[]
+    NOT?: StoreSettingWhereInput | StoreSettingWhereInput[]
+    key?: StringFilter<"StoreSetting"> | string
+    value?: StringFilter<"StoreSetting"> | string
+  }
+
+  export type StoreSettingOrderByWithRelationInput = {
+    key?: SortOrder
+    value?: SortOrder
+  }
+
+  export type StoreSettingWhereUniqueInput = Prisma.AtLeast<{
+    key?: string
+    AND?: StoreSettingWhereInput | StoreSettingWhereInput[]
+    OR?: StoreSettingWhereInput[]
+    NOT?: StoreSettingWhereInput | StoreSettingWhereInput[]
+    value?: StringFilter<"StoreSetting"> | string
+  }, "key">
+
+  export type StoreSettingOrderByWithAggregationInput = {
+    key?: SortOrder
+    value?: SortOrder
+    _count?: StoreSettingCountOrderByAggregateInput
+    _max?: StoreSettingMaxOrderByAggregateInput
+    _min?: StoreSettingMinOrderByAggregateInput
+  }
+
+  export type StoreSettingScalarWhereWithAggregatesInput = {
+    AND?: StoreSettingScalarWhereWithAggregatesInput | StoreSettingScalarWhereWithAggregatesInput[]
+    OR?: StoreSettingScalarWhereWithAggregatesInput[]
+    NOT?: StoreSettingScalarWhereWithAggregatesInput | StoreSettingScalarWhereWithAggregatesInput[]
+    key?: StringWithAggregatesFilter<"StoreSetting"> | string
+    value?: StringWithAggregatesFilter<"StoreSetting"> | string
+  }
+
   export type OrderCreateInput = {
     id: string
     customer: string
@@ -2295,6 +3392,41 @@ export namespace Prisma {
     payment?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StoreSettingCreateInput = {
+    key: string
+    value: string
+  }
+
+  export type StoreSettingUncheckedCreateInput = {
+    key: string
+    value: string
+  }
+
+  export type StoreSettingUpdateInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StoreSettingUncheckedUpdateInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StoreSettingCreateManyInput = {
+    key: string
+    value: string
+  }
+
+  export type StoreSettingUpdateManyMutationInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StoreSettingUncheckedUpdateManyInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -2477,6 +3609,21 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type StoreSettingCountOrderByAggregateInput = {
+    key?: SortOrder
+    value?: SortOrder
+  }
+
+  export type StoreSettingMaxOrderByAggregateInput = {
+    key?: SortOrder
+    value?: SortOrder
+  }
+
+  export type StoreSettingMinOrderByAggregateInput = {
+    key?: SortOrder
+    value?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {

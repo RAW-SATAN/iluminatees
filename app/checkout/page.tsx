@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Check, ShoppingBag, ChevronLeft } from "lucide-react";
 import { useCart } from "@/components/CartProvider";
@@ -14,6 +14,14 @@ export default function CheckoutPage() {
   const [form, setForm] = useState({ name: "", phone: "", address: "", city: "", pincode: "" });
   const [placed, setPlaced] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [codEnabled, setCodEnabled] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(r => r.ok ? r.json() : {} as any)
+      .then(d => { if (d.cod_enabled === "0") { setCodEnabled(false); if (payment === "cod") setPayment("prepaid"); } })
+      .catch(() => {});
+  }, []);
 
   const discount = payment === "prepaid" ? Math.round(total * PREPAID_DISCOUNT) : 0;
   const payable = total - discount;
@@ -135,14 +143,16 @@ export default function CheckoutPage() {
               </button>
 
               {/* COD */}
-              <button onClick={() => setPayment("cod")}
-                style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 12, padding: "0.9rem 1rem", borderRadius: 10, border: `2px solid ${payment === "cod" ? "#111" : "#e5e5e5"}`, background: "#fff", cursor: "pointer" }}>
-                <span style={{ width: 18, height: 18, borderRadius: "50%", border: `5px solid ${payment === "cod" ? "#111" : "#ccc"}`, flexShrink: 0, boxSizing: "border-box" }} />
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: "block", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.72rem", color: "#111" }}>Cash on Delivery</span>
-                  <span style={{ display: "block", fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#777", marginTop: 3 }}>Pay when your order arrives</span>
-                </span>
-              </button>
+              {codEnabled && (
+                <button onClick={() => setPayment("cod")}
+                  style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 12, padding: "0.9rem 1rem", borderRadius: 10, border: `2px solid ${payment === "cod" ? "#111" : "#e5e5e5"}`, background: "#fff", cursor: "pointer" }}>
+                  <span style={{ width: 18, height: 18, borderRadius: "50%", border: `5px solid ${payment === "cod" ? "#111" : "#ccc"}`, flexShrink: 0, boxSizing: "border-box" }} />
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: "block", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.72rem", color: "#111" }}>Cash on Delivery</span>
+                    <span style={{ display: "block", fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#777", marginTop: 3 }}>Pay when your order arrives</span>
+                  </span>
+                </button>
+              )}
 
               {/* UPI QR */}
               {payment === "prepaid" && (

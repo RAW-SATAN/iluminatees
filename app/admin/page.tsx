@@ -79,7 +79,7 @@ export default function AdminPage() {
   const [authed, setAuthed]         = useState(false);
   const [pw, setPw]                 = useState("");
   const [pwErr, setPwErr]           = useState(false);
-  const [tab, setTab]               = useState<"home"|"orders"|"products"|"homepage">("home");
+  const [tab, setTab]               = useState<"home"|"orders"|"products"|"homepage"|"settings">("home");
   const [orders, setOrders]         = useState<Order[]>([]);
   const [edits, setEdits]           = useLS<Record<string, ProductEdit>>(EDITS_KEY, {});
   const [search, setSearch]         = useState("");
@@ -105,11 +105,19 @@ export default function AdminPage() {
   const [toast, setToast]           = useState<string|null>(null);
   const [siteAssets, setSiteAssets] = useState<{ heroBanners: Record<string,string>; carouselMockups: Record<string,string>; cultGallery: Record<string,string>; misc: Record<string,string> }>({ heroBanners: {}, carouselMockups: {}, cultGallery: {}, misc: {} });
   const [assetBusy, setAssetBusy]   = useState<string|null>(null);
+  const [settings, setSettings]     = useState<Record<string,string>>({});
 
   useEffect(() => {
     fetch("/site-assets.json", { cache: "no-store" })
       .then(r => (r.ok ? r.json() : null))
       .then(d => { if (d) setSiteAssets({ heroBanners: d.heroBanners ?? {}, carouselMockups: d.carouselMockups ?? {}, cultGallery: d.cultGallery ?? {}, misc: d.misc ?? {} }); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(r => r.ok ? r.json() : {})
+      .then(d => { if (d) setSettings(d); })
       .catch(() => {});
   }, []);
 
@@ -361,12 +369,16 @@ export default function AdminPage() {
           <div style={{ height: 1, background: S.sidebarBorder, margin: "0.75rem 0" }} />
 
           {/* Bottom links */}
-          {[{icon:"⚙️", label:"Settings"}, {icon:"📊", label:"Analytics"}].map(({icon, label}) => (
-            <button key={label} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "0.55rem 0.75rem", borderRadius: 8, background: "none", border: "none", borderLeft: "3px solid transparent", cursor: "pointer", marginBottom: 2 }}>
-              <span style={{ fontSize: 14 }}>{icon}</span>
-              <span style={{ fontSize: "0.68rem", color: S.sidebarText }}>{label}</span>
-            </button>
-          ))}
+          {[{icon:"⚙️", label:"Settings", key:"settings" as const}].map(({icon, label, key}) => {
+              const active = tab === key;
+              return (
+                <button key={label} onClick={() => setTab(key)}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "0.55rem 0.75rem", borderRadius: 8, background: active ? S.sidebarActive : "none", border: "none", borderLeft: active ? `3px solid ${S.sidebarActiveBorder}` : "3px solid transparent", cursor: "pointer", marginBottom: 2, textAlign: "left" }}>
+                  <span style={{ fontSize: 14 }}>{icon}</span>
+                  <span style={{ fontSize: "0.68rem", fontWeight: active ? 600 : 400, color: active ? "#fff" : S.sidebarText }}>{label}</span>
+                </button>
+              );
+            })}
         </nav>
 
         {/* Footer */}
@@ -453,315 +465,25 @@ export default function AdminPage() {
               </table>
             </div>
           </>)}
-
-          {/* ════ ORDERS ════ */}
-          {tab === "orders" && (<>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
-              <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: S.text }}>Orders</h1>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ padding: "0.5rem 1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Export</button>
-                <button style={{ padding: "0.5rem 1rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.65rem", color: "#fff", cursor: "pointer", fontWeight: 600 }}>+ Create order</button>
-              </div>
-            </div>
-
-            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, overflow: "hidden" }}>
-              {/* Filter tabs */}
-              <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${S.border}`, overflowX: "auto" }}>
-                {([{k:"all",l:"All"},{k:"pending",l:"Pending"},{k:"confirmed",l:"Confirmed"},{k:"shipped",l:"Shipped"},{k:"delivered",l:"Delivered"},{k:"cancelled",l:"Cancelled"}] as {k:OrderStatus|"all",l:string}[]).map(({k,l}) => (
-                  <button key={k} onClick={() => setOFilter(k)}
-                    style={{ padding: "0.75rem 1.1rem", background: "none", border: "none", borderBottom: oFilter===k ? `2px solid ${S.green}` : "2px solid transparent", fontSize: "0.65rem", fontWeight: oFilter===k ? 700 : 500, color: oFilter===k ? S.green : S.muted, cursor: "pointer", whiteSpace: "nowrap" }}>
-                    {l}
-                  </button>
-                ))}
-              </div>
-
-              {/* Search + filter bar */}
-              <div style={{ padding: "0.75rem 1rem", borderBottom: `1px solid ${S.border}`, display: "flex", gap: 8 }}>
-                <div style={{ position: "relative", flex: 1 }}>
-                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "#C9CCCF" }}>🔍</span>
-                  <input value={oSearch} onChange={e => setOSearch(e.target.value)} placeholder="Search orders..."
-                    style={{ width: "100%", paddingLeft: 30, paddingRight: 12, paddingTop: 6, paddingBottom: 6, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, outline: "none", boxSizing: "border-box" }} />
+          {tab === "settings" && (<>
+            <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: S.text, marginBottom: 20 }}>Settings</h1>
+            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, padding: "1.5rem", maxWidth: 480 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 700, color: S.text }}>Cash on Delivery</div>
+                  <div style={{ fontSize: "0.62rem", color: S.muted, marginTop: 4 }}>Customers can pay when order arrives</div>
                 </div>
-              </div>
-
-              {/* Table */}
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ background: S.bg }}>
-                      <th style={{ padding: "0.6rem 1rem", width: 36 }}>
-                        <input type="checkbox" onChange={e => e.target.checked ? setSelOrders(new Set(filtOrders.map(o=>o.id))) : setSelOrders(new Set())} />
-                      </th>
-                      {["Order","Date","Customer","Items","Total","Payment","Fulfillment",""].map(h => (
-                        <th key={h} style={{ padding: "0.6rem 0.85rem", textAlign: "left", fontSize: "0.58rem", fontWeight: 600, color: S.muted, whiteSpace: "nowrap", borderBottom: `1px solid ${S.border}` }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtOrders.map((o, i) => (
-                      <>
-                        <tr key={o.id} style={{ borderBottom: `1px solid ${S.border}`, background: selOrders.has(o.id) ? "#F0F7FF" : "transparent" }}>
-                          <td style={{ padding: "0.75rem 1rem" }}><input type="checkbox" checked={selOrders.has(o.id)} onChange={() => toggleOrderSel(o.id)} /></td>
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <button onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}
-                              style={{ fontSize: "0.65rem", fontWeight: 700, color: S.green, background: "none", border: "none", cursor: "pointer", padding: 0 }}>{o.id}</button>
-                          </td>
-                          <td style={{ padding: "0.75rem 0.85rem", fontSize: "0.62rem", color: S.muted, whiteSpace: "nowrap" }}>{o.date}</td>
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <div style={{ fontSize: "0.65rem", fontWeight: 500, color: S.text }}>{o.customer}</div>
-                            <div style={{ fontSize: "0.55rem", color: S.muted }}>{o.city}</div>
-                          </td>
-                          <td style={{ padding: "0.75rem 0.85rem", fontSize: "0.62rem", color: S.muted }}>{o.items.reduce((s,i)=>s+i.qty,0)} item{o.items.reduce((s,i)=>s+i.qty,0)>1?"s":""}</td>
-                          <td style={{ padding: "0.75rem 0.85rem", fontSize: "0.65rem", fontWeight: 600, color: S.text }}>₹{o.total.toLocaleString("en-IN")}</td>
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.58rem", fontWeight: 600, color: PAYMENT[o.payment].color, background: PAYMENT[o.payment].bg, borderRadius: 20, padding: "0.2rem 0.65rem", whiteSpace: "nowrap" }}>
-                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: PAYMENT[o.payment].dot }} />
-                              {PAYMENT[o.payment].label}
-                            </span>
-                          </td>
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <span style={{ fontSize: "0.58rem", fontWeight: 600, color: ORDER_STATUS[o.status].color, background: ORDER_STATUS[o.status].bg, borderRadius: 20, padding: "0.2rem 0.65rem", whiteSpace: "nowrap" }}>
-                              {ORDER_STATUS[o.status].label}
-                            </span>
-                          </td>
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <select value={o.status} onChange={e => {
-                                const newStatus = e.target.value as OrderStatus;
-                                setOrders(orders.map(x => x.id===o.id ? {...x,status:newStatus} : x));
-                                fetch("/api/orders", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: o.id, status: newStatus }) }).catch(() => {});
-                              }}
-                              style={{ fontSize: "0.58rem", border: `1px solid ${S.border}`, borderRadius: 6, padding: "0.3rem 0.5rem", color: S.text, cursor: "pointer", outline: "none", background: S.card }}>
-                              {(["pending","confirmed","shipped","delivered","cancelled"] as OrderStatus[]).map(s => (
-                                <option key={s} value={s}>{ORDER_STATUS[s].label}</option>
-                              ))}
-                            </select>
-                          </td>
-                        </tr>
-                        {expandedOrder === o.id && (
-                          <tr key={`${o.id}-exp`}>
-                            <td colSpan={9} style={{ padding: "0 1rem 1rem 4rem", background: "#FAFBFB" }}>
-                              <div style={{ padding: "1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 10 }}>
-                                <div style={{ fontSize: "0.6rem", fontWeight: 600, color: S.muted, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.06em" }}>Order Details</div>
-                                <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginBottom: 12 }}>
-                                  <div>
-                                    <div style={{ fontSize: "0.55rem", color: S.muted }}>Customer</div>
-                                    <div style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>{o.customer}</div>
-                                  </div>
-                                  <div>
-                                    <div style={{ fontSize: "0.55rem", color: S.muted }}>Phone</div>
-                                    <div style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>{o.phone}</div>
-                                  </div>
-                                  <div>
-                                    <div style={{ fontSize: "0.55rem", color: S.muted }}>Shipping address</div>
-                                    <div style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>{o.address}, {o.city}</div>
-                                  </div>
-                                </div>
-                                {o.items.map((item, idx) => (
-                                  <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", borderTop: `1px solid ${S.border}` }}>
-                                    <span style={{ fontSize: "0.62rem", color: S.text }}>{item.name} <span style={{ color: S.muted }}>/ Size {item.size}</span></span>
-                                    <span style={{ fontSize: "0.62rem", color: S.muted }}>×{item.qty} · <strong style={{ color: S.text }}>₹{(item.price*item.qty).toLocaleString("en-IN")}</strong></span>
-                                  </div>
-                                ))}
-                                <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 10, borderTop: `1px solid ${S.border}`, marginTop: 4 }}>
-                                  <span style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>Total: ₹{o.total.toLocaleString("en-IN")}</span>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </>
-                    ))}
-                  </tbody>
-                </table>
-                {filtOrders.length === 0 && (
-                  <div style={{ textAlign: "center", padding: "3rem", fontSize: "0.7rem", color: S.muted }}>No orders found.</div>
-                )}
+                <button onClick={async () => {
+                  const next = settings.cod_enabled !== "1" ? "1" : "0";
+                  await fetch("/api/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "cod_enabled", value: next }) });
+                  setSettings({ ...settings, cod_enabled: next });
+                }}
+                  style={{ width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", position: "relative", background: settings.cod_enabled === "1" ? S.green : "#C9CCCF", transition: "background 0.2s" }}>
+                  <span style={{ position: "absolute", top: 3, left: settings.cod_enabled === "1" ? 24 : 3, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+                </button>
               </div>
             </div>
           </>)}
-
-          {/* ════ PRODUCTS ════ */}
-          {tab === "products" && (<>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
-              <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: S.text }}>Products</h1>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ padding: "0.5rem 1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Export</button>
-                <button style={{ padding: "0.5rem 1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Import</button>
-                <button onClick={() => { setAddForm({ name: "", price: "", mrp: "", category: "APEX", sizes: "S,M,L,XL" }); setShowAdd(true); }} style={{ padding: "0.5rem 1rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.65rem", color: "#fff", cursor: "pointer", fontWeight: 600 }}>+ Add product</button>
-              </div>
-            </div>
-
-            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, overflow: "hidden" }}>
-              {/* Search */}
-              <div style={{ padding: "0.75rem 1rem", borderBottom: `1px solid ${S.border}`, display: "flex", gap: 8 }}>
-                <div style={{ position: "relative", flex: 1, maxWidth: 320 }}>
-                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "#C9CCCF" }}>🔍</span>
-                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..."
-                    style={{ width: "100%", paddingLeft: 30, paddingRight: 12, paddingTop: 6, paddingBottom: 6, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, outline: "none", boxSizing: "border-box" }} />
-                </div>
-                <button style={{ padding: "0.4rem 0.85rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>Category ⌄</button>
-                <button style={{ padding: "0.4rem 0.85rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>Stock ⌄</button>
-              </div>
-
-              {/* Bulk action bar */}
-              {selProds.size > 0 && (
-                <div style={{ padding: "0.65rem 1rem", borderBottom: `1px solid ${S.border}`, background: "#EAF4FF", display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "#004085" }}>
-                    {selProds.size} product{selProds.size > 1 ? "s" : ""} selected
-                  </span>
-                  <div style={{ flex: 1 }} />
-                  {confirmBulkDelete ? (
-                    <>
-                      <span style={{ fontSize: "0.62rem", color: S.red, fontWeight: 600 }}>
-                        Delete {selProds.size} product{selProds.size > 1 ? "s" : ""}?
-                      </span>
-                      <button onClick={bulkDeleteProducts}
-                        style={{ padding: "0.38rem 0.9rem", background: S.red, border: "none", borderRadius: 7, fontSize: "0.62rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>
-                        Confirm
-                      </button>
-                      <button onClick={() => setConfirmBulkDelete(false)}
-                        style={{ padding: "0.38rem 0.9rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 7, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => setConfirmBulkDelete(true)}
-                        style={{ padding: "0.38rem 0.9rem", background: S.red, border: "none", borderRadius: 7, fontSize: "0.62rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>
-                        🗑️ Delete selected
-                      </button>
-                      <button onClick={() => setSelProds(new Set())}
-                        style={{ padding: "0.38rem 0.9rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 7, fontSize: "0.62rem", color: S.text, cursor: "pointer" }}>
-                        Clear selection
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Table */}
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ background: S.bg }}>
-                      <th style={{ padding: "0.6rem 1rem", width: 36 }}>
-                        <input type="checkbox" onChange={e => e.target.checked ? setSelProds(new Set(filtProds.map(p=>p.id))) : setSelProds(new Set())} />
-                      </th>
-                      {["Product","Category","Price","MRP","Stock","Actions"].map(h => (
-                        <th key={h} style={{ padding: "0.6rem 0.85rem", textAlign: "left", fontSize: "0.58rem", fontWeight: 600, color: S.muted, whiteSpace: "nowrap", borderBottom: `1px solid ${S.border}` }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtProds.map((p, i) => {
-                      const isEditing = editId === p.id;
-                      const hasEdit   = !!edits[p.id];
-                      return (
-                        <tr key={p.id} style={{ borderBottom: i < filtProds.length - 1 ? `1px solid ${S.border}` : "none", background: selProds.has(p.id) ? "#F0F7FF" : "transparent" }}>
-                          <td style={{ padding: "0.75rem 1rem" }}><input type="checkbox" checked={selProds.has(p.id)} onChange={() => toggleProdSel(p.id)} /></td>
-
-                          {/* Product */}
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                              <div style={{ width: 40, height: 48, background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-                                {(edits[p.id]?.customImages?.[0] || edits[p.id]?.customImage)
-                                  ? <img src={edits[p.id]?.customImages?.[0] || edits[p.id]?.customImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                  : <ProductMockup product={p} size={32} />
-                                }
-                              </div>
-                              <div>
-                                <div style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>{p.name}</div>
-                                <div style={{ fontSize: "0.52rem", color: S.muted }}>{p.codename}</div>
-                                {hasEdit && <span style={{ fontSize: "0.46rem", color: "#856404", background: "#FFF3CD", borderRadius: 4, padding: "0.08rem 0.4rem", fontWeight: 600 }}>edited</span>}
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Category */}
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <span style={{ fontSize: "0.58rem", fontWeight: 600, color: "#5A2D91", background: "#E2D9F3", borderRadius: 20, padding: "0.2rem 0.6rem" }}>{p.category}</span>
-                          </td>
-
-                          {/* Price */}
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <span style={{ fontSize: "0.65rem", fontWeight: 600, color: S.text }}>₹{p.price.toLocaleString("en-IN")}</span>
-                          </td>
-
-                          {/* MRP */}
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <span style={{ fontSize: "0.65rem", color: p.originalPrice ? S.muted : "#C9CCCF", textDecoration: p.originalPrice ? "line-through" : "none" }}>
-                              {p.originalPrice ? `₹${p.originalPrice.toLocaleString("en-IN")}` : "—"}
-                            </span>
-                          </td>
-
-                          {/* Stock */}
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.58rem", fontWeight: 600,
-                              color: p.inStock ? "#155724" : "#721C24",
-                              background: p.inStock ? "#D4EDDA" : "#F8D7DA",
-                              borderRadius: 20, padding: "0.2rem 0.65rem" }}>
-                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: p.inStock ? "#28A745" : "#DC3545" }} />
-                              {p.inStock ? "In stock" : "Out of stock"}
-                            </span>
-                          </td>
-
-                          {/* Actions */}
-                          <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                            {confirmDelete === p.id ? (
-                              <>
-                                <span style={{ fontSize: "0.56rem", color: S.red, fontWeight: 600 }}>Delete?</span>
-                                <button onClick={() => deleteProduct(p.id, p.name)}
-                                  style={{ padding: "0.3rem 0.65rem", background: S.red, border: "none", borderRadius: 6, fontSize: "0.56rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>Yes</button>
-                                <button onClick={() => setConfirmDelete(null)}
-                                  style={{ padding: "0.3rem 0.65rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.56rem", color: S.text, cursor: "pointer" }}>No</button>
-                              </>
-                            ) : (
-                              <button onClick={() => setConfirmDelete(p.id)}
-                                style={{ padding: "0.35rem 0.6rem", background: "none", border: `1px solid #F8D7DA`, borderRadius: 6, fontSize: "0.62rem", color: S.red, cursor: "pointer", lineHeight: 1 }}
-                                title="Delete product">🗑️</button>
-                            )}
-                            <button
-                              onClick={() => {
-                                setConfirmDelete(null);
-                                const e = edits[p.id] ?? {};
-                                setPanelProduct(p);
-                                setPanelDraft({
-                                  name: e.name ?? p.name,
-                                  description: e.description ?? p.description ?? "",
-                                  price: String(e.price ?? p.price),
-                                  mrp: e.originalPrice != null ? String(e.originalPrice) : (p.originalPrice ? String(p.originalPrice) : ""),
-                                  category: e.category ?? p.category,
-                                  sizes: e.sizes ? e.sizes.split(",").map(s=>s.trim()) : [...(p.sizes as string[])],
-                                  inStock: e.inStock ?? p.inStock,
-                                  limited: e.limited ?? p.limited,
-                                  customImages: e.customImages ?? (e.customImage ? [e.customImage] : []),
-                                });
-                              }}
-                              style={{ padding: "0.35rem 0.85rem", background: S.bg, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.58rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>
-                              Edit
-                            </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Footer */}
-              <div style={{ padding: "0.75rem 1rem", borderTop: `1px solid ${S.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "0.6rem", color: S.muted }}>Showing {filtProds.length} of {products.length} products</span>
-                <div style={{ display: "flex", gap: 6 }}>
-                  <button style={{ padding: "0.3rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.6rem", background: S.card, color: S.muted, cursor: "pointer" }}>← Previous</button>
-                  <button style={{ padding: "0.3rem 0.7rem", border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.6rem", background: S.card, color: S.muted, cursor: "pointer" }}>Next →</button>
-                </div>
-              </div>
-            </div>
-          </>)}
-
-          {/* ══════ HOMEPAGE TAB ══════ */}
           {tab === "homepage" && (<>
             <div style={{ marginBottom: 16 }}>
               <h1 style={{ fontSize: "1.05rem", fontWeight: 700, color: S.text, marginBottom: 4 }}>Homepage</h1>

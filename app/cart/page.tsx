@@ -40,7 +40,7 @@ export default function CartPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#fff" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "2rem 1.25rem 5rem" }}>
+      <div className="cart-wrap" style={{ maxWidth: 1100, margin: "0 auto", padding: "2rem 1.25rem 5rem" }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 8 }}>
@@ -64,7 +64,7 @@ export default function CartPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 
             {/* Urgency strip */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, background: "#fff1f2", border: "1px solid #ffd7d9", borderRadius: 10, padding: "0.65rem 0.9rem" }}>
+            <div className="cart-urgency" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, background: "#fff1f2", border: "1px solid #ffd7d9", borderRadius: 10, padding: "0.65rem 0.9rem" }}>
               <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.62rem", color: "#111" }}>
                 🔥 Limited vault drop — items in your bag are NOT reserved
               </span>
@@ -73,7 +73,7 @@ export default function CartPage() {
 
             {/* Bundle offer nudge */}
             {nextTierMsg && (
-              <div style={{ background: "#f0fdf4", border: "1px dashed #86efac", borderRadius: 10, padding: "0.6rem 0.9rem", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#15803d" }}>
+              <div className="cart-bundle" style={{ background: "#f0fdf4", border: "1px dashed #86efac", borderRadius: 10, padding: "0.6rem 0.9rem", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#15803d" }}>
                 {nextTierMsg}
               </div>
             )}
@@ -83,29 +83,30 @@ export default function CartPage() {
               return (
                 <div
                   key={`${item.productId}-${item.size}`}
+                  className="cart-item"
                   style={{ display: "flex", alignItems: "center", gap: 12, padding: "0.9rem 1rem", border: "1px solid #eee", borderRadius: 12, background: "#fff" }}
                 >
                   {/* Thumbnail */}
-                  <div style={{ width: 68, height: 84, flexShrink: 0, background: "#f5f5f5", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                  <div className="cart-thumb" style={{ width: 68, height: 84, flexShrink: 0, background: "#f5f5f5", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                     {product && <ProductMockup product={product} size={54} />}
                   </div>
 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#111", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div className="cart-name" style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#111", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {item.name}
                     </div>
                     <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.55rem", color: "#aaa", marginBottom: 6 }}>
                       Size: {item.size}
                     </div>
-                    <div style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "0.82rem", color: "#111" }}>
+                    <div className="cart-price" style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "0.82rem", color: "#111" }}>
                       ₹{item.price.toLocaleString("en-IN")}
                     </div>
                   </div>
 
                   {/* Qty + remove */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid #e8e8e8", borderRadius: 8, padding: "0.28rem 0.55rem" }}>
+                  <div className="cart-actions" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                    <div className="cart-qty" style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid #e8e8e8", borderRadius: 8, padding: "0.28rem 0.55rem" }}>
                       <button
                         onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
                         style={{ background: "none", border: "none", cursor: "pointer", padding: 3, display: "flex", alignItems: "center", color: "#555" }}
@@ -184,7 +185,7 @@ export default function CartPage() {
 
           {/* ── Summary ── */}
           <div>
-            <div style={{ border: "1px solid #eee", borderRadius: 12, padding: "1.4rem", background: "#fafafa", position: "sticky", top: 142 }}>
+            <div className="cart-summary" style={{ border: "1px solid #eee", borderRadius: 12, padding: "1.4rem", background: "#fafafa", position: "sticky", top: 142 }}>
               <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.54rem", letterSpacing: "0.18em", color: "#aaa", textTransform: "uppercase", marginBottom: 16 }}>
                 Order Summary
               </div>
@@ -209,7 +210,7 @@ export default function CartPage() {
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20, paddingBottom: 14, borderBottom: "1px solid #eee" }}>
                 <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.72rem", color: "#111" }}>Total</span>
-                <span style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "1.25rem", color: "#111" }}>
+                <span className="cart-total" style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "1.25rem", color: "#111" }}>
                   ₹{total.toLocaleString("en-IN")}
                 </span>
               </div>
