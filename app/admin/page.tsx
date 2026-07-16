@@ -115,7 +115,7 @@ export default function AdminPage() {
 
   /* ── Login ── */
   if (!authed) return (
-    <div style={{ minHeight: "100vh", background: S.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: S.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif" }}>
       <div style={{ background: S.card, borderRadius: 12, padding: "2.5rem 2.2rem", width: "100%", maxWidth: 400, boxShadow: "0 1px 3px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.08)" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 28 }}>
           <div style={{ width: 48, height: 48, borderRadius: 10, background: "#111", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
@@ -151,10 +151,10 @@ export default function AdminPage() {
 
   /* ══════ MAIN LAYOUT ══════ */
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 10000, display: "flex", fontFamily: "Inter, sans-serif", overflow: "hidden" }}>
 
       {/* ── Sidebar ── */}
-      <aside style={{ width: 240, background: S.sidebar, display: "flex", flexDirection: "column", flexShrink: 0, position: "fixed", top: 0, left: 0, height: "100vh", zIndex: 100 }}>
+      <aside style={{ width: 240, background: S.sidebar, display: "flex", flexDirection: "column", flexShrink: 0, height: "100vh", overflowY: "auto" }}>
         {/* Store header */}
         <div style={{ padding: "1rem 1rem 0.75rem", borderBottom: `1px solid ${S.sidebarBorder}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0.5rem 0.6rem", borderRadius: 8, background: S.sidebarActive, cursor: "pointer" }}>
@@ -206,10 +206,10 @@ export default function AdminPage() {
       </aside>
 
       {/* ── Main (offset by sidebar) ── */}
-      <div style={{ marginLeft: 240, flex: 1, background: S.bg, minHeight: "100vh" }}>
+      <div style={{ marginLeft: 240, flex: 1, background: S.bg, overflowY: "auto", height: "100vh" }}>
 
         {/* Top bar */}
-        <div style={{ background: S.topbar, borderBottom: `1px solid ${S.border}`, padding: "0 1.5rem", height: 56, display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 50 }}>
+        <div style={{ background: S.topbar, borderBottom: `1px solid ${S.border}`, padding: "0 1.5rem", height: 56, display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 50, flexShrink: 0 }}>
           <div style={{ flex: 1, position: "relative" }}>
             <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#C9CCCF" }}>🔍</span>
             <input placeholder="Search" style={{ width: "100%", maxWidth: 380, padding: "0.45rem 0.75rem 0.45rem 2rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.72rem", color: S.text, background: S.bg, outline: "none" }} />
