@@ -5,6 +5,9 @@ import { isAdmin } from '@/lib/adminAuth'
 /* Settings safe to expose to the storefront; everything else is admin-only */
 const PUBLIC_KEYS = new Set(['cod_enabled'])
 
+/* Never cache — checkout must always see the latest COD toggle */
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const all = await prisma.storeSetting.findMany()

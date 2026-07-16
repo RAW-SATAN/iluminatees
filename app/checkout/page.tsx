@@ -18,7 +18,7 @@ export default function CheckoutPage() {
   const [codEnabled, setCodEnabled] = useState(true);
 
   useEffect(() => {
-    fetch("/api/settings")
+    fetch("/api/settings", { cache: "no-store" })
       .then(r => r.ok ? r.json() : {} as any)
       .then(d => { if (d.cod_enabled === "0") { setCodEnabled(false); if (payment === "cod") setPayment("prepaid"); } })
       .catch(() => {});

@@ -525,12 +525,15 @@ export default function AdminPage() {
                   <div style={{ fontSize: "0.62rem", color: S.muted, marginTop: 4 }}>Customers can pay when order arrives</div>
                 </div>
                 <button onClick={async () => {
-                  const next = settings.cod_enabled !== "1" ? "1" : "0";
+                  /* Unset in DB means "enabled" (matches checkout's default) — so toggling off
+                     from that state must write "0" explicitly, not "1". */
+                  const isEnabled = settings.cod_enabled !== "0";
+                  const next = isEnabled ? "0" : "1";
                   await fetch("/api/settings", { method: "PUT", headers: authHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ key: "cod_enabled", value: next }) });
                   setSettings({ ...settings, cod_enabled: next });
                 }}
-                  style={{ width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", position: "relative", background: settings.cod_enabled === "1" ? S.green : "#C9CCCF", transition: "background 0.2s" }}>
-                  <span style={{ position: "absolute", top: 3, left: settings.cod_enabled === "1" ? 24 : 3, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+                  style={{ width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", position: "relative", background: settings.cod_enabled !== "0" ? S.green : "#C9CCCF", transition: "background 0.2s" }}>
+                  <span style={{ position: "absolute", top: 3, left: settings.cod_enabled !== "0" ? 24 : 3, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
                 </button>
               </div>
             </div>
