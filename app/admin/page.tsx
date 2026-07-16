@@ -108,6 +108,7 @@ export default function AdminPage() {
   const [deletedIds, setDeletedIds] = useLS<string[]>(DELETED_KEY, []);
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null);
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [toast, setToast]           = useState<string|null>(null);
 
   function showToast(msg: string) {
@@ -1016,10 +1017,11 @@ export default function AdminPage() {
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button onClick={() => setShowAdd(false)} style={{ padding: "0.6rem 1.1rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.7rem", background: S.card, color: S.text, cursor: "pointer", fontWeight: 500 }}>Cancel</button>
               <button
-                onClick={() => {
+                disabled={publishing}
+                onClick={async () => {
                   if (!addForm.name.trim() || !addForm.price.trim()) return;
-                  const id = `custom-${Date.now()}`;
-                  const slug = addForm.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+                  const id   = `custom-${Date.now()}`;
+                  const slug = addForm.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-");
                   const newP: CustomProduct = {
                     id, slug, name: addForm.name.trim(),
                     category: addForm.category,
@@ -1028,13 +1030,42 @@ export default function AdminPage() {
                     sizes: addForm.sizes || "S,M,L,XL",
                     inStock: true, limited: false,
                   };
+                  /* Save to localStorage immediately so it shows locally */
                   setAddedProducts([...addedProducts, newP]);
                   setShowAdd(false);
-                  showToast(`✅ "${newP.name}" added to products`);
+                  /* Publish to codebase via API → triggers Vercel redeploy */
+                  setPublishing(true);
+                  showToast("⏳ Publishing product...");
+                  try {
+                    const res = await fetch("/api/products", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        id, slug,
+                        name: newP.name,
+                        category: newP.category,
+                        price: newP.price,
+                        originalPrice: newP.originalPrice,
+                        sizes: newP.sizes,
+                        inStock: newP.inStock,
+                        limited: newP.limited,
+                      }),
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      showToast(`✅ "${newP.name}" published! Live in ~1 min.`);
+                    } else {
+                      showToast(`⚠️ Saved locally. Publish failed: ${data.error}`);
+                    }
+                  } catch {
+                    showToast(`⚠️ "${newP.name}" saved locally only.`);
+                  } finally {
+                    setPublishing(false);
+                  }
                 }}
-                style={{ padding: "0.6rem 1.2rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.7rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}
+                style={{ padding: "0.6rem 1.2rem", background: publishing ? "#aaa" : S.green, border: "none", borderRadius: 8, fontSize: "0.7rem", color: "#fff", cursor: publishing ? "not-allowed" : "pointer", fontWeight: 700 }}
               >
-                Save product
+                {publishing ? "Publishing..." : "Publish product"}
               </button>
             </div>
           </div>
