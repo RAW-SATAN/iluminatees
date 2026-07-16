@@ -102,7 +102,7 @@ export function DropsCarousel() {
       <div style={{
         position: "relative",
         width: "100%",
-        height: "clamp(240px, 28vw, 350px)",
+        height: "clamp(300px, 44vw, 460px)",
       }}>
         {products.map((prod, pIdx) => {
           const d = slotOf(pIdx, idx, products.length);
@@ -141,8 +141,8 @@ export function DropsCarousel() {
                 /* Uploaded 3D mockups float free — no card, and the centre one is larger */
                 return (
                   <div style={{
-                    width:  mock && isCenter ? "clamp(230px, 26vw, 330px)" : "clamp(150px, 17vw, 210px)",
-                    height: mock && isCenter ? "clamp(230px, 26vw, 330px)" : "clamp(150px, 17vw, 210px)",
+                    width:  mock && isCenter ? "clamp(280px, 42vw, 430px)" : "clamp(150px, 17vw, 210px)",
+                    height: mock && isCenter ? "clamp(280px, 42vw, 430px)" : "clamp(150px, 17vw, 210px)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     background: isCenter && !mock ? "#fff" : "transparent",
                     borderRadius: 20,
