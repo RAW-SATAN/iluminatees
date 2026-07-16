@@ -698,43 +698,10 @@ export default function AdminPage() {
         const pid = panelProduct.id;
         const pname = panelProduct.name;
         const pslug = panelProduct.slug;
-        async function savePanel() {
-          let finalImages = [...panelDraft.customImages];
+        function savePanel() {
+          const finalImages = [...panelDraft.customImages];
 
-          /* Upload base64 images to GitHub for permanent storage */
-          const hasBase64 = finalImages.some(img => img.startsWith("data:"));
-          if (finalImages.length > 0 && hasBase64) {
-            setSavingImages(true);
-            showToast("⏳ Uploading photos...");
-            try {
-              const res = await fetch("/api/save-images", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slug: pslug, images: finalImages }),
-              });
-              const data = await res.json();
-              if (data.success) {
-                finalImages = data.urls;
-                showToast("✅ Photos uploaded! Live in ~1 min.");
-              } else {
-                showToast(`⚠️ Photo upload failed: ${data.error}`);
-              }
-            } catch {
-              showToast("⚠️ Photo upload failed — saved locally only.");
-            } finally {
-              setSavingImages(false);
-            }
-          } else if (finalImages.length > 0 && !hasBase64) {
-            /* External URLs — still register them permanently */
-            try {
-              await fetch("/api/save-images", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slug: pslug, images: finalImages }),
-              });
-            } catch {}
-          }
-
+          /* Save to localStorage immediately with base64 so photos show right away */
           const newEdit: ProductEdit = {
             name: panelDraft.name.trim() || undefined,
             description: panelDraft.description.trim() || undefined,
@@ -750,6 +717,15 @@ export default function AdminPage() {
           setEdits({ ...edits, [pid]: newEdit });
           setPanelProduct(null);
           showToast(`✅ "${panelDraft.name || pname}" saved`);
+
+          /* Fire GitHub upload in background for permanent storage (non-blocking) */
+          if (finalImages.length > 0) {
+            fetch("/api/save-images", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ slug: pslug, images: finalImages }),
+            }).catch(() => {});
+          }
         }
         function handleImageFiles(e: React.ChangeEvent<HTMLInputElement>) {
           const files = Array.from(e.target.files ?? []);
@@ -797,8 +773,8 @@ export default function AdminPage() {
                   <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>{panelProduct.codename}</div>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <button onClick={() => setPanelProduct(null)} disabled={savingImages} style={{ padding: "0.5rem 1rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.68rem", color: S.text, cursor: savingImages ? "not-allowed" : "pointer", fontWeight: 500 }}>Discard</button>
-                  <button onClick={savePanel} disabled={savingImages} style={{ padding: "0.5rem 1.2rem", background: savingImages ? "#aaa" : S.green, border: "none", borderRadius: 8, fontSize: "0.68rem", color: "#fff", cursor: savingImages ? "not-allowed" : "pointer", fontWeight: 700 }}>{savingImages ? "Uploading..." : "Save"}</button>
+                  <button onClick={() => setPanelProduct(null)} style={{ padding: "0.5rem 1rem", background: "none", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.68rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Discard</button>
+                  <button onClick={savePanel} style={{ padding: "0.5rem 1.2rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.68rem", color: "#fff", cursor: "pointer", fontWeight: 700 }}>Save</button>
                 </div>
               </div>
 
