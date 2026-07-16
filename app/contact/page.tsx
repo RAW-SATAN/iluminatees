@@ -19,7 +19,7 @@ export default function ContactPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {[
             { icon: "💬", title: "WhatsApp", desc: "Fastest — order status, exchange, anything", href: "https://wa.me/917055470321", cta: "Chat on WhatsApp" },
-            { icon: "✉️", title: "Email", desc: "support@iluminatees.in — replies within 24 hrs", href: "mailto:support@iluminatees.in", cta: "Send Email" },
+            { icon: "✉️", title: "Email", desc: "help@iluminatees.com — replies within 24 hrs", href: "mailto:help@iluminatees.com", cta: "Send Email" },
             { icon: "📞", title: "Call / SMS", desc: "+91 70554 70321 (11 AM – 7 PM, Mon–Sat)", href: "tel:+917055470321", cta: "Call Now" },
           ].map(({ icon, title, desc, href, cta }) => (
             <div key={title} style={{ display: "flex", alignItems: "center", gap: 16, border: "1px solid #eee", borderRadius: 14, padding: "1.1rem 1.2rem" }}>

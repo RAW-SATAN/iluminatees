@@ -18,10 +18,13 @@ const COL2 = [
 ];
 
 const COL3 = [
-  { href: "/about",    label: "About Us"    },
-  { href: "/contact",  label: "Contact Us"  },
-  { href: "/cart",     label: "Your Bag"    },
-  { href: "/wishlist", label: "Wishlist"    },
+  { href: "/about",    label: "About Us"           },
+  { href: "/contact",  label: "Contact Us"         },
+  { href: "/track",    label: "Track Order"        },
+  { href: "/returns",  label: "Returns & Exchange" },
+  { href: "/shipping", label: "Shipping Policy"    },
+  { href: "/terms",    label: "Terms & Conditions" },
+  { href: "/privacy",  label: "Privacy Policy"     },
 ];
 
 const LINK_STYLE = {
@@ -138,8 +141,8 @@ export function Footer() {
           <a href="https://wa.me/917055470321" style={{ ...LINK_STYLE, color: "rgba(255,255,255,0.55)" }}>
             📱 WhatsApp Support
           </a>
-          <a href="mailto:support@iluminatees.in" style={{ ...LINK_STYLE, color: "rgba(255,255,255,0.55)" }}>
-            ✉ support@iluminatees.in
+          <a href="mailto:help@iluminatees.com" style={{ ...LINK_STYLE, color: "rgba(255,255,255,0.55)" }}>
+            ✉ help@iluminatees.com
           </a>
           <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "rgba(255,255,255,0.3)", lineHeight: 1.8 }}>
             Made in India.<br />Shipped Pan-India.

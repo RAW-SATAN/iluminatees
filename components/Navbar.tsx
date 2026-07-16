@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Heart, ShoppingBag, Search, MapPin, Menu, X, Headphones } from "lucide-react";
 import { useCart } from "./CartProvider";
@@ -44,6 +45,7 @@ function countryFlag(code: string) {
 }
 
 export function Navbar() {
+  const router = useRouter();
   const { itemCount } = useCart();
   const { itemCount: wishCount } = useWishlist();
   const [phIdx,     setPhIdx]    = useState(0);
@@ -118,13 +120,19 @@ export function Navbar() {
           </div>
 
           {/* Search bar */}
-          <div style={{
-            flex: 1, minWidth: 0,
-            display: "flex", alignItems: "center", gap: 10,
-            background: "#f5f5f5", border: "1.5px solid #e8e8e8",
-            height: 42, padding: "0 16px",
-            borderRadius: 24,
-          }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = searchVal.trim();
+              router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
+            }}
+            style={{
+              flex: 1, minWidth: 0,
+              display: "flex", alignItems: "center", gap: 10,
+              background: "#f5f5f5", border: "1.5px solid #e8e8e8",
+              height: 42, padding: "0 16px",
+              borderRadius: 24,
+            }}>
             <Search size={13} color="#aaa" style={{ flexShrink: 0 }} />
             <input
               className="nav-search"
@@ -137,7 +145,7 @@ export function Navbar() {
                 fontSize: "0.72rem",
               }}
             />
-          </div>
+          </form>
 
           {/* Right actions */}
           <div style={{ display: "flex", alignItems: "center", gap: 18, flexShrink: 0 }}>
@@ -214,14 +222,14 @@ export function Navbar() {
             {/* CTA button */}
             <Link href="/shop" style={{ textDecoration: "none" }} className="hidden sm:block">
               <div className="btn-black" style={{ borderRadius: 20 }}>
-                <span>🎁</span>
-                <span>CLAIM FREE TEE</span>
+                <span>⚡</span>
+                <span>PREPAID OFFER</span>
                 <span style={{
                   background: "#fff", color: "#111",
                   fontSize: "0.52rem", fontWeight: 800,
                   padding: "1px 7px", borderRadius: 10,
                   letterSpacing: "0.05em",
-                }}>₹999</span>
+                }}>20% OFF</span>
               </div>
             </Link>
 

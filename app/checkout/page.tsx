@@ -13,6 +13,7 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState<"prepaid" | "cod">("prepaid");
   const [form, setForm] = useState({ name: "", phone: "", address: "", city: "", pincode: "" });
   const [placed, setPlaced] = useState<string | null>(null);
+  const [placedSummary, setPlacedSummary] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [codEnabled, setCodEnabled] = useState(true);
 
@@ -23,8 +24,13 @@ export default function CheckoutPage() {
       .catch(() => {});
   }, []);
 
-  const discount = payment === "prepaid" ? Math.round(total * PREPAID_DISCOUNT) : 0;
-  const payable = total - discount;
+  /* Bundle offer: any 2 tees → 10% off, any 3+ → 15% off (matches the cart nudge) */
+  const totalQty = items.reduce((s, i) => s + i.quantity, 0);
+  const bundleRate = totalQty >= 3 ? 0.15 : totalQty >= 2 ? 0.10 : 0;
+  const bundleDiscount = Math.round(total * bundleRate);
+  const afterBundle = total - bundleDiscount;
+  const discount = payment === "prepaid" ? Math.round(afterBundle * PREPAID_DISCOUNT) : 0;
+  const payable = afterBundle - discount;
   const upiLink = `upi://pay?pa=${UPI_ID}&pn=ILUMINATEES&am=${payable}&cu=INR`;
   const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=210x210&data=${encodeURIComponent(upiLink)}`;
 
@@ -35,7 +41,6 @@ export default function CheckoutPage() {
       setErr("Naam, 10-digit phone, address aur city bharna zaroori hai.");
       return;
     }
-    const orderId = `#${1000 + Math.floor(Math.random() * 9000)}`;
     const order = {
       id: `#${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
       customer: form.name.trim(),
@@ -46,6 +51,7 @@ export default function CheckoutPage() {
       total: payable,
       payment: payment === "cod" ? "cod" : "unpaid",
     };
+    let savedId = order.id;
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -54,13 +60,17 @@ export default function CheckoutPage() {
       });
       if (!res.ok) { setErr("Order place nahi ho paya. Dobara try karo."); return; }
       const saved = await res.json();
+      savedId = saved.id ?? order.id;
       try { localStorage.setItem("iluminatees_orders", JSON.stringify([saved, ...JSON.parse(localStorage.getItem("iluminatees_orders") ?? "[]")])); } catch {}
     } catch {
       setErr("Server se connect nahi ho paya. Dobara try karo.");
       return;
     }
+    setPlacedSummary(items.map(i => `${i.name} (${i.size}) × ${i.quantity}`).join(", "));
+    /* Purchase conversion for Meta Pixel, if configured */
+    try { (window as any).fbq?.("track", "Purchase", { value: payable, currency: "INR" }); } catch {}
     clearCart();
-    setPlaced(orderId);
+    setPlaced(savedId);
   }
 
   /* ── Success ── */
@@ -77,9 +87,20 @@ export default function CheckoutPage() {
           Order <strong>{placed}</strong> mil gaya. Hum WhatsApp par confirm karenge.
           {payment === "prepaid" && <> Payment UPI se complete karna na bhoolein — <strong>{UPI_ID}</strong>.</>}
         </p>
-        <Link href="/shop" style={{ display: "inline-block", background: "#111", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.12em", padding: "0.85rem 2rem", borderRadius: 24, textDecoration: "none" }}>
-          CONTINUE SHOPPING →
-        </Link>
+        <a
+          href={`https://wa.me/917055470321?text=${encodeURIComponent(`Hi! Maine order place kiya hai.\n\nOrder: ${placed}\nItems: ${placedSummary}\nPayment: ${payment === "cod" ? "COD" : "UPI (paid)"}\n\nPlease confirm.`)}`}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#25D366", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.06em", padding: "0.9rem 1.8rem", borderRadius: 24, textDecoration: "none" }}
+        >
+          💬 WhatsApp par order confirm karo
+        </a>
+        <div style={{ display: "flex", gap: 16 }}>
+          <Link href="/track" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#888", textDecoration: "underline" }}>
+            Track order
+          </Link>
+          <Link href="/shop" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#888", textDecoration: "underline" }}>
+            Continue shopping →
+          </Link>
+        </div>
       </div>
     );
   }
@@ -184,6 +205,11 @@ export default function CheckoutPage() {
               <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#666", marginBottom: 6 }}>
                 <span>Subtotal</span><span style={{ fontFamily: "Space Mono, monospace" }}>₹{total.toLocaleString("en-IN")}</span>
               </div>
+              {bundleDiscount > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#16a34a", fontWeight: 700, marginBottom: 6 }}>
+                  <span>Bundle offer ({totalQty >= 3 ? "3+ tees · 15%" : "2 tees · 10%"})</span><span style={{ fontFamily: "Space Mono, monospace" }}>−₹{bundleDiscount.toLocaleString("en-IN")}</span>
+                </div>
+              )}
               <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#666", marginBottom: 6 }}>
                 <span>Shipping</span><span style={{ color: "#16a34a", fontWeight: 700 }}>FREE</span>
               </div>
@@ -198,7 +224,7 @@ export default function CheckoutPage() {
               </div>
               {payment === "cod" && (
                 <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.54rem", color: "#e8000d", marginBottom: 4 }}>
-                  Pay Now select karo aur ₹{Math.round(total * PREPAID_DISCOUNT).toLocaleString("en-IN")} bacha lo 👀
+                  Pay Now select karo aur ₹{Math.round(afterBundle * PREPAID_DISCOUNT).toLocaleString("en-IN")} bacha lo 👀
                 </div>
               )}
 

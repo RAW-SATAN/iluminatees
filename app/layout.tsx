@@ -6,8 +6,10 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBubble } from "@/components/StickyBubble";
 import { ExitOfferPopup } from "@/components/ExitOfferPopup";
+import { MetaPixel } from "@/components/MetaPixel";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.iluminatees.com"),
   title: "ILUMINATEES — Not Made To Fit In.",
   description: "Dark luxury streetwear. Limited drops. Heavyweight cotton. No compromises.",
   keywords: ["streetwear", "illuminati", "luxury", "oversized tee", "limited edition", "India"],
@@ -36,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <StickyBubble />
           <ExitOfferPopup />
+          <MetaPixel />
           </WishlistProvider>
         </CartProvider>
       </body>

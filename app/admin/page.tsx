@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { products as staticProducts, type Product } from "@/lib/products";
 import { ProductMockup } from "@/components/ProductMockup";
 
-const ADMIN_PASSWORD = "ILUM2026";
 const EDITS_KEY      = "iluminatees_product_edits";
 const ADDED_KEY      = "iluminatees_added_products";
 const DELETED_KEY    = "iluminatees_deleted_products";
@@ -106,6 +105,10 @@ export default function AdminPage() {
   const [siteAssets, setSiteAssets] = useState<{ heroBanners: Record<string,string>; carouselMockups: Record<string,string>; cultGallery: Record<string,string>; misc: Record<string,string> }>({ heroBanners: {}, carouselMockups: {}, cultGallery: {}, misc: {} });
   const [assetBusy, setAssetBusy]   = useState<string|null>(null);
   const [settings, setSettings]     = useState<Record<string,string>>({});
+  const [adminKey, setAdminKey]     = useState<string>("");
+
+  /* Auth header for all admin API calls */
+  const authHeaders = (extra: Record<string, string> = {}) => ({ "x-admin-key": adminKey, ...extra });
 
   useEffect(() => {
     fetch("/site-assets.json", { cache: "no-store" })
@@ -114,23 +117,21 @@ export default function AdminPage() {
       .catch(() => {});
   }, []);
 
+  const [subscribers, setSubscribers] = useState<{ email: string; date: string }[]>([]);
+
+  /* Admin data — loaded only after login (needs the admin key) */
   useEffect(() => {
-    fetch("/api/settings")
+    if (!adminKey) return;
+    const h = { "x-admin-key": adminKey };
+    fetch("/api/settings", { headers: h })
       .then(r => r.ok ? r.json() : {})
       .then(d => { if (d) setSettings(d); })
       .catch(() => {});
-  }, []);
-
-  const [subscribers, setSubscribers] = useState<{ email: string; date: string }[]>([]);
-  useEffect(() => {
-    fetch("/api/subscribe")
+    fetch("/api/subscribe", { headers: h })
       .then(r => r.ok ? r.json() : [])
       .then(d => { if (Array.isArray(d)) setSubscribers(d); })
       .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/orders")
+    fetch("/api/orders", { headers: h })
       .then(r => r.ok ? r.json() : [])
       .then(data => {
         if (Array.isArray(data) && data.length) {
@@ -141,6 +142,14 @@ export default function AdminPage() {
         }
       })
       .catch(() => {});
+  }, [adminKey]);
+
+  /* Restore session on refresh */
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("ilu_admin_key");
+      if (saved) { setAdminKey(saved); setAuthed(true); }
+    } catch {}
   }, []);
 
   function showToast(msg: string) {
@@ -187,7 +196,7 @@ export default function AdminPage() {
       }
       const res = await fetch("/api/save-site-assets", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ kind, key, image }),
       });
       const data = await res.json();
@@ -290,9 +299,17 @@ export default function AdminPage() {
     p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase())
   );
 
-  function login() {
-    if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwErr(false); }
-    else setPwErr(true);
+  async function login() {
+    /* Verify against the server — the password never lives in client code */
+    try {
+      const res = await fetch("/api/orders", { headers: { "x-admin-key": pw } });
+      if (!res.ok) { setPwErr(true); return; }
+      setAdminKey(pw);
+      try { sessionStorage.setItem("ilu_admin_key", pw); } catch {}
+      setAuthed(true); setPwErr(false);
+    } catch {
+      setPwErr(true);
+    }
   }
   function toggleOrderSel(id: string) {
     setSelOrders(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -391,7 +408,7 @@ export default function AdminPage() {
 
         {/* Footer */}
         <div style={{ padding: "0.75rem", borderTop: `1px solid ${S.sidebarBorder}` }}>
-          <button onClick={() => setAuthed(false)}
+          <button onClick={() => { setAuthed(false); setAdminKey(""); try { sessionStorage.removeItem("ilu_admin_key"); } catch {} }}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "0.5rem 0.75rem", borderRadius: 8, background: "none", border: "none", cursor: "pointer" }}>
             <span style={{ fontSize: 14 }}>↩️</span>
             <span style={{ fontSize: "0.62rem", color: S.sidebarText }}>Log out</span>
@@ -509,7 +526,7 @@ export default function AdminPage() {
                 </div>
                 <button onClick={async () => {
                   const next = settings.cod_enabled !== "1" ? "1" : "0";
-                  await fetch("/api/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "cod_enabled", value: next }) });
+                  await fetch("/api/settings", { method: "PUT", headers: authHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ key: "cod_enabled", value: next }) });
                   setSettings({ ...settings, cod_enabled: next });
                 }}
                   style={{ width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", position: "relative", background: settings.cod_enabled === "1" ? S.green : "#C9CCCF", transition: "background 0.2s" }}>
@@ -708,15 +725,28 @@ export default function AdminPage() {
             customImage: finalImages[0] || undefined,
             customImages: finalImages.length > 0 ? finalImages : undefined,
           };
-          setEdits({ ...edits, [pid]: newEdit });
+          const nextEdits = { ...edits, [pid]: newEdit };
+          setEdits(nextEdits);
           setPanelProduct(null);
           showToast(`✅ "${panelDraft.name || pname}" saved`);
+
+          /* Persist edits to the DB so EVERY visitor sees them (images stay out — too big) */
+          const dbEdits: Record<string, ProductEdit> = {};
+          for (const [k, v] of Object.entries(nextEdits)) {
+            const { customImage, customImages, ...rest } = v;
+            dbEdits[k] = rest;
+          }
+          fetch("/api/product-edits", {
+            method: "PUT",
+            headers: authHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify(dbEdits),
+          }).catch(() => {});
 
           /* Fire GitHub upload in background for permanent storage (non-blocking) */
           if (finalImages.length > 0) {
             fetch("/api/save-images", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: authHeaders({ "Content-Type": "application/json" }),
               body: JSON.stringify({ slug: pslug, images: finalImages }),
             }).catch(() => {});
           }
@@ -1095,7 +1125,7 @@ export default function AdminPage() {
                   try {
                     const res = await fetch("/api/products", {
                       method: "POST",
-                      headers: { "Content-Type": "application/json" },
+                      headers: authHeaders({ "Content-Type": "application/json" }),
                       body: JSON.stringify({
                         id, slug,
                         name: newP.name,

@@ -29,7 +29,18 @@ export function useProducts(): Product[] {
           if (res.ok) permanentImages = await res.json();
         } catch {}
 
-        const edits: Record<string, ProductEdit> = JSON.parse(localStorage.getItem(EDITS_KEY) ?? "{}");
+        /* ── Product edits from the DB (visible to every visitor) ── */
+        let serverEdits: Record<string, ProductEdit> = {};
+        try {
+          const res = await fetch("/api/product-edits", { cache: "no-store" });
+          if (res.ok) serverEdits = await res.json();
+        } catch {}
+
+        const localEdits: Record<string, ProductEdit> = JSON.parse(localStorage.getItem(EDITS_KEY) ?? "{}");
+        /* server edits are the shared truth; the owner's fresh local edits win on their own device */
+        const editIds = new Set([...Object.keys(serverEdits), ...Object.keys(localEdits)]);
+        const edits: Record<string, ProductEdit> = {};
+        for (const id of editIds) edits[id] = { ...serverEdits[id], ...localEdits[id] };
         const added: CustomProduct[]             = JSON.parse(localStorage.getItem(ADDED_KEY)   ?? "[]");
         const deleted: string[]                  = JSON.parse(localStorage.getItem(DELETED_KEY) ?? "[]");
 

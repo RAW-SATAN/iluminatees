@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { isAdmin } from '@/lib/adminAuth'
 
 const KEY = 'newsletter_subscribers'
 
@@ -11,7 +12,8 @@ async function readList(): Promise<Subscriber[]> {
   try { return JSON.parse(row.value) } catch { return [] }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     return NextResponse.json(await readList())
   } catch (e) {

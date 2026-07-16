@@ -42,6 +42,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, newItem];
     });
+    /* Meta Pixel conversion event, if configured */
+    try { (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq?.("track", "AddToCart", { content_name: newItem.name, value: newItem.price, currency: "INR" }); } catch {}
   }, []);
 
   const removeItem = useCallback((productId: string, size: ProductSize) => {

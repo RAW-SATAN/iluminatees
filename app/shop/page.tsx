@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SlidersHorizontal, Plus, Check, Heart } from "lucide-react";
 import { type Product } from "@/lib/products";
@@ -112,12 +113,21 @@ function ShopCard({ product }: { product: Product }) {
 }
 
 /* ── Page ───────────────────────────────────────────────── */
-export default function ShopPage() {
+function ShopPageInner() {
   const products = useProducts();
   const [activeFilter, setActiveFilter] = useState("ALL");
-  const filtered = filterProducts(activeFilter, products);
+  const q = (useSearchParams().get("q") ?? "").trim().toLowerCase();
 
-  const catLabel = FILTERS.find(f => f.key === activeFilter)?.label ?? "All";
+  const searched = q
+    ? products.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.slug.includes(q) ||
+        p.tags.some(t => t.toLowerCase().includes(q)) ||
+        p.category.toLowerCase().includes(q))
+    : products;
+  const filtered = filterProducts(activeFilter, searched);
+
+  const catLabel = q ? `Search: "${q}"` : (FILTERS.find(f => f.key === activeFilter)?.label ?? "All");
 
   return (
     <div style={{ minHeight: "100vh", background: "#fff" }}>
@@ -190,5 +200,13 @@ export default function ShopPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopPageInner />
+    </Suspense>
   );
 }

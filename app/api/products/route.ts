@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdmin } from "@/lib/adminAuth";
 
 const REPO   = "RAW-SATAN/iluminatees";
 const FILE   = "lib/products.ts";
@@ -37,6 +38,7 @@ function buildProductEntry(p: {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isAdmin(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const token = process.env.GITHUB_TOKEN;
     if (!token) return NextResponse.json({ error: "GITHUB_TOKEN not set in environment" }, { status: 500 });

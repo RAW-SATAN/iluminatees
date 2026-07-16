@@ -50,14 +50,14 @@ export function StickyBubble() {
           marginBottom: 1,
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>
-          Unlock a FREE Eye of Providence Tee
+          Flat 20% OFF on prepaid orders
         </div>
         <div style={{
           fontFamily: "Inter, sans-serif", fontSize: "0.5rem",
           color: "rgba(255,255,255,0.4)",
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>
-          Shop ₹5,000+ from the Limited Drop collection
+          Any 2 tees +10% · Any 3 +15% — auto-applied at checkout
         </div>
       </div>
 

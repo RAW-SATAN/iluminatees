@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdmin } from "@/lib/adminAuth";
 
 const REPO   = "RAW-SATAN/iluminatees";
 const BRANCH = "main";
@@ -25,6 +26,7 @@ async function githubPut(token: string, path: string, content: string, sha: stri
 }
 
 export async function POST(req: NextRequest) {
+  if (!isAdmin(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const token = process.env.GITHUB_TOKEN;
     if (!token) return NextResponse.json({ error: "GITHUB_TOKEN not set" }, { status: 500 });

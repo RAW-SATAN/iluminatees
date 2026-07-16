@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { isAdmin } from '@/lib/adminAuth'
 
-export async function GET() {
+/* Settings safe to expose to the storefront; everything else is admin-only */
+const PUBLIC_KEYS = new Set(['cod_enabled'])
+
+export async function GET(req: NextRequest) {
   try {
     const all = await prisma.storeSetting.findMany()
+    const admin = isAdmin(req)
     const map: Record<string, string> = {}
-    for (const s of all) map[s.key] = s.value
+    for (const s of all) {
+      if (admin || PUBLIC_KEYS.has(s.key)) map[s.key] = s.value
+    }
     return NextResponse.json(map)
   } catch (e) {
     console.error('GET /api/settings error:', e)
@@ -14,6 +21,7 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
+  if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const body = await req.json()
     const { key, value } = body
