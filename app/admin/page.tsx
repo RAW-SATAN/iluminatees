@@ -5,7 +5,6 @@ import { products as staticProducts, type Product } from "@/lib/products";
 import { ProductMockup } from "@/components/ProductMockup";
 
 const ADMIN_PASSWORD = "ILUM2026";
-const ORDER_KEY      = "iluminatees_orders";
 const EDITS_KEY      = "iluminatees_product_edits";
 const ADDED_KEY      = "iluminatees_added_products";
 const DELETED_KEY    = "iluminatees_deleted_products";
@@ -88,7 +87,7 @@ export default function AdminPage() {
   const [pw, setPw]                 = useState("");
   const [pwErr, setPwErr]           = useState(false);
   const [tab, setTab]               = useState<"home"|"orders"|"products"|"homepage">("home");
-  const [orders, setOrders]         = useLS<Order[]>(ORDER_KEY, DEMO_ORDERS);
+  const [orders, setOrders]         = useState<Order[]>(DEMO_ORDERS);
   const [edits, setEdits]           = useLS<Record<string, ProductEdit>>(EDITS_KEY, {});
   const [search, setSearch]         = useState("");
   const [oSearch, setOSearch]       = useState("");
@@ -118,6 +117,20 @@ export default function AdminPage() {
     fetch("/site-assets.json", { cache: "no-store" })
       .then(r => (r.ok ? r.json() : null))
       .then(d => { if (d) setSiteAssets({ heroBanners: d.heroBanners ?? {}, carouselMockups: d.carouselMockups ?? {}, cultGallery: d.cultGallery ?? {}, misc: d.misc ?? {} }); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/orders")
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        if (Array.isArray(data) && data.length) {
+          setOrders(data.map((o: any) => ({
+            ...o,
+            date: o.date || new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+          })));
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -519,7 +532,11 @@ export default function AdminPage() {
                             </span>
                           </td>
                           <td style={{ padding: "0.75rem 0.85rem" }}>
-                            <select value={o.status} onChange={e => setOrders(orders.map(x => x.id===o.id ? {...x,status:e.target.value as OrderStatus} : x))}
+                            <select value={o.status} onChange={e => {
+                                const newStatus = e.target.value as OrderStatus;
+                                setOrders(orders.map(x => x.id===o.id ? {...x,status:newStatus} : x));
+                                fetch("/api/orders", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: o.id, status: newStatus }) }).catch(() => {});
+                              }}
                               style={{ fontSize: "0.58rem", border: `1px solid ${S.border}`, borderRadius: 6, padding: "0.3rem 0.5rem", color: S.text, cursor: "pointer", outline: "none", background: S.card }}>
                               {(["pending","confirmed","shipped","delivered","cancelled"] as OrderStatus[]).map(s => (
                                 <option key={s} value={s}>{ORDER_STATUS[s].label}</option>

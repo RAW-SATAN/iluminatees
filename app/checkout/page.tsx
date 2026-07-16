@@ -22,28 +22,35 @@ export default function CheckoutPage() {
 
   function setField(k: keyof typeof form, v: string) { setForm(f => ({ ...f, [k]: v })); setErr(null); }
 
-  function placeOrder() {
+  async function placeOrder() {
     if (!form.name.trim() || !/^\d{10}$/.test(form.phone.trim()) || !form.address.trim() || !form.city.trim()) {
       setErr("Naam, 10-digit phone, address aur city bharna zaroori hai.");
       return;
     }
     const orderId = `#${1000 + Math.floor(Math.random() * 9000)}`;
     const order = {
-      id: orderId,
+      id: `#${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
       customer: form.name.trim(),
       phone: form.phone.trim(),
       address: `${form.address.trim()}${form.pincode.trim() ? ", " + form.pincode.trim() : ""}`,
       city: form.city.trim(),
       items: items.map(i => ({ name: i.name, size: i.size, qty: i.quantity, price: i.price })),
       total: payable,
-      status: "pending",
       payment: payment === "cod" ? "cod" : "unpaid",
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     };
     try {
-      const existing = JSON.parse(localStorage.getItem("iluminatees_orders") ?? "[]");
-      localStorage.setItem("iluminatees_orders", JSON.stringify([order, ...existing]));
-    } catch {}
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
+      });
+      if (!res.ok) { setErr("Order place nahi ho paya. Dobara try karo."); return; }
+      const saved = await res.json();
+      try { localStorage.setItem("iluminatees_orders", JSON.stringify([saved, ...JSON.parse(localStorage.getItem("iluminatees_orders") ?? "[]")])); } catch {}
+    } catch {
+      setErr("Server se connect nahi ho paya. Dobara try karo.");
+      return;
+    }
     clearCart();
     setPlaced(orderId);
   }
