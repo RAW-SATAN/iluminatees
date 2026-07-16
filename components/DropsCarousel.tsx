@@ -19,7 +19,7 @@ import { useWishlist } from "./WishlistProvider";
 const SLOTS = [
   { scale: 0.40, opacity: 0.28, tx: "-38vw", zIndex: 1 }, // -2
   { scale: 0.63, opacity: 0.52, tx: "-21vw", zIndex: 2 }, // -1
-  { scale: 1.00, opacity: 1.00, tx:    "0",  zIndex: 4 }, //  0  ← center
+  { scale: 1.00, opacity: 1.00, tx:  "0px",  zIndex: 4 }, //  0  ← center
   { scale: 0.63, opacity: 0.52, tx:  "21vw", zIndex: 2 }, // +1
   { scale: 0.40, opacity: 0.28, tx:  "38vw", zIndex: 1 }, // +2
 ];
@@ -102,7 +102,7 @@ export function DropsCarousel() {
       <div style={{
         position: "relative",
         width: "100%",
-        height: "clamp(190px, 22vw, 260px)",
+        height: "clamp(240px, 28vw, 350px)",
       }}>
         {products.map((prod, pIdx) => {
           const d = slotOf(pIdx, idx, products.length);
@@ -136,31 +136,38 @@ export function DropsCarousel() {
                 pointerEvents: isClickable ? "auto" : "none",
               }}
             >
-              <div style={{
-                width:  "clamp(150px, 17vw, 210px)",
-                height: "clamp(150px, 17vw, 210px)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                background: isCenter ? "#fff" : "transparent",
-                borderRadius: 20,
-                boxShadow: isCenter ? "0 16px 56px rgba(0,0,0,0.12)" : "none",
-                border:     isCenter ? "1px solid #eee" : "none",
-                transition: "box-shadow 0.4s ease, border-color 0.4s ease",
-              }}>
-                {carouselMockups[prod.slug] ? (
-                  <img
-                    src={carouselMockups[prod.slug]}
-                    alt={prod.name}
-                    style={{
-                      width:  isCenter ? 175 : 135,
-                      height: (isCenter ? 175 : 135) * 1.2,
-                      objectFit: "contain",
-                      pointerEvents: "none",
-                    }}
-                  />
-                ) : (
-                  <ProductMockup product={prod} size={isCenter ? 175 : 135} />
-                )}
-              </div>
+              {(() => {
+                const mock = carouselMockups[prod.slug];
+                /* Uploaded 3D mockups float free — no card, and the centre one is larger */
+                return (
+                  <div style={{
+                    width:  mock && isCenter ? "clamp(230px, 26vw, 330px)" : "clamp(150px, 17vw, 210px)",
+                    height: mock && isCenter ? "clamp(230px, 26vw, 330px)" : "clamp(150px, 17vw, 210px)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: isCenter && !mock ? "#fff" : "transparent",
+                    borderRadius: 20,
+                    boxShadow: isCenter && !mock ? "0 16px 56px rgba(0,0,0,0.12)" : "none",
+                    border:     isCenter && !mock ? "1px solid #eee" : "none",
+                    transition: "box-shadow 0.4s ease, border-color 0.4s ease, width 0.4s ease, height 0.4s ease",
+                  }}>
+                    {mock ? (
+                      <img
+                        src={mock}
+                        alt={prod.name}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                          pointerEvents: "none",
+                          filter: isCenter ? "drop-shadow(0 18px 40px rgba(0,0,0,0.18))" : "none",
+                        }}
+                      />
+                    ) : (
+                      <ProductMockup product={prod} size={isCenter ? 175 : 135} />
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}
