@@ -40,14 +40,7 @@ function useLS<T>(key: string, init: T) {
 }
 
 /* ── Demo data ── */
-const DEMO_ORDERS: Order[] = [
-  { id: "#1001", customer: "Rahul Kumar",  phone: "9876543210", address: "12 MG Road", city: "Bangalore", items: [{ name: "Eye of Providence", size: "L", qty: 1, price: 1333 }], total: 1333, status: "delivered", payment: "paid",   date: "Jul 10, 2026" },
-  { id: "#1002", customer: "Priya Sharma", phone: "9123456789", address: "45 Connaught Place", city: "Delhi",     items: [{ name: "Sacred Geometry", size: "M", qty: 1, price: 1111 }, { name: "Cipher 33", size: "M", qty: 1, price: 1111 }], total: 2222, status: "shipped",   payment: "paid",   date: "Jul 12, 2026" },
-  { id: "#1003", customer: "Aryan Mehta",  phone: "9988776655", address: "7 Bandra West", city: "Mumbai",     items: [{ name: "The Architect", size: "XL", qty: 2, price: 1199 }], total: 2398, status: "confirmed", payment: "cod",    date: "Jul 14, 2026" },
-  { id: "#1004", customer: "Neha Singh",   phone: "8877665544", address: "23 Anna Salai", city: "Chennai",    items: [{ name: "Novus Ordo Seclorum", size: "S", qty: 1, price: 999 }], total: 999, status: "pending",   payment: "unpaid", date: "Jul 15, 2026" },
-  { id: "#1005", customer: "Vikram Patel", phone: "7766554433", address: "90 CG Road", city: "Ahmedabad",  items: [{ name: "Third Eye Open", size: "L", qty: 1, price: 1111 }, { name: "Ouroboros", size: "L", qty: 1, price: 1299 }], total: 2410, status: "pending",   payment: "cod",    date: "Jul 15, 2026" },
-  { id: "#1006", customer: "Sneha Reddy",  phone: "9900112233", address: "14 Film Nagar", city: "Hyderabad", items: [{ name: "Eye of Providence", size: "M", qty: 1, price: 1333 }], total: 1333, status: "cancelled",  payment: "unpaid", date: "Jul 13, 2026" },
-];
+const DEMO_ORDERS: Order[] = [];
 
 /* ── Badge configs ── */
 const ORDER_STATUS: Record<OrderStatus, { label: string; bg: string; color: string }> = {
@@ -87,7 +80,7 @@ export default function AdminPage() {
   const [pw, setPw]                 = useState("");
   const [pwErr, setPwErr]           = useState(false);
   const [tab, setTab]               = useState<"home"|"orders"|"products"|"homepage">("home");
-  const [orders, setOrders]         = useState<Order[]>(DEMO_ORDERS);
+  const [orders, setOrders]         = useState<Order[]>([]);
   const [edits, setEdits]           = useLS<Record<string, ProductEdit>>(EDITS_KEY, {});
   const [search, setSearch]         = useState("");
   const [oSearch, setOSearch]       = useState("");
