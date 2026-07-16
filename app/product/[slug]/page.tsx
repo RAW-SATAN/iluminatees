@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check, Share2 } from "lucide-react";
 import { getProductBySlug, products as staticProducts, type ProductSize } from "@/lib/products";
 import { useProducts } from "@/lib/useProducts";
+import { useSiteAssets } from "@/lib/useSiteAssets";
 import { ProductMockup } from "@/components/ProductMockup";
 import { useCart } from "@/components/CartProvider";
 import { useWishlist } from "@/components/WishlistProvider";
@@ -16,7 +17,7 @@ const FAQS = [
   { q: "Check Check Authenticated", a: "Every ILUMINATEES drop undergoes a 5-level verification before dispatch — fabric GSM check, print quality, stitching, sizing accuracy, and packaging integrity. You get what you paid for, guaranteed." },
   { q: "Our Promise", a: "Heavyweight cotton, screen-printed graphics that outlast the trend, and drops that actually sell out. No filler. No fast fashion. Only pieces worth owning." },
   { q: "Money Back Guarantee", a: "If your order arrives damaged, wrong size, or not as described — we refund 100%, no questions asked. Just WhatsApp us within 48 hours of delivery." },
-  { q: "Shippings & EMIs", a: "Ships Pan-India within 3-5 business days. Express delivery available. No-cost EMI on orders above ₹999 via Razorpay, PhonePe Pay Later, and select cards." },
+  { q: "Shipping", a: "Ships Pan-India within 3-5 business days. Express delivery available on orders placed before 2 PM." },
   { q: "FAQ", a: "Q: 100% cotton? Yes — 220-260 GSM heavyweight ringspun cotton.\nQ: Wash care? Cold wash, inside out, no tumble dry.\nQ: Restocks? Limited drops never restock. Sacred/Cipher series may restock once per season." },
   { q: "Product Information", a: "220-260 GSM heavyweight cotton. Pre-washed, pre-shrunk. Oversized/boxy/relaxed fit depending on style. Screen-printed graphics — not DTG. Unisex sizing." },
 ];
@@ -118,7 +119,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null;
-  const emi = Math.round(product.price / 9);
+  const { misc } = useSiteAssets();
+  const sizeChartImg = misc["sizechart"];
+  const [showSizeChart, setShowSizeChart] = useState(false);
   const sold = parseInt(product.id.replace("custom-", "")) % 500 + 124;
   const otherProducts = allProducts.filter(p => p.id !== product.id);
   const related = otherProducts.slice(0, 6);
@@ -314,10 +317,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           <div style={{ marginBottom: 14 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
               <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.62rem", color: "#111", letterSpacing: "0.04em" }}>SELECT YOUR SIZE</span>
-              <div style={{ display: "flex", gap: 12 }}>
-                <a href="#" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555", textDecoration: "underline" }}>↗ Size Chart</a>
-                <a href="#" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555", textDecoration: "underline" }}>Find in store</a>
-              </div>
+              {sizeChartImg && (
+                <button onClick={() => setShowSizeChart(true)} style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                  ↗ Size Chart
+                </button>
+              )}
             </div>
             <div style={{ position: "relative" }}>
               <select
@@ -394,11 +398,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </button>
           </div>
 
-          {/* Pay later */}
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#888", textAlign: "center", marginBottom: 12 }}>
-            Get It At <strong style={{ color: "#111" }}>₹{emi.toLocaleString("en-IN")}/Month</strong> With ILUMINATEES Pay Later
-          </div>
-
           {/* Auth row */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.7rem 0.9rem", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, marginBottom: 16, cursor: "pointer" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -407,8 +406,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </span>
               <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.57rem", color: "#333", lineHeight: 1.4 }}>
                 Each Product Includes A{" "}
-                <span style={{ color: "#0066cc", textDecoration: "underline" }}>Quality Certificate</span>,{" "}
-                <span style={{ color: "#0066cc", textDecoration: "underline" }}>Buyer Protection Policy</span>{" "}
+                <span style={{ color: "#0066cc", textDecoration: "underline" }}>Quality Certificate</span>{" "}
                 And{" "}
                 <span style={{ color: "#0066cc", textDecoration: "underline" }}>Delivery Insurance</span>
               </span>
@@ -504,7 +502,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 DELIVERY AND SERVICES
               </div>
               {[
-                { icon: "🔄", title: "Easy Exchange & Buyer Protection Policy", desc: "ILUMINATEES offers size exchange and 100% satisfaction guarantee on every drop." },
+                { icon: "🔄", title: "Easy Exchange Policy", desc: "ILUMINATEES offers size exchange and 100% satisfaction guarantee on every drop." },
                 { icon: "📦", title: "Cash on Delivery Available", desc: "Available on orders above ₹999" },
                 { icon: "⚡", title: "Express Shipping", desc: "Your order ships today if placed before 2 PM." },
               ].map(({ icon, title, desc }) => (
@@ -635,21 +633,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 <div style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.4rem, 3vw, 2rem)", color: "#fff", letterSpacing: "0.04em", marginBottom: 20 }}>
                   Join The Order
                 </div>
-                <div style={{ display: "flex", gap: 10 }}>
-                  <div style={{ background: "#fff", borderRadius: 8, padding: "0.4rem 0.8rem", display: "flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#111"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                    <div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.38rem", color: "#555" }}>Download on the</div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.58rem", color: "#111" }}>App Store</div>
-                    </div>
-                  </div>
-                  <div style={{ background: "#fff", borderRadius: 8, padding: "0.4rem 0.8rem", display: "flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#111"><path d="M3.18 23.76c.3.17.64.22.98.14l12.48-7.17-2.83-2.83-10.63 9.86zm-1.7-20.1C1.18 4.04 1 4.53 1 5.1v13.8c0 .57.18 1.06.48 1.44l.08.07 7.74-7.73v-.18L1.56 3.6l-.08.06zM20.49 10.7l-2.66-1.53-3.15 3.14 3.15 3.15 2.68-1.54c.76-.44.76-1.78-.02-2.22zm-17.3 11.06l10.56-9.73-2.83-2.83-7.73 12.56z"/></svg>
-                    <div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.38rem", color: "#555" }}>Get it on</div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.58rem", color: "#111" }}>Google Play</div>
-                    </div>
-                  </div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 20, padding: "0.5rem 1.1rem" }}>
+                  <span style={{ fontSize: "0.85rem" }}>📱</span>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", letterSpacing: "0.14em", color: "#fff", textTransform: "uppercase" }}>
+                    Mobile App — Coming Soon
+                  </span>
                 </div>
               </div>
               {/* QR + phone mockup */}
@@ -778,7 +766,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     <span style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "0.78rem", color: "#111" }}>₹{p.price.toLocaleString("en-IN")}</span>
                     {p.originalPrice && <span style={{ fontFamily: "Space Mono, monospace", fontSize: "0.56rem", color: "#bbb", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString("en-IN")}</span>}
                   </div>
-                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.46rem", color: "#bbb" }}>EMI @ ₹{Math.round(p.price / 9).toLocaleString("en-IN")}/month</div>
                 </div>
               </Link>
             );
@@ -813,6 +800,17 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           ))}
         </div>
       </div>
+
+      {/* ── Size Chart Modal ── */}
+      {showSizeChart && sizeChartImg && (
+        <div onClick={() => setShowSizeChart(false)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 14, maxWidth: 640, width: "100%", maxHeight: "85vh", overflow: "auto", position: "relative" }}>
+            <button onClick={() => setShowSizeChart(false)} style={{ position: "absolute", top: 10, right: 10, width: 30, height: 30, borderRadius: "50%", background: "#111", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.8rem", zIndex: 1 }}>✕</button>
+            <div style={{ padding: "1rem 1rem 0.5rem", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", color: "#111" }}>Size Chart</div>
+            <img src={sizeChartImg} alt="Size chart" style={{ width: "100%", display: "block" }} />
+          </div>
+        </div>
+      )}
 
       <style>{`
         @media (max-width: 768px) {

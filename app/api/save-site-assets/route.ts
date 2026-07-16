@@ -27,16 +27,26 @@ async function githubPut(token: string, path: string, content: string, sha: stri
 interface SiteAssets {
   heroBanners: Record<string, string>;
   carouselMockups: Record<string, string>;
+  cultGallery: Record<string, string>;
+  misc: Record<string, string>;
 }
+
+const KIND_CONFIG: Record<string, { dir: string; mapKey: keyof SiteAssets }> = {
+  hero:   { dir: "public/site/hero",     mapKey: "heroBanners" },
+  mockup: { dir: "public/site/mockups",  mapKey: "carouselMockups" },
+  cult:   { dir: "public/site/cult",     mapKey: "cultGallery" },
+  misc:   { dir: "public/site/misc",     mapKey: "misc" },
+};
 
 export async function POST(req: NextRequest) {
   try {
     const token = process.env.GITHUB_TOKEN;
     if (!token) return NextResponse.json({ error: "GITHUB_TOKEN not set" }, { status: 500 });
 
-    const { kind, key, image }: { kind: "hero" | "mockup"; key: string; image: string | null } = await req.json();
-    if ((kind !== "hero" && kind !== "mockup") || !key) {
-      return NextResponse.json({ error: "kind ('hero'|'mockup') and key required" }, { status: 400 });
+    const { kind, key, image }: { kind: string; key: string; image: string | null } = await req.json();
+    const cfg = KIND_CONFIG[kind];
+    if (!cfg || !key) {
+      return NextResponse.json({ error: "kind ('hero'|'mockup'|'cult'|'misc') and key required" }, { status: 400 });
     }
     const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, "");
     if (!safeKey) return NextResponse.json({ error: "invalid key" }, { status: 400 });
@@ -48,9 +58,10 @@ export async function POST(req: NextRequest) {
       const header = image.slice(0, comma);
       const b64 = image.slice(comma + 1);
       const ext = header.includes("png") ? "png" : header.includes("webp") ? "webp" : "jpg";
+      /* keep legacy hero path (hero-<key>.jpg) so existing uploads stay valid */
       const filePath = kind === "hero"
         ? `public/site/hero-${safeKey}.${ext}`
-        : `public/site/mockups/${safeKey}.${ext}`;
+        : `${cfg.dir}/${safeKey}.${ext}`;
 
       let sha: string | undefined;
       const checkRes = await githubGet(token, filePath);
@@ -73,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     /* ── Update site-assets.json ── */
     const jsonPath = "public/site-assets.json";
-    let data: SiteAssets = { heroBanners: {}, carouselMockups: {} };
+    let data: SiteAssets = { heroBanners: {}, carouselMockups: {}, cultGallery: {}, misc: {} };
     let jsonSha: string | undefined;
 
     const getRes = await githubGet(token, jsonPath);
@@ -82,11 +93,16 @@ export async function POST(req: NextRequest) {
       jsonSha = fileData.sha;
       try {
         const parsed = JSON.parse(Buffer.from(fileData.content, "base64").toString("utf-8"));
-        data = { heroBanners: parsed.heroBanners ?? {}, carouselMockups: parsed.carouselMockups ?? {} };
+        data = {
+          heroBanners:     parsed.heroBanners ?? {},
+          carouselMockups: parsed.carouselMockups ?? {},
+          cultGallery:     parsed.cultGallery ?? {},
+          misc:            parsed.misc ?? {},
+        };
       } catch {}
     }
 
-    const map = kind === "hero" ? data.heroBanners : data.carouselMockups;
+    const map = data[cfg.mapKey] as Record<string, string>;
     if (url) map[safeKey] = url;
     else delete map[safeKey];
 

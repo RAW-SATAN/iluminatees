@@ -3,7 +3,6 @@ import { Hero } from "@/components/Hero";
 import { DropsCarousel } from "@/components/DropsCarousel";
 import { TrendingSection } from "@/components/TrendingSection";
 import { BrandStory } from "@/components/BrandStory";
-import { CategoryGrid } from "@/components/CategoryGrid";
 import { NewsletterForm } from "@/components/NewsletterForm";
 
 export default function HomePage() {
@@ -55,9 +54,6 @@ export default function HomePage() {
           </p>
         </div>
       </div>
-
-      {/* ── Category Grid ────────────────────────────── */}
-      <CategoryGrid />
 
       {/* ── Newsletter ──────────────────────────────── */}
       <section style={{

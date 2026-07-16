@@ -18,12 +18,9 @@ const PLACEHOLDERS = [
 const NAV_CATS = [
   { label: "ALL",          href: "/shop" },
   { label: "⚡ NEW DROPS", href: "/shop" },
-  { label: "BRANDS",       href: "/shop" },
-  { label: "APEX",         href: "/shop?cat=APEX" },
-  { label: "CIPHER",       href: "/shop?cat=CIPHER" },
-  { label: "SACRED",       href: "/shop?cat=SACRED" },
-  { label: "ACCESSORIES",  href: "/shop" },
   { label: "SALE",         href: "/shop", red: true },
+  { label: "CONTACT US",   href: "/contact" },
+  { label: "ABOUT US",     href: "/about" },
 ];
 
 const MARQUEE_ITEMS = [

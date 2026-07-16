@@ -5,6 +5,7 @@ import { WishlistProvider } from "@/components/WishlistProvider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBubble } from "@/components/StickyBubble";
+import { ExitOfferPopup } from "@/components/ExitOfferPopup";
 
 export const metadata: Metadata = {
   title: "ILUMINATEES — Not Made To Fit In.",
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main style={{ paddingTop: 126 }}>{children}</main>
           <Footer />
           <StickyBubble />
+          <ExitOfferPopup />
           </WishlistProvider>
         </CartProvider>
       </body>

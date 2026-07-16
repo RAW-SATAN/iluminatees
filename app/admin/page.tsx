@@ -111,13 +111,13 @@ export default function AdminPage() {
   const [publishing, setPublishing] = useState(false);
   const [savingImages, setSavingImages] = useState(false);
   const [toast, setToast]           = useState<string|null>(null);
-  const [siteAssets, setSiteAssets] = useState<{ heroBanners: Record<string,string>; carouselMockups: Record<string,string> }>({ heroBanners: {}, carouselMockups: {} });
+  const [siteAssets, setSiteAssets] = useState<{ heroBanners: Record<string,string>; carouselMockups: Record<string,string>; cultGallery: Record<string,string>; misc: Record<string,string> }>({ heroBanners: {}, carouselMockups: {}, cultGallery: {}, misc: {} });
   const [assetBusy, setAssetBusy]   = useState<string|null>(null);
 
   useEffect(() => {
     fetch("/site-assets.json", { cache: "no-store" })
       .then(r => (r.ok ? r.json() : null))
-      .then(d => { if (d) setSiteAssets({ heroBanners: d.heroBanners ?? {}, carouselMockups: d.carouselMockups ?? {} }); })
+      .then(d => { if (d) setSiteAssets({ heroBanners: d.heroBanners ?? {}, carouselMockups: d.carouselMockups ?? {}, cultGallery: d.cultGallery ?? {}, misc: d.misc ?? {} }); })
       .catch(() => {});
   }, []);
 
@@ -146,7 +146,7 @@ export default function AdminPage() {
     });
   }
 
-  async function saveSiteAsset(kind: "hero"|"mockup", key: string, file: File | null) {
+  async function saveSiteAsset(kind: "hero"|"mockup"|"cult"|"misc", key: string, file: File | null) {
     const busyKey = `${kind}:${key}`;
     setAssetBusy(busyKey);
     try {
@@ -158,8 +158,10 @@ export default function AdminPage() {
           reader.onerror = rej;
           reader.readAsDataURL(file);
         });
-        /* Banners stay wide (1920px JPEG); mockups keep transparency (900px PNG) */
-        image = kind === "hero" ? await resizeImage(dataUrl, 1920, false) : await resizeImage(dataUrl, 900, true);
+        /* Banners stay wide (1920px JPEG); mockups keep transparency (900px PNG); rest JPEG */
+        image = kind === "hero" ? await resizeImage(dataUrl, 1920, false)
+              : kind === "mockup" ? await resizeImage(dataUrl, 900, true)
+              : await resizeImage(dataUrl, 1400, false);
       }
       const res = await fetch("/api/save-site-assets", {
         method: "POST",
@@ -169,8 +171,8 @@ export default function AdminPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "upload failed");
       setSiteAssets(prev => {
-        const next = { heroBanners: { ...prev.heroBanners }, carouselMockups: { ...prev.carouselMockups } };
-        const map = kind === "hero" ? next.heroBanners : next.carouselMockups;
+        const next = { heroBanners: { ...prev.heroBanners }, carouselMockups: { ...prev.carouselMockups }, cultGallery: { ...prev.cultGallery }, misc: { ...prev.misc } };
+        const map = kind === "hero" ? next.heroBanners : kind === "mockup" ? next.carouselMockups : kind === "cult" ? next.cultGallery : next.misc;
         if (data.url) map[key] = data.url; else delete map[key];
         return next;
       });
@@ -835,6 +837,77 @@ export default function AdminPage() {
                   );
                 })}
               </div>
+            </div>
+
+            {/* ── Cult Slider Photos ── */}
+            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, marginTop: 20, overflow: "hidden" }}>
+              <div style={{ padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
+                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>"We Illuminated The Cult" — Photos</div>
+                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Achievements, awards ya koi bhi photos — homepage ke cult slider mein cards ke saath dikhengi. 6 slots.</div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 12, padding: "1rem" }}>
+                {["0","1","2","3","4","5"].map(key => {
+                  const img = siteAssets.cultGallery[key];
+                  const busy = assetBusy === `cult:${key}`;
+                  return (
+                    <div key={key} style={{ border: `1px solid ${S.border}`, borderRadius: 10, overflow: "hidden" }}>
+                      <div style={{ height: 110, background: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {img
+                          ? <img src={img} alt={`Cult photo ${Number(key)+1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          : <span style={{ fontSize: "0.52rem", color: S.muted }}>Photo {Number(key)+1} — empty</span>}
+                      </div>
+                      <div style={{ display: "flex", gap: 6, padding: "0.6rem" }}>
+                        <label style={{ flex: 1, textAlign: "center", padding: "0.32rem 0", background: S.green, color: "#fff", borderRadius: 5, fontSize: "0.54rem", fontWeight: 600, cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}>
+                          {busy ? "Saving…" : img ? "Replace" : "Upload"}
+                          <input type="file" accept="image/*" disabled={busy} style={{ display: "none" }}
+                            onChange={e => { const f = e.target.files?.[0]; if (f) saveSiteAsset("cult", key, f); e.target.value = ""; }} />
+                        </label>
+                        {img && (
+                          <button disabled={busy} onClick={() => saveSiteAsset("cult", key, null)}
+                            style={{ padding: "0.32rem 0.6rem", background: S.card, color: S.red, border: `1px solid ${S.border}`, borderRadius: 5, fontSize: "0.54rem", fontWeight: 600, cursor: busy ? "wait" : "pointer" }}>
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ── Size Chart ── */}
+            <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, marginTop: 20, overflow: "hidden" }}>
+              <div style={{ padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
+                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>Size Chart</div>
+                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Size chart ki photo upload karo — product page par "Size Chart" click karne par yahi khulegi.</div>
+              </div>
+              {(() => {
+                const img = siteAssets.misc["sizechart"];
+                const busy = assetBusy === "misc:sizechart";
+                return (
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "0.85rem 1rem" }}>
+                    <div style={{ width: 120, height: 90, borderRadius: 8, border: `1px solid ${S.border}`, background: "#f0f0f0", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {img
+                        ? <img src={img} alt="Size chart" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        : <span style={{ fontSize: "0.52rem", color: S.muted }}>No size chart</span>}
+                    </div>
+                    <div style={{ flex: 1, fontSize: "0.56rem", color: img ? S.green : S.muted }}>
+                      {img ? "Size chart active — product page par dikh raha hai" : "Upload nahi hui — product page par Size Chart button hidden rahega"}
+                    </div>
+                    <label style={{ padding: "0.4rem 0.9rem", background: S.green, color: "#fff", borderRadius: 6, fontSize: "0.6rem", fontWeight: 600, cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}>
+                      {busy ? "Saving…" : img ? "Replace" : "Upload"}
+                      <input type="file" accept="image/*" disabled={busy} style={{ display: "none" }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) saveSiteAsset("misc", "sizechart", f); e.target.value = ""; }} />
+                    </label>
+                    {img && (
+                      <button disabled={busy} onClick={() => saveSiteAsset("misc", "sizechart", null)}
+                        style={{ padding: "0.4rem 0.9rem", background: S.card, color: S.red, border: `1px solid ${S.border}`, borderRadius: 6, fontSize: "0.6rem", fontWeight: 600, cursor: busy ? "wait" : "pointer" }}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </>)}
 

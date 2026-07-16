@@ -3,11 +3,21 @@
 import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
 import { ProductMockup } from "@/components/ProductMockup";
-import { getProductBySlug } from "@/lib/products";
+import { getProductBySlug, type ProductSize } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, total, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, total, clearCart, addItem } = useCart();
+  const allProducts = useProducts();
+
+  const inCart = new Set(items.map(i => i.slug));
+  const suggestions = allProducts.filter(p => !inCart.has(p.slug) && p.inStock).slice(0, 3);
+  const totalQty = items.reduce((s, i) => s + i.quantity, 0);
+  const nextTierMsg =
+    totalQty === 1 ? "1 aur tee add karo → Any 2 par 10% OFF 🔥"
+    : totalQty === 2 ? "1 aur tee add karo → Any 3 par 15% OFF 🔥"
+    : null;
 
   if (items.length === 0) {
     return (
@@ -52,8 +62,24 @@ export default function CartPage() {
 
           {/* ── Items ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+            {/* Urgency strip */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, background: "#fff1f2", border: "1px solid #ffd7d9", borderRadius: 10, padding: "0.65rem 0.9rem" }}>
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.62rem", color: "#111" }}>
+                🔥 Limited vault drop — items in your bag are NOT reserved
+              </span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.56rem", color: "#e8000d", flexShrink: 0 }}>Selling fast</span>
+            </div>
+
+            {/* Bundle offer nudge */}
+            {nextTierMsg && (
+              <div style={{ background: "#f0fdf4", border: "1px dashed #86efac", borderRadius: 10, padding: "0.6rem 0.9rem", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", color: "#15803d" }}>
+                {nextTierMsg}
+              </div>
+            )}
+
             {items.map((item) => {
-              const product = getProductBySlug(item.slug);
+              const product = allProducts.find(p => p.slug === item.slug) ?? getProductBySlug(item.slug);
               return (
                 <div
                   key={`${item.productId}-${item.size}`}
@@ -114,9 +140,43 @@ export default function CartPage() {
               );
             })}
 
+            {/* ── Bought Together / upsell ── */}
+            {suggestions.length > 0 && (
+              <div style={{ border: "1px solid #eee", borderRadius: 12, marginTop: 8, overflow: "hidden" }}>
+                <div style={{ padding: "0.75rem 1rem", borderBottom: "1px solid #f0f0f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.62rem", color: "#111" }}>USUALLY BOUGHT TOGETHER</span>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#16a34a", fontWeight: 700 }}>Bundle & save upto 15%</span>
+                </div>
+                <div className="no-scrollbar" style={{ display: "flex", gap: 10, padding: "0.9rem 1rem", overflowX: "auto" }}>
+                  {suggestions.map(p => (
+                    <div key={p.slug} style={{ flexShrink: 0, width: 150, border: "1px solid #f0f0f0", borderRadius: 10, overflow: "hidden" }}>
+                      <Link href={`/product/${p.slug}`} style={{ textDecoration: "none" }}>
+                        <div style={{ height: 120, background: "#f7f7f7", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                          {p.customImage
+                            ? <img src={p.customImage} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <ProductMockup product={p} size={70} />}
+                        </div>
+                      </Link>
+                      <div style={{ padding: "0.55rem 0.6rem" }}>
+                        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.56rem", color: "#111", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
+                          <span style={{ fontFamily: "Space Mono, monospace", fontWeight: 700, fontSize: "0.62rem", color: "#111" }}>₹{p.price.toLocaleString("en-IN")}</span>
+                          <button
+                            onClick={() => addItem({ productId: p.id, slug: p.slug, name: p.name, price: p.price, size: "M" as ProductSize, quantity: 1, shirtColor: p.shirtColor, symbol: p.symbol })}
+                            style={{ background: "#111", color: "#fff", border: "none", borderRadius: 6, fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.52rem", padding: "0.3rem 0.6rem", cursor: "pointer" }}>
+                            + Add
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Trust badges */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
-              {["🔄 Easy Returns", "📦 Cash on Delivery", "⚡ Fast Shipping"].map(b => (
+              {["🔄 Easy Returns", "📦 Cash on Delivery", "⚡ Fast Shipping", "💸 20% OFF on prepaid"].map(b => (
                 <span key={b} style={{ fontFamily: "Inter, sans-serif", fontSize: "0.56rem", color: "#888", background: "#f9f9f9", border: "1px solid #eee", borderRadius: 6, padding: "0.3rem 0.7rem" }}>{b}</span>
               ))}
             </div>
@@ -154,12 +214,15 @@ export default function CartPage() {
                 </span>
               </div>
 
-              <button
-                onClick={() => alert("Checkout coming soon!")}
-                style={{ width: "100%", padding: "1rem", background: "#111", color: "#fff", border: "none", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.78rem", letterSpacing: "0.1em", cursor: "pointer", marginBottom: 10, textTransform: "uppercase" }}
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.56rem", color: "#16a34a", fontWeight: 700, textAlign: "center", marginBottom: 10 }}>
+                ⚡ Pay online at checkout & get 20% OFF
+              </div>
+              <Link
+                href="/checkout"
+                style={{ display: "block", textAlign: "center", width: "100%", padding: "1rem 0", background: "#111", color: "#fff", border: "none", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.78rem", letterSpacing: "0.1em", cursor: "pointer", marginBottom: 10, textTransform: "uppercase", textDecoration: "none", boxSizing: "border-box" }}
               >
                 Proceed To Checkout →
-              </button>
+              </Link>
 
               <Link href="/shop" style={{ display: "block", textAlign: "center", fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#aaa", textDecoration: "none" }}>
                 ← Continue Shopping

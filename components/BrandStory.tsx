@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useSiteAssets } from "@/lib/useSiteAssets";
 
 const CARDS = [
   {
@@ -60,6 +61,11 @@ const CARDS = [
 export function BrandStory() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(2); // center card
+  const { cultGallery } = useSiteAssets();
+
+  /* Admin-uploaded photos (achievements, awards, moments) — shown as image cards in the slider */
+  const photos = Object.keys(cultGallery).sort().map(k => cultGallery[k]);
+  const totalCards = CARDS.length + photos.length;
 
   const scrollTo = (i: number) => {
     setActive(i);
@@ -224,6 +230,41 @@ export function BrandStory() {
               </div>
             );
           })}
+
+          {/* Admin-uploaded photo cards */}
+          {photos.map((src, pi) => {
+            const i = CARDS.length + pi;
+            const isActive = active === i;
+            return (
+              <div
+                key={`photo-${pi}`}
+                onClick={() => scrollTo(i)}
+                style={{
+                  flexShrink: 0,
+                  width: "clamp(240px, 24vw, 310px)",
+                  minHeight: 300,
+                  borderRadius: 20,
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  scrollSnapAlign: "center",
+                  transform: isActive ? "translateY(-8px)" : "translateY(0)",
+                  boxShadow: isActive
+                    ? "0 20px 60px rgba(0,0,0,0.3)"
+                    : "0 4px 20px rgba(0,0,0,0.15)",
+                  transition: "transform 0.4s cubic-bezier(0.34,1.28,0.64,1), box-shadow 0.4s ease",
+                  border: "1px solid rgba(0,0,0,0.06)",
+                  position: "relative",
+                  background: "#111",
+                }}
+              >
+                <img
+                  src={src}
+                  alt={`ILUMINATEES moment ${pi + 1}`}
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+            );
+          })}
         </div>
 
         {/* Arrows */}
@@ -233,7 +274,7 @@ export function BrandStory() {
         ].map(({ dir, side, label }) => (
           <button
             key={label}
-            onClick={() => scrollTo(Math.max(0, Math.min(CARDS.length - 1, active + dir)))}
+            onClick={() => scrollTo(Math.max(0, Math.min(totalCards - 1, active + dir)))}
             style={{
               position: "absolute",
               [side]: "2vw",
@@ -254,7 +295,7 @@ export function BrandStory() {
 
       {/* Dot nav */}
       <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 24 }}>
-        {CARDS.map((_, i) => (
+        {Array.from({ length: totalCards }).map((_, i) => (
           <button
             key={i}
             onClick={() => scrollTo(i)}

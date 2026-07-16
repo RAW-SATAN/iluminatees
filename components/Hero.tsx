@@ -66,10 +66,20 @@ const SLIDES = [
 /* ── Component ──────────────────────────────────────────── */
 export function Hero() {
   const products = useProducts();
-  const { heroBanners } = useSiteAssets();
+  const { heroBanners, loaded } = useSiteAssets();
   const [slide,      setSlide]      = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const touchX = useRef<number | null>(null);
+
+  function onTouchStart(e: React.TouchEvent) { touchX.current = e.touches[0].clientX; }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (touchX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (dx > 45) prev();
+    else if (dx < -45) next();
+  }
 
   useEffect(() => {
     if (isHovering) { clearInterval(timerRef.current); return; }
@@ -154,11 +164,13 @@ export function Hero() {
 
       {/* ── Center Carousel ───────────────────────────── */}
       <div
-        style={{ flex: 1, position: "relative", overflow: "hidden", minWidth: 0 }}
+        style={{ flex: 1, position: "relative", overflow: "hidden", minWidth: 0, touchAction: "pan-y" }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
-        {SLIDES.map((s, i) => {
+        {loaded && SLIDES.map((s, i) => {
           const prod = products.find((p) => p.slug === s.slug)!;
           const active = slide === i;
           const banner = heroBanners[String(i)];

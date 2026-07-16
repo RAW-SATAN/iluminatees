@@ -52,7 +52,6 @@ function ProductTile({ product }: { product: Product }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const tag  = getTag(product);
-  const emi  = Math.round(product.price / 9);
   const wishlisted = isWishlisted(product.slug);
 
   function handleAddToCart(e: React.MouseEvent) {
@@ -155,15 +154,6 @@ function ProductTile({ product }: { product: Product }) {
                 ₹{product.originalPrice.toLocaleString("en-IN")}
               </span>
             )}
-          </div>
-
-          {/* EMI */}
-          <div style={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: "0.48rem", color: "#aaa",
-            letterSpacing: "0.02em",
-          }}>
-            EMI @ ₹{emi.toLocaleString("en-IN")}/Month
           </div>
 
           {/* Wishlist row */}

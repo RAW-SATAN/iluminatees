@@ -51,7 +51,6 @@ function ShopCard({ product }: { product: Product }) {
   const { toggleItem, isWishlisted } = useWishlist();
   const [added, setAdded] = useState(false);
   const tag = getTag(product);
-  const emi = Math.round(product.price / 9);
   const wishlisted = isWishlisted(product.slug);
 
   function handleAdd(e: React.MouseEvent) {
@@ -100,9 +99,6 @@ function ShopCard({ product }: { product: Product }) {
                 ₹{product.originalPrice.toLocaleString("en-IN")}
               </span>
             )}
-          </div>
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.48rem", color: "#bbb" }}>
-            EMI @ ₹{emi.toLocaleString("en-IN")}/month
           </div>
         </div>
       </Link>

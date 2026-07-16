@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import type { Product } from "@/lib/products";
@@ -46,15 +46,24 @@ function getTag(p: Product) {
 
 export function DropsCarousel() {
   const products = useProducts();
-  const { carouselMockups } = useSiteAssets();
+  const { carouselMockups, loaded } = useSiteAssets();
   const [idx, setIdx] = useState(0);
   const { toggleItem, isWishlisted } = useWishlist();
+  const touchX = useRef<number | null>(null);
 
   const prev = useCallback(() => setIdx((i) => (i - 1 + products.length) % products.length), [products.length]);
   const next = useCallback(() => setIdx((i) => (i + 1) % products.length), [products.length]);
 
+  function onTouchStart(e: React.TouchEvent) { touchX.current = e.touches[0].clientX; }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (touchX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (dx > 45) prev();
+    else if (dx < -45) next();
+  }
+
   const center = products[idx];
-  const emi    = Math.round(center.price / 9);
 
   return (
     <section style={{
@@ -99,12 +108,16 @@ export function DropsCarousel() {
       </div>
 
       {/* ── Fan stage ─────────────────────────────── */}
-      <div style={{
-        position: "relative",
-        width: "100%",
-        height: "clamp(300px, 44vw, 460px)",
-      }}>
-        {products.map((prod, pIdx) => {
+      <div
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "clamp(300px, 44vw, 460px)",
+          touchAction: "pan-y",
+        }}>
+        {loaded && products.map((prod, pIdx) => {
           const d = slotOf(pIdx, idx, products.length);
           const abs = Math.abs(d);
 
@@ -254,13 +267,6 @@ export function DropsCarousel() {
             </span>
           )}
         </div>
-        <div style={{
-          fontFamily: "Inter, sans-serif", fontSize: "0.52rem",
-          color: "#aaa", letterSpacing: "0.02em", marginBottom: 14,
-        }}>
-          EMI @INR {emi.toLocaleString("en-IN")}/Month
-        </div>
-
         {/* CTA */}
         <Link
           href={`/product/${center.slug}`}
