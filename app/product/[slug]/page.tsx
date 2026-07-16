@@ -103,6 +103,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   const availSizes = SIZES.filter(s => product.sizes.includes(s));
   const [selectedSize, setSelectedSize] = useState<ProductSize>(availSizes[2] ?? availSizes[0]);
+  const availColors = product.colors ?? [];
+  const [selectedColor, setSelectedColor] = useState<string>(availColors[0]?.hex ?? product.shirtColor);
   const [added, setAdded] = useState(false);
   const [bundleSize, setBundleSize] = useState<1 | 2 | 3>(1);
   const [bundlePicks, setBundlePicks] = useState<string[]>([]);
@@ -156,7 +158,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <div className="product-thumbnails" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[0, 1, 2].map(i => (
                 <div key={i} className="product-thumbnail-item" style={{ width: 68, height: 84, background: "#f5f5f5", borderRadius: 8, border: "1.5px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                  <ProductMockup product={product} size={52} />
+                  <ProductMockup product={product} size={52} colorOverride={selectedColor} />
                 </div>
               ))}
             </div>
@@ -184,7 +186,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     <span style={{ fontFamily: "Anton, sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em" }}>SHARK TANK</span>
                   </div>
                 </div>
-                <ProductMockup product={product} size={340} />
+                <ProductMockup product={product} size={340} colorOverride={selectedColor} />
               </div>
 
               {/* Sold + rating bar */}
@@ -241,6 +243,44 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               <span style={{ fontSize: "0.7rem", color: "#1565c0", fontWeight: 700 }}>›</span>
             </button>
           </div>
+
+          {/* Color picker */}
+          {availColors.length > 0 && (
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.62rem", color: "#111", letterSpacing: "0.04em" }}>
+                  COLOR:
+                </span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#555" }}>
+                  {availColors.find(c => c.hex === selectedColor)?.name ?? ""}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {availColors.map(col => {
+                  const active = selectedColor === col.hex;
+                  const isLight = parseInt(col.hex.replace("#", ""), 16) > 0x888888;
+                  return (
+                    <button
+                      key={col.hex}
+                      title={col.name}
+                      onClick={() => setSelectedColor(col.hex)}
+                      style={{
+                        width: 30, height: 30, borderRadius: "50%",
+                        background: col.hex,
+                        border: active
+                          ? `3px solid ${isLight ? "#111" : col.hex === "#050505" ? "#555" : "#111"}`
+                          : "2px solid #e0e0e0",
+                        boxShadow: active ? `0 0 0 2px #fff, 0 0 0 4px ${isLight ? "#333" : col.hex}` : "none",
+                        cursor: "pointer", padding: 0, flexShrink: 0,
+                        transition: "box-shadow 0.15s, border 0.15s",
+                        outline: "none",
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Size dropdown */}
           <div style={{ marginBottom: 14 }}>

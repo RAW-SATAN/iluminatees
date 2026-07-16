@@ -169,10 +169,12 @@ interface Props {
   product: Pick<Product, "shirtColor" | "accentColor" | "symbol" | "slug">;
   size?: number;
   className?: string;
+  colorOverride?: string;
 }
 
-export function ProductMockup({ product, size = 260, className }: Props) {
-  const { shirtColor, accentColor, symbol, slug } = product;
+export function ProductMockup({ product, size = 260, className, colorOverride }: Props) {
+  const { accentColor, symbol, slug } = product;
+  const shirtColor = colorOverride ?? product.shirtColor;
   const SymbolEl = symbols[symbol] ?? symbols.eye;
   /* Use slug (unique per product) as the SVG ID prefix so multiple
      ProductMockup instances with the same symbol never share gradient IDs. */

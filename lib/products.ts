@@ -18,6 +18,7 @@ export interface Product {
   inStock: boolean;
   limited: boolean;
   tags: string[];
+  colors?: { name: string; hex: string }[];
 }
 
 export const products: Product[] = [
@@ -38,6 +39,13 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["bestseller", "oversized", "heavyweight"],
+    colors: [
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Cream", hex: "#f0ead8" },
+      { name: "Navy", hex: "#0d1b2a" },
+      { name: "Maroon", hex: "#5c0a14" },
+    ],
   },
   {
     id: "02",
@@ -55,6 +63,12 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["classic", "boxy"],
+    colors: [
+      { name: "Olive Night", hex: "#1a1a0a" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Cream", hex: "#f0ead8" },
+    ],
   },
   {
     id: "03",
@@ -72,6 +86,13 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["slim", "geometric"],
+    colors: [
+      { name: "Cosmos Blue", hex: "#0a0a1a" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Navy", hex: "#0d1b2a" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Ivory", hex: "#faf7f2" },
+    ],
   },
   {
     id: "04",
@@ -89,6 +110,12 @@ export const products: Product[] = [
     inStock: true,
     limited: true,
     tags: ["premium", "drop-shoulder", "limited"],
+    colors: [
+      { name: "Cipher Teal", hex: "#0a1212" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Forest", hex: "#1a2a1a" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+    ],
   },
   {
     id: "05",
@@ -106,6 +133,13 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["relaxed", "washed"],
+    colors: [
+      { name: "Ajna Purple", hex: "#12001a" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Deep Navy", hex: "#0d1b2a" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Maroon", hex: "#5c0a14" },
+    ],
   },
   {
     id: "06",
@@ -123,6 +157,12 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["regular-fit", "everyday"],
+    colors: [
+      { name: "Gold Dust", hex: "#1a1200" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Cream", hex: "#f0ead8" },
+    ],
   },
   {
     id: "07",
@@ -140,6 +180,12 @@ export const products: Product[] = [
     inStock: true,
     limited: true,
     tags: ["apex", "heavyweight", "limited", "collectible"],
+    colors: [
+      { name: "Obsidian", hex: "#050505" },
+      { name: "Deep Navy", hex: "#0d1b2a" },
+      { name: "Forest", hex: "#1a2a1a" },
+      { name: "Maroon", hex: "#5c0a14" },
+    ],
   },
   {
     id: "08",
@@ -157,6 +203,13 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["boxy", "organic"],
+    colors: [
+      { name: "Lodge Green", hex: "#001a00" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Navy", hex: "#0d1b2a" },
+      { name: "Cream", hex: "#f0ead8" },
+    ],
   },
   {
     id: "09",
@@ -174,6 +227,13 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["cotton-linen", "regular-fit"],
+    colors: [
+      { name: "Ember", hex: "#1a0500" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Maroon", hex: "#5c0a14" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Cream", hex: "#f0ead8" },
+    ],
   },
   {
     id: "10",
@@ -191,6 +251,11 @@ export const products: Product[] = [
     inStock: true,
     limited: true,
     tags: ["apex", "ultra-heavy", "tonal", "limited", "collectible"],
+    colors: [
+      { name: "Pure Void", hex: "#050505" },
+      { name: "Onyx", hex: "#0d0d0d" },
+      { name: "Deep Navy", hex: "#0d1b2a" },
+    ],
   },
   {
     id: "11",
@@ -208,6 +273,13 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["garment-dyed", "relaxed", "burgundy"],
+    colors: [
+      { name: "Burgundy", hex: "#1a0010" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Maroon", hex: "#5c0a14" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+      { name: "Ivory", hex: "#faf7f2" },
+    ],
   },
   {
     id: "12",
@@ -225,6 +297,12 @@ export const products: Product[] = [
     inStock: true,
     limited: true,
     tags: ["oversized", "acid-wash", "limited"],
+    colors: [
+      { name: "Quantum Teal", hex: "#001a1a" },
+      { name: "Void Black", hex: "#0d0d0d" },
+      { name: "Deep Navy", hex: "#0d1b2a" },
+      { name: "Ash Grey", hex: "#9e9e9e" },
+    ],
   },
 ];
 
