@@ -32,6 +32,24 @@ export default function AboutPage() {
           </p>
         </div>
 
+        {/* Founder */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16, border: "1px solid #eee", borderRadius: 16, padding: "1.3rem 1.4rem", marginTop: 36 }}>
+          <div style={{ width: 54, height: 54, borderRadius: "50%", background: "#111", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Anton, sans-serif", fontSize: "1.1rem", flexShrink: 0 }}>
+            SM
+          </div>
+          <div>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5rem", fontWeight: 700, letterSpacing: "0.3em", color: "#aaa", textTransform: "uppercase", marginBottom: 4 }}>
+              FOUNDER
+            </div>
+            <div style={{ fontFamily: "Anton, sans-serif", fontSize: "1.15rem", letterSpacing: "0.04em", color: "#111" }}>
+              Adv. Sneha Mishra
+            </div>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#888", marginTop: 3 }}>
+              Building ILUMINATEES from India — one limited drop at a time.
+            </div>
+          </div>
+        </div>
+
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14, margin: "40px 0" }}>
           {[
             { n: "5,000+", l: "Initiates" },
