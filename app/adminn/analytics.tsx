@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 /* ── Shopify-style dashboard for the admin panel ──────────────
    Sales/orders numbers come straight from the DB orders.
@@ -264,23 +264,11 @@ function Legend({ curLabel, prevLabel }: { curLabel: string; prevLabel: string }
 }
 
 /* ── HOME: range picker + metric strip + big sales chart ── */
-export function HomeDashboard({ orders }: { orders: OrderLite[] }) {
+export function HomeDashboard({ orders, live }: { orders: OrderLite[]; live: number | null }) {
   const [range, setRange] = useState<RangeKey>("today");
   const s = useSeries(orders, range);
   const t = totals(s.cur, s.upto);
   const p = totals(s.prev, s.prev.length - 1);
-
-  const [live, setLive] = useState(0);
-  useEffect(() => {
-    const calc = () => {
-      const h = new Date().getHours();
-      const base = HOUR_CURVE[h] * 1.4;
-      setLive(Math.max(1, Math.round(base + rand(Math.floor(Date.now() / 5000)) * base * 0.9)));
-    };
-    calc();
-    const iv = setInterval(calc, 5000);
-    return () => clearInterval(iv);
-  }, []);
 
   const conv = t.sessions > 0 ? (t.orders / t.sessions) * 100 : 0;
   const convPrev = p.sessions > 0 ? (p.orders / p.sessions) * 100 : 0;
@@ -311,9 +299,10 @@ export function HomeDashboard({ orders }: { orders: OrderLite[] }) {
         <div style={{ flex: "1 1 140px", background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, padding: "0.8rem 1rem" }}>
           <div style={{ fontSize: "0.62rem", color: S.muted, fontWeight: 600, marginBottom: 8 }}>Live visitors</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: "1.15rem", fontWeight: 700, color: S.text }}>{live}</span>
-            <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#29845A", boxShadow: "0 0 0 3px rgba(41,132,90,0.25)", display: "inline-block", animation: "livePulse 1.6s ease-out infinite" }} />
+            <span style={{ fontSize: "1.15rem", fontWeight: 700, color: S.text }}>{live ?? "…"}</span>
+            <span style={{ width: 9, height: 9, borderRadius: "50%", background: (live ?? 0) > 0 ? "#29845A" : "#C9CCCF", boxShadow: (live ?? 0) > 0 ? "0 0 0 3px rgba(41,132,90,0.25)" : "none", display: "inline-block", animation: (live ?? 0) > 0 ? "livePulse 1.6s ease-out infinite" : "none" }} />
           </div>
+          <div style={{ fontSize: "0.5rem", color: S.muted, marginTop: 4 }}>active in last 3 min</div>
         </div>
       </div>
 

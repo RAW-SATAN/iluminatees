@@ -119,6 +119,20 @@ export default function AdminPage() {
   }, []);
 
   const [subscribers, setSubscribers] = useState<{ email: string; date: string }[]>([]);
+  const [liveVisitors, setLiveVisitors] = useState<number | null>(null);
+
+  /* Real live-visitor count from heartbeats, refreshed every 10s */
+  useEffect(() => {
+    if (!adminKey) return;
+    const load = () =>
+      fetch("/api/presence", { headers: { "x-admin-key": adminKey }, cache: "no-store" })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d && typeof d.live === "number") setLiveVisitors(d.live); })
+        .catch(() => {});
+    load();
+    const iv = setInterval(load, 10_000);
+    return () => clearInterval(iv);
+  }, [adminKey]);
 
   /* Admin data — loaded only after login (needs the admin key) */
   useEffect(() => {
@@ -438,7 +452,7 @@ export default function AdminPage() {
           {tab === "home" && (<>
             <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: S.text, marginBottom: 20 }}>Good morning, ILUMINATEES 👁️</h1>
 
-            <HomeDashboard orders={orders} />
+            <HomeDashboard orders={orders} live={liveVisitors} />
 
             {/* Recent orders card */}
             <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, overflow: "hidden" }}>

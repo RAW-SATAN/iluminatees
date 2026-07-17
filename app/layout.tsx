@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { StickyBubble } from "@/components/StickyBubble";
 import { ExitOfferPopup } from "@/components/ExitOfferPopup";
 import { MetaPixel } from "@/components/MetaPixel";
+import { PresencePing } from "@/components/PresencePing";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.iluminatees.com"),
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <StickyBubble />
           <ExitOfferPopup />
           <MetaPixel />
+          <PresencePing />
           </WishlistProvider>
         </CartProvider>
       </body>
