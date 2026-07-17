@@ -22,6 +22,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    /* Admin-only extras (used for imports/seeding): custom createdAt + status */
+    const admin = isAdmin(req)
+    const createdAt = admin && body.createdAt ? new Date(body.createdAt) : undefined
+    const status = admin && body.status ? String(body.status) : 'pending'
+
     const order = await prisma.order.create({
       data: {
         id: id || `#${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
@@ -32,7 +37,8 @@ export async function POST(req: NextRequest) {
         items,
         total,
         payment: payment || 'unpaid',
-        status: 'pending',
+        status,
+        ...(createdAt && !isNaN(createdAt.getTime()) ? { createdAt } : {}),
       },
     })
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { products as staticProducts, type Product } from "@/lib/products";
 import { ProductMockup } from "@/components/ProductMockup";
+import { HomeDashboard, AnalyticsTab } from "./analytics";
 
 const EDITS_KEY      = "iluminatees_product_edits";
 const ADDED_KEY      = "iluminatees_added_products";
@@ -14,7 +15,7 @@ interface OrderItem { name: string; size: string; qty: number; price: number }
 interface Order {
   id: string; customer: string; phone: string; address: string; city: string;
   items: OrderItem[]; total: number; status: OrderStatus;
-  payment: "paid" | "unpaid" | "cod"; date: string;
+  payment: "paid" | "unpaid" | "cod"; date: string; createdAt?: string;
 }
 interface ProductEdit {
   price?: number; originalPrice?: number | null; inStock?: boolean;
@@ -78,7 +79,7 @@ export default function AdminPage() {
   const [authed, setAuthed]         = useState(false);
   const [pw, setPw]                 = useState("");
   const [pwErr, setPwErr]           = useState(false);
-  const [tab, setTab]               = useState<"home"|"orders"|"products"|"homepage"|"settings">("home");
+  const [tab, setTab]               = useState<"home"|"orders"|"products"|"homepage"|"settings"|"analytics">("home");
   const [orders, setOrders]         = useState<Order[]>([]);
   const [edits, setEdits]           = useLS<Record<string, ProductEdit>>(EDITS_KEY, {});
   const [search, setSearch]         = useState("");
@@ -350,10 +351,11 @@ export default function AdminPage() {
 
   /* ── Nav items ── */
   const NAV = [
-    { key: "home"     as const, label: "Home",     icon: "🏠" },
-    { key: "orders"   as const, label: "Orders",   icon: "🛍️", badge: pending },
-    { key: "products" as const, label: "Products", icon: "📦" },
-    { key: "homepage" as const, label: "Homepage", icon: "🖼️" },
+    { key: "home"      as const, label: "Home",      icon: "🏠" },
+    { key: "orders"    as const, label: "Orders",    icon: "🛍️", badge: pending },
+    { key: "products"  as const, label: "Products",  icon: "📦" },
+    { key: "analytics" as const, label: "Analytics", icon: "📊" },
+    { key: "homepage"  as const, label: "Homepage",  icon: "🖼️" },
   ];
 
   /* ══════ MAIN LAYOUT ══════ */
@@ -436,21 +438,7 @@ export default function AdminPage() {
           {tab === "home" && (<>
             <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: S.text, marginBottom: 20 }}>Good morning, ILUMINATEES 👁️</h1>
 
-            {/* Stats row */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14, marginBottom: 24 }}>
-              {[
-                { label: "Today's sales", value: `₹${todaySales.toLocaleString("en-IN")}`, sub: "Jul 15, 2026", color: S.green },
-                { label: "Total revenue",  value: `₹${revenue.toLocaleString("en-IN")}`,    sub: "All time",    color: S.green },
-                { label: "Total orders",   value: orders.length,                              sub: `${pending} pending`,    color: S.text },
-                { label: "Products live",  value: products.filter(p => p.inStock).length,    sub: `${products.length} total`, color: S.text },
-              ].map(({ label, value, sub, color }) => (
-                <div key={label} style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, padding: "1.1rem 1.25rem" }}>
-                  <div style={{ fontSize: "0.6rem", color: S.muted, marginBottom: 8, fontWeight: 500 }}>{label}</div>
-                  <div style={{ fontSize: "1.5rem", fontWeight: 700, color, marginBottom: 4, fontVariantNumeric: "tabular-nums" }}>{value}</div>
-                  <div style={{ fontSize: "0.56rem", color: S.muted }}>{sub}</div>
-                </div>
-              ))}
-            </div>
+            <HomeDashboard orders={orders} />
 
             {/* Recent orders card */}
             <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, overflow: "hidden" }}>
@@ -516,6 +504,7 @@ export default function AdminPage() {
               )}
             </div>
           </>)}
+          {tab === "analytics" && <AnalyticsTab orders={orders} />}
           {tab === "settings" && (<>
             <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: S.text, marginBottom: 20 }}>Settings</h1>
             <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, padding: "1.5rem", maxWidth: 480 }}>
