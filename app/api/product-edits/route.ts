@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma, ensureStoreSetting } from '@/lib/db'
 import { isAdmin } from '@/lib/adminAuth'
 
 /*
@@ -11,6 +11,7 @@ const KEY = 'product_edits'
 
 export async function GET() {
   try {
+    await ensureStoreSetting()
     const row = await prisma.storeSetting.findUnique({ where: { key: KEY } })
     if (!row) return NextResponse.json({})
     try { return NextResponse.json(JSON.parse(row.value)) } catch { return NextResponse.json({}) }
@@ -28,6 +29,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Expected an object map of edits' }, { status: 400 })
     }
     const value = JSON.stringify(body)
+    await ensureStoreSetting()
     await prisma.storeSetting.upsert({
       where: { key: KEY },
       update: { value },

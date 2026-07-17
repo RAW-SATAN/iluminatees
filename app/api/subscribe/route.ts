@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma, ensureStoreSetting } from '@/lib/db'
 import { isAdmin } from '@/lib/adminAuth'
 
 const KEY = 'newsletter_subscribers'
@@ -7,6 +7,7 @@ const KEY = 'newsletter_subscribers'
 interface Subscriber { email: string; date: string }
 
 async function readList(): Promise<Subscriber[]> {
+  await ensureStoreSetting()
   const row = await prisma.storeSetting.findUnique({ where: { key: KEY } })
   if (!row) return []
   try { return JSON.parse(row.value) } catch { return [] }

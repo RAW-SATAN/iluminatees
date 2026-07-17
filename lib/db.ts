@@ -13,3 +13,17 @@ function createPrismaClient() {
 export const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+/*
+ * The StoreSetting table was never created by the original `prisma db push`
+ * (only Order exists in Neon), so every settings/subscriber/product-edits
+ * query 500s. Self-heal: create it on first use, once per instance.
+ */
+let storeSettingReady = false
+export async function ensureStoreSetting() {
+  if (storeSettingReady) return
+  await prisma.$executeRawUnsafe(
+    'CREATE TABLE IF NOT EXISTS "StoreSetting" ("key" TEXT NOT NULL PRIMARY KEY, "value" TEXT NOT NULL)'
+  )
+  storeSettingReady = true
+}

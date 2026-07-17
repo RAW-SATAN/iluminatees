@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma, ensureStoreSetting } from '@/lib/db'
 import { isAdmin } from '@/lib/adminAuth'
 
 /* Settings safe to expose to the storefront; everything else is admin-only */
@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
+    await ensureStoreSetting()
     const all = await prisma.storeSetting.findMany()
     const admin = isAdmin(req)
     const map: Record<string, string> = {}
@@ -30,6 +31,7 @@ export async function PUT(req: NextRequest) {
     const { key, value } = body
     if (!key) return NextResponse.json({ error: 'Missing key' }, { status: 400 })
 
+    await ensureStoreSetting()
     await prisma.storeSetting.upsert({
       where: { key },
       update: { value: String(value) },

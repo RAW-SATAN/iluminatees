@@ -529,8 +529,14 @@ export default function AdminPage() {
                      from that state must write "0" explicitly, not "1". */
                   const isEnabled = settings.cod_enabled !== "0";
                   const next = isEnabled ? "0" : "1";
-                  await fetch("/api/settings", { method: "PUT", headers: authHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ key: "cod_enabled", value: next }) });
-                  setSettings({ ...settings, cod_enabled: next });
+                  try {
+                    const res = await fetch("/api/settings", { method: "PUT", headers: authHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ key: "cod_enabled", value: next }) });
+                    if (!res.ok) throw new Error();
+                    setSettings({ ...settings, cod_enabled: next });
+                    showToast(next === "0" ? "✅ COD band ho gaya" : "✅ COD chalu ho gaya");
+                  } catch {
+                    showToast("❌ Save nahi hua — dobara try karo");
+                  }
                 }}
                   style={{ width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", position: "relative", background: settings.cod_enabled !== "0" ? S.green : "#C9CCCF", transition: "background 0.2s" }}>
                   <span style={{ position: "absolute", top: 3, left: settings.cod_enabled !== "0" ? 24 : 3, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
