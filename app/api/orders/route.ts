@@ -70,3 +70,18 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const { ids } = await req.json()
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json({ error: 'ids array required' }, { status: 400 })
+    }
+    const result = await prisma.order.deleteMany({ where: { id: { in: ids.map(String) } } })
+    return NextResponse.json({ deleted: result.count })
+  } catch (e) {
+    console.error('DELETE /api/orders error:', e)
+    return NextResponse.json({ error: 'Failed to delete orders' }, { status: 500 })
+  }
+}
