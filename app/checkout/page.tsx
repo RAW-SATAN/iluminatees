@@ -16,13 +16,33 @@ export default function CheckoutPage() {
   const [placedSummary, setPlacedSummary] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [codEnabled, setCodEnabled] = useState(true);
+  const [cfEnabled, setCfEnabled] = useState(false);
+  const [cfMode, setCfMode] = useState<"production" | "sandbox">("production");
+  const [paying, setPaying] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings", { cache: "no-store" })
       .then(r => r.ok ? r.json() : {} as any)
       .then(d => { if (d.cod_enabled === "0") { setCodEnabled(false); if (payment === "cod") setPayment("prepaid"); } })
       .catch(() => {});
+    fetch("/api/pay", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : { enabled: false })
+      .then(d => { setCfEnabled(Boolean(d.enabled)); if (d.mode) setCfMode(d.mode); })
+      .catch(() => {});
   }, []);
+
+  /* Cashfree hosted checkout SDK */
+  function loadCashfreeSdk(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const w = window as any;
+      if (w.Cashfree) return resolve(w.Cashfree);
+      const s = document.createElement("script");
+      s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+      s.onload = () => (w.Cashfree ? resolve(w.Cashfree) : reject(new Error("SDK load failed")));
+      s.onerror = () => reject(new Error("SDK load failed"));
+      document.head.appendChild(s);
+    });
+  }
 
   /* Bundle offer: any 2 tees → 10% off, any 3+ → 15% off (matches the cart nudge) */
   const totalQty = items.reduce((s, i) => s + i.quantity, 0);
@@ -66,6 +86,29 @@ export default function CheckoutPage() {
       setErr("Server se connect nahi ho paya. Dobara try karo.");
       return;
     }
+    /* ── Prepaid + Cashfree configured → hosted payment page ── */
+    if (payment === "prepaid" && cfEnabled) {
+      setPaying(true);
+      try {
+        const payRes = await fetch("/api/pay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: savedId }),
+        });
+        const payData = await payRes.json();
+        if (!payRes.ok || !payData.paymentSessionId) throw new Error(payData.error || "payment session failed");
+        const Cashfree = await loadCashfreeSdk();
+        const cashfree = Cashfree({ mode: payData.mode ?? cfMode });
+        /* Cart stays intact until the return page confirms payment */
+        cashfree.checkout({ paymentSessionId: payData.paymentSessionId, redirectTarget: "_self" });
+        return;
+      } catch (e) {
+        setPaying(false);
+        setErr("Payment page load nahi hua — dobara try karo ya WhatsApp karo. Order save ho gaya hai.");
+        return;
+      }
+    }
+
     setPlacedSummary(items.map(i => `${i.name} (${i.size}) × ${i.quantity}`).join(", "));
     /* Purchase conversion for Meta Pixel, if configured */
     try { (window as any).fbq?.("track", "Purchase", { value: payable, currency: "INR" }); } catch {}
@@ -159,7 +202,7 @@ export default function CheckoutPage() {
                   <span style={{ display: "block", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.72rem", color: "#111" }}>
                     Pay Now (UPI) <span style={{ background: "#16a34a", color: "#fff", fontSize: "0.5rem", fontWeight: 800, borderRadius: 4, padding: "0.15rem 0.45rem", marginLeft: 6, letterSpacing: "0.06em" }}>20% OFF</span>
                   </span>
-                  <span style={{ display: "block", fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#777", marginTop: 3 }}>GPay / PhonePe / Paytm — instant 20% discount</span>
+                  <span style={{ display: "block", fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#777", marginTop: 3 }}>{cfEnabled ? "UPI / Cards / NetBanking — instant 20% discount" : "GPay / PhonePe / Paytm — instant 20% discount"}</span>
                 </span>
               </button>
 
@@ -176,7 +219,16 @@ export default function CheckoutPage() {
               )}
 
               {/* UPI QR */}
-              {payment === "prepaid" && (
+              {payment === "prepaid" && cfEnabled && (
+                <div style={{ marginTop: 14, border: "1px dashed #c9e5d2", background: "#f7fff9", borderRadius: 12, padding: "0.9rem 1rem", display: "flex", alignItems: "center", gap: 12 }}>
+                  <span style={{ fontSize: "1.3rem" }}>🔒</span>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#333", lineHeight: 1.7 }}>
+                    Place Order dabate hi <strong>secure payment page</strong> khulega — UPI, cards, netbanking sab chalega. Payment hote hi order automatically confirm ho jayega.
+                  </div>
+                </div>
+              )}
+
+              {payment === "prepaid" && !cfEnabled && (
                 <div style={{ marginTop: 14, border: "1px dashed #c9e5d2", background: "#f7fff9", borderRadius: 12, padding: "1rem", display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
                   <img src={qrSrc} alt="UPI QR code" width={130} height={130} style={{ borderRadius: 8, background: "#fff", padding: 4, border: "1px solid #e5e5e5" }} />
                   <div style={{ flex: 1, minWidth: 180 }}>
@@ -230,9 +282,9 @@ export default function CheckoutPage() {
 
               {err && <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#e8000d", margin: "8px 0" }}>{err}</div>}
 
-              <button onClick={placeOrder}
+              <button onClick={placeOrder} disabled={paying}
                 style={{ width: "100%", marginTop: 12, padding: "1rem", borderRadius: 10, background: "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.8rem", letterSpacing: "0.06em", cursor: "pointer" }}>
-                PLACE ORDER — ₹{payable.toLocaleString("en-IN")}
+                {paying ? "PAYMENT PAGE KHUL RAHA HAI…" : `PLACE ORDER — ₹${payable.toLocaleString("en-IN")}`}
               </button>
               <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa", textAlign: "center", marginTop: 10 }}>
                 🔒 100% secure · Easy size exchange · Ships in 3–5 days
