@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Heart, ShoppingBag, Search, MapPin, Menu, X, Headphones } from "lucide-react";
 import { useCart } from "./CartProvider";
 import { useWishlist } from "./WishlistProvider";
+import { Logo } from "./Logo";
 
 const PLACEHOLDERS = [
   "Search For Tees...",
@@ -97,13 +98,8 @@ export function Navbar() {
         }}>
           {/* Logo */}
           <div style={{ flexShrink: 0 }}>
-            <Link href="/" style={{ textDecoration: "none" }}>
-              <span style={{
-                fontFamily: "Anton, sans-serif",
-                fontSize: "1.05rem", letterSpacing: "0.12em", color: "#111",
-              }}>
-                ILUMINATEES<sup style={{ fontSize: "0.42em", marginLeft: 1 }}>®</sup>
-              </span>
+            <Link href="/" style={{ textDecoration: "none", display: "inline-block", color: "#111", padding: "4px 0" }}>
+              <Logo height={15} />
             </Link>
             {/* Delivery location */}
             <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 1 }}>

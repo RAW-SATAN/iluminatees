@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Logo } from "./Logo";
 
 const COL1 = [
   { href: "/shop", label: "All Products"  },
@@ -79,12 +80,8 @@ export function Footer() {
 
         {/* Logo + tagline */}
         <div style={{ gridColumn: "span 1" }}>
-          <div style={{
-            fontFamily: "Anton, sans-serif",
-            fontSize: "1.1rem", letterSpacing: "0.18em",
-            color: "#fff", marginBottom: 12,
-          }}>
-            ILUMINATEES<span style={{ color: "#e8000d", fontSize: "0.5em" }}>®</span>
+          <div style={{ color: "#fff", marginBottom: 14 }}>
+            <Logo height={14} />
           </div>
           <p style={{
             fontFamily: "Inter, sans-serif",
