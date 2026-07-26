@@ -12,14 +12,14 @@ interface Props {
 type Stage = "upload" | "processing" | "result" | "error";
 
 const TIPS = [
-  "Stand facing the camera",
-  "Full body or half-body works best",
-  "Good lighting = better result",
-  "Plain background preferred",
+  "📸 Full body photo (head to toe)",
+  "🧍 Stand straight, face camera",
+  "☀️ Bright lighting, plain background",
+  "❌ No selfies / close-ups",
 ];
 
 // Creates a 4-sec Ken Burns video from a data-URI image using Canvas + MediaRecorder
-function makeVideo(dataUri: string): Promise<Blob> {
+function makeVideo(dataUri: string): Promise<{ blob: Blob; ext: string }> {
   return new Promise((resolve, reject) => {
     const W = 540, H = 720;
     const canvas = document.createElement("canvas");
@@ -28,14 +28,19 @@ function makeVideo(dataUri: string): Promise<Blob> {
 
     const img = new Image();
     img.onload = () => {
-      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-        ? "video/webm;codecs=vp9"
-        : "video/webm";
+      // Pick best supported format — MP4 for Safari/iPhone, WebM for others
+      const mimeType =
+        MediaRecorder.isTypeSupported("video/mp4")
+          ? "video/mp4"
+          : MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+            ? "video/webm;codecs=vp9"
+            : "video/webm";
+      const ext = mimeType.includes("mp4") ? "mp4" : "webm";
       const stream = canvas.captureStream(25);
       const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2_500_000 });
       const chunks: Blob[] = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => resolve(new Blob(chunks, { type: "video/webm" }));
+      recorder.onstop = () => resolve({ blob: new Blob(chunks, { type: mimeType }), ext });
       recorder.start(100);
 
       const FPS = 25, SECS = 4;
@@ -90,6 +95,7 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
   const [personPreview, setPersonPreview] = useState<string | null>(null);
   const [tryonImage, setTryonImage] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoExt, setVideoExt] = useState<string>("mp4");
   const [statusMsg, setStatusMsg] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -127,7 +133,8 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
       setTryonImage(json.image);
       setStatusMsg("Creating your video clip...");
 
-      const videoBlob = await makeVideo(json.image);
+      const { blob: videoBlob, ext } = await makeVideo(json.image);
+      setVideoExt(ext);
       setVideoUrl(URL.createObjectURL(videoBlob));
       setStage("result");
 
@@ -141,7 +148,7 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
     if (!videoUrl) return;
     const a = document.createElement("a");
     a.href = videoUrl;
-    a.download = `iluminatees-tryon.webm`;
+    a.download = `iluminatees-tryon.${videoExt}`;
     a.click();
   }
 
@@ -337,6 +344,7 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
                   setPersonPreview(null);
                   setTryonImage(null);
                   setVideoUrl(null);
+                  setVideoExt("mp4");
                 }}
                 style={{
                   flex: 1, padding: "0.85rem",
