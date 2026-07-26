@@ -20,7 +20,11 @@ export async function POST(req: NextRequest) {
 
     let garmentBlob: Blob
     if (garmentUrl) {
-      const res = await fetch(garmentUrl)
+      // Convert relative URL to absolute for server-side fetch
+      const absUrl = garmentUrl.startsWith('http')
+        ? garmentUrl
+        : `${req.nextUrl.protocol}//${req.headers.get('host')}${garmentUrl.startsWith('/') ? '' : '/'}${garmentUrl}`
+      const res = await fetch(absUrl)
       garmentBlob = await res.blob()
     } else {
       garmentBlob = personBlob
