@@ -96,16 +96,30 @@ export async function POST(req: NextRequest) {
     const client = await Client.connect('yisol/IDM-VTON')
     console.log('[tryon] connected, calling /tryon...')
 
-    const result = await client.predict('/tryon', [
-      // dict: ImageEditor — background must be FileData format
+    const args = [
       { background: fileData(personPath, 'person.jpg'), layers: [], composite: null },
-      fileData(garmentPath, 'garment.jpg'),   // garm_img
-      'stylish oversized graphic streetwear tee', // garment_des
-      true,   // is_checked (auto-masking)
-      false,  // is_checked_crop
-      30,     // denoise_steps
-      42,     // seed
-    ])
+      fileData(garmentPath, 'garment.jpg'),
+      'stylish oversized graphic streetwear tee',
+      true, false, 30, 42,
+    ]
+
+    // Retry up to 2 times on GPU/AcceleratorError
+    let result
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        result = await client.predict('/tryon', args)
+        break
+      } catch (e: unknown) {
+        const msg = typeof e === 'object' && e !== null ? JSON.stringify(e) : String(e)
+        const isGpuError = msg.includes('AcceleratorError') || msg.includes('CUDA') || msg.includes('GPU')
+        console.log(`[tryon] attempt ${attempt} failed:`, msg.slice(0, 120))
+        if (attempt < 3 && isGpuError) {
+          await new Promise(r => setTimeout(r, 4000 * attempt))
+          continue
+        }
+        throw e
+      }
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const out = (result?.data as any[])?.[0]
@@ -135,6 +149,9 @@ export async function POST(req: NextRequest) {
         : typeof err === 'object' && err !== null
           ? JSON.stringify(err)
           : String(err)
+    if (msg.includes('AcceleratorError') || msg.includes('CUDA') || msg.includes('GPU')) {
+      return NextResponse.json({ error: 'GPU busy — please retry in a few seconds' }, { status: 503 })
+    }
     if (msg.includes('503') || msg.includes('loading') || msg.includes('waking')) {
       return NextResponse.json({ error: 'Model warming up — wait 60 sec and retry' }, { status: 503 })
     }
