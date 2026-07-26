@@ -29,23 +29,21 @@ export async function POST(req: NextRequest) {
 
     const client = await Client.connect('Kwai-Kolors/Kolors-Virtual-Try-On')
 
-    // Discover available API endpoints — will appear in Vercel logs
-    let endpoint: string | number = 0
+    // Log full API so we know exact inputs needed
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const api = await (client as any).view_api()
-      const named = Object.keys(api?.named_endpoints ?? {})
-      const unnamed = api?.unnamed_endpoints?.length ?? 0
-      console.log('[tryon] named_endpoints:', named)
-      console.log('[tryon] unnamed_endpoints count:', unnamed)
-      if (named.length > 0) endpoint = named[0]
+      console.log('[tryon] FULL API:', JSON.stringify(api).slice(0, 1000))
     } catch (e) {
       console.log('[tryon] view_api failed:', e)
     }
 
-    console.log('[tryon] using endpoint:', endpoint)
-
-    const result = await client.predict(endpoint, [personBlob, garmentBlob])
+    // Kolors Virtual Try-On: person image, garment image, cloth_type
+    const result = await client.predict('/predict', [
+      personBlob,
+      garmentBlob,
+      'upper_body',   // cloth type — upper_body / lower_body / dresses
+    ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const resultData = (result?.data as any[]) ?? []
