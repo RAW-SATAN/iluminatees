@@ -74,7 +74,7 @@ function ReturnInner() {
           Hum jaldi hi dispatch details WhatsApp par bhejenge.
         </p>
         <a
-          href={`https://wa.me/917055470321?text=${encodeURIComponent(`Hi! Payment ho gaya.\n\nOrder: ${order.id}\nItems: ${summary}\nAmount: ₹${order.total} (PAID via Cashfree)\n\nPlease confirm.`)}`}
+          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Payment ho gaya.\n\nOrder: ${order.id}\nItems: ${summary}\nAmount: ₹${order.total} (PAID via Cashfree)\n\nPlease confirm.`)}`}
           style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#25D366", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.06em", padding: "0.9rem 1.8rem", borderRadius: 24, textDecoration: "none" }}
         >
           💬 WhatsApp par order confirm karo
@@ -106,7 +106,7 @@ function ReturnInner() {
       <Link href="/checkout" style={{ display: "inline-block", background: "#111", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.12em", padding: "0.85rem 2rem", borderRadius: 24, textDecoration: "none" }}>
         TRY AGAIN →
       </Link>
-      <a href={`https://wa.me/917055470321?text=${encodeURIComponent(`Hi! Order ${order?.id ?? orderId} ka payment issue hai, please check.`)}`}
+      <a href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Order ${order?.id ?? orderId} ka payment issue hai, please check.`)}`}
         style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#16a34a", fontWeight: 700, textDecoration: "none" }}>
         💬 WhatsApp support
       </a>

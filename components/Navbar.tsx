@@ -157,7 +157,7 @@ export function Navbar() {
 
             {/* Support — WhatsApp */}
             <a
-              href="https://wa.me/919999999999?text=Hi%2C%20I%20need%20help%20with%20my%20ILUMINATEES%20order"
+              href="https://wa.me/919760492581?text=Hi%2C%20I%20need%20help%20with%20my%20ILUMINATEES%20order"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden md:flex"
@@ -321,7 +321,7 @@ export function Navbar() {
           ))}
           {/* Mobile: support link */}
           <a
-            href="https://wa.me/919999999999?text=Hi%2C%20I%20need%20help%20with%20my%20ILUMINATEES%20order"
+            href="https://wa.me/919760492581?text=Hi%2C%20I%20need%20help%20with%20my%20ILUMINATEES%20order"
             target="_blank"
             rel="noopener noreferrer"
             style={{

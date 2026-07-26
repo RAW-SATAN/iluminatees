@@ -135,7 +135,7 @@ export function Footer() {
             Monday to Saturday<br />
             10:30am to 7:00pm
           </p>
-          <a href="https://wa.me/917055470321" style={{ ...LINK_STYLE, color: "rgba(255,255,255,0.55)" }}>
+          <a href="https://wa.me/919760492581" style={{ ...LINK_STYLE, color: "rgba(255,255,255,0.55)" }}>
             📱 WhatsApp Support
           </a>
           <a href="mailto:help@iluminatees.com" style={{ ...LINK_STYLE, color: "rgba(255,255,255,0.55)" }}>

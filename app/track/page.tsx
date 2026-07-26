@@ -112,7 +112,7 @@ export default function TrackPage() {
               </div>
             )}
 
-            <a href={`https://wa.me/917055470321?text=${encodeURIComponent(`Hi! Order ${order.id} ka update chahiye.`)}`}
+            <a href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Order ${order.id} ka update chahiye.`)}`}
               style={{ display: "block", textAlign: "center", marginTop: 20, fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#16a34a", fontWeight: 700, textDecoration: "none" }}>
               💬 WhatsApp par live update lo →
             </a>

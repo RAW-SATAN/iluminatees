@@ -131,7 +131,7 @@ export default function CheckoutPage() {
           {payment === "prepaid" && <> Payment UPI se complete karna na bhoolein — <strong>{UPI_ID}</strong>.</>}
         </p>
         <a
-          href={`https://wa.me/917055470321?text=${encodeURIComponent(`Hi! Maine order place kiya hai.\n\nOrder: ${placed}\nItems: ${placedSummary}\nPayment: ${payment === "cod" ? "COD" : "UPI (paid)"}\n\nPlease confirm.`)}`}
+          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Maine order place kiya hai.\n\nOrder: ${placed}\nItems: ${placedSummary}\nPayment: ${payment === "cod" ? "COD" : "UPI (paid)"}\n\nPlease confirm.`)}`}
           style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#25D366", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.06em", padding: "0.9rem 1.8rem", borderRadius: 24, textDecoration: "none" }}
         >
           💬 WhatsApp par order confirm karo
