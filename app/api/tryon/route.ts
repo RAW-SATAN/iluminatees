@@ -47,10 +47,12 @@ export async function POST(req: NextRequest) {
 
     const result = await client.predict(endpoint, [personBlob, garmentBlob])
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const resultData = (result?.data as any[]) ?? []
     console.log('[tryon] result keys:', Object.keys(result ?? {}))
-    console.log('[tryon] data[0]:', JSON.stringify(result?.data?.[0]).slice(0, 200))
+    console.log('[tryon] data[0]:', JSON.stringify(resultData[0]).slice(0, 200))
 
-    const outData = result?.data?.[0]
+    const outData = resultData[0]
     const tryonUrl: string | null =
       typeof outData === 'string'
         ? outData
