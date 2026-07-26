@@ -3,7 +3,28 @@ import { NextRequest, NextResponse } from 'next/server'
 export const maxDuration = 60
 export const runtime = 'nodejs'
 
-// GET: debug — visit /api/tryon in browser to see available endpoints
+const SPACE_URL = 'https://yisol-idm-vton.hf.space'
+
+// Upload a blob to the HF space, returns the remote file path
+async function uploadFile(blob: Blob, filename: string): Promise<string> {
+  const fd = new FormData()
+  fd.append('files', blob, filename)
+  const res = await fetch(`${SPACE_URL}/upload`, {
+    method: 'POST',
+    headers: process.env.HF_TOKEN ? { Authorization: `Bearer ${process.env.HF_TOKEN}` } : {},
+    body: fd,
+  })
+  if (!res.ok) throw new Error(`Upload failed ${res.status}`)
+  const json = await res.json()
+  const path = Array.isArray(json) ? json[0] : json
+  return typeof path === 'string' ? path : (path?.path ?? path?.name ?? '')
+}
+
+// Wrap a remote path into a Gradio FileData object
+function fileData(path: string, name: string) {
+  return { path, meta: { _type: 'gradio.FileData' }, orig_name: name, url: `${SPACE_URL}/file=${path}` }
+}
+
 export async function GET() {
   const { Client } = await import('@gradio/client')
   try {
@@ -40,37 +61,41 @@ export async function POST(req: NextRequest) {
       garmentBlob = await r.blob()
     }
 
-    console.log('[tryon] connecting to yisol/IDM-VTON...')
+    console.log('[tryon] uploading images to space...')
+    const [personPath, garmentPath] = await Promise.all([
+      uploadFile(personBlob, 'person.jpg'),
+      uploadFile(garmentBlob, 'garment.jpg'),
+    ])
+    console.log('[tryon] uploaded — person:', personPath, 'garment:', garmentPath)
+
     const client = await Client.connect('yisol/IDM-VTON')
     console.log('[tryon] connected, calling /tryon...')
 
-    // IDM-VTON /tryon: dict(ImageEditor), garm_img, garment_des,
-    //                   is_checked, is_checked_crop, denoise_steps, seed
     const result = await client.predict('/tryon', [
-      { background: personBlob, layers: [], composite: null }, // ImageEditor dict
-      garmentBlob,
-      'stylish oversized graphic streetwear tee',
-      true,   // is_checked
+      // dict: ImageEditor — background must be FileData format
+      { background: fileData(personPath, 'person.jpg'), layers: [], composite: null },
+      fileData(garmentPath, 'garment.jpg'),   // garm_img
+      'stylish oversized graphic streetwear tee', // garment_des
+      true,   // is_checked (auto-masking)
       false,  // is_checked_crop
       30,     // denoise_steps
       42,     // seed
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const resultData = (result?.data as any[]) ?? []
-    console.log('[tryon] output[0]:', JSON.stringify(resultData[0]).slice(0, 200))
+    const out = (result?.data as any[])?.[0]
+    console.log('[tryon] output:', JSON.stringify(out).slice(0, 200))
 
-    const outData = resultData[0]
     const tryonUrl: string | null =
-      typeof outData === 'string'
-        ? outData
-        : outData?.url ?? (outData?.path ? `https://yisol-idm-vton.hf.space/file=${outData.path}` : null)
+      typeof out === 'string'
+        ? out
+        : out?.url ?? (out?.path ? `${SPACE_URL}/file=${out.path}` : null)
 
     if (!tryonUrl) {
-      return NextResponse.json({ error: 'No output — try again in 60 sec (model may be warming up)' }, { status: 500 })
+      return NextResponse.json({ error: 'No output — model may be warming up, try again in 60 sec' }, { status: 500 })
     }
 
-    const imgRes = await fetch(tryonUrl.startsWith('http') ? tryonUrl : `https://yisol-idm-vton.hf.space/file=${tryonUrl}`)
+    const imgRes = await fetch(tryonUrl.startsWith('http') ? tryonUrl : `${SPACE_URL}/file=${tryonUrl}`)
     const imgBuf = await imgRes.arrayBuffer()
     const b64 = Buffer.from(imgBuf).toString('base64')
     const mime = imgRes.headers.get('content-type') ?? 'image/jpeg'
@@ -85,8 +110,7 @@ export async function POST(req: NextRequest) {
         : typeof err === 'object' && err !== null
           ? JSON.stringify(err)
           : String(err)
-
-    if (msg.includes('503') || msg.includes('loading') || msg.includes('waking') || msg.includes('sleeping')) {
+    if (msg.includes('503') || msg.includes('loading') || msg.includes('waking')) {
       return NextResponse.json({ error: 'Model warming up — wait 60 sec and retry' }, { status: 503 })
     }
     return NextResponse.json({ error: msg.slice(0, 300) }, { status: 500 })
