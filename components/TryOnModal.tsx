@@ -113,14 +113,15 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
     if (f && f.type.startsWith("image/")) pickFile(f);
   }
 
-  async function generate() {
-    if (!personFile) return;
+  async function runTryon(mode: "user" | "model") {
+    if (mode === "user" && !personFile) return;
     setStage("processing");
-    setStatusMsg("Sending to AI... (30-60 sec)");
+    setStatusMsg(mode === "model" ? "Generating AI model photo..." : "Sending to AI...");
 
     try {
       const fd = new FormData();
-      fd.append("person", personFile);
+      fd.append("mode", mode);
+      if (mode === "user" && personFile) fd.append("person", personFile);
       if (garmentImageUrl) fd.append("garmentUrl", garmentImageUrl);
 
       const res = await fetch("/api/tryon", { method: "POST", body: fd });
@@ -266,11 +267,33 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
               </div>
             )}
 
+            {/* AI Model option */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "14px 0 0" }}>
+              <div style={{ flex: 1, height: 1, background: "#eee" }} />
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#bbb" }}>OR</span>
+              <div style={{ flex: 1, height: 1, background: "#eee" }} />
+            </div>
+
             <button
-              onClick={generate}
+              onClick={() => runTryon("model")}
+              style={{
+                width: "100%", marginTop: 10,
+                padding: "0.9rem",
+                background: "#f5f5f5", color: "#111",
+                border: "1.5px solid #e0e0e0", borderRadius: 10,
+                fontFamily: "Inter, sans-serif", fontWeight: 700,
+                fontSize: "0.78rem", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}
+            >
+              🤖 Try with AI Model (No Photo Needed)
+            </button>
+
+            <button
+              onClick={() => runTryon("user")}
               disabled={!personFile}
               style={{
-                width: "100%", marginTop: 14,
+                width: "100%", marginTop: 8,
                 padding: "1rem",
                 background: personFile ? "#111" : "#e8e8e8",
                 color: personFile ? "#fff" : "#aaa",
@@ -280,7 +303,7 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
                 transition: "background 0.2s",
               }}
             >
-              ✨ Generate Try-On Video
+              ✨ Try On My Photo
             </button>
 
             <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5rem", color: "#bbb", textAlign: "center", marginTop: 8 }}>

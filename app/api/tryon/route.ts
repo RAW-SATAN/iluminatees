@@ -42,15 +42,32 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData()
     const personFile = formData.get('person') as File | null
     const garmentUrl = formData.get('garmentUrl') as string | null
-
-    if (!personFile) {
-      return NextResponse.json({ error: 'No photo uploaded' }, { status: 400 })
-    }
+    const mode = (formData.get('mode') as string | null) ?? 'user'
 
     const { Client } = await import('@gradio/client')
 
-    const personBuffer = await personFile.arrayBuffer()
-    const personBlob = new Blob([personBuffer], { type: personFile.type })
+    let personBlob: Blob
+
+    if (mode === 'model') {
+      // Generate AI fashion model photo via pollinations.ai (free, no API key)
+      const prompt = encodeURIComponent(
+        'full body young person standing straight facing camera, plain white background, basic white t-shirt, professional fashion photography, studio lighting, 512x768'
+      )
+      const seed = Math.floor(Math.random() * 99999)
+      const polUrl = `https://image.pollinations.ai/prompt/${prompt}?width=512&height=768&nologo=true&seed=${seed}`
+      console.log('[tryon] generating model photo from pollinations.ai...')
+      const polRes = await fetch(polUrl)
+      if (!polRes.ok) throw new Error(`Pollinations failed: ${polRes.status}`)
+      const polBuf = await polRes.arrayBuffer()
+      personBlob = new Blob([polBuf], { type: 'image/jpeg' })
+      console.log('[tryon] model photo generated, size:', personBlob.size)
+    } else {
+      if (!personFile) {
+        return NextResponse.json({ error: 'No photo uploaded' }, { status: 400 })
+      }
+      const personBuffer = await personFile.arrayBuffer()
+      personBlob = new Blob([personBuffer], { type: personFile.type })
+    }
 
     let garmentBlob: Blob = personBlob
     if (garmentUrl) {
