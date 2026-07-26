@@ -3,9 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 export const maxDuration = 60
 export const runtime = 'nodejs'
 
-const SPACE = 'Kwai-Kolors/Kolors-Virtual-Try-On'
-const SPACE_URL = 'https://kwai-kolors-kolors-virtual-try-on.hf.space'
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
@@ -15,6 +12,8 @@ export async function POST(req: NextRequest) {
     if (!personFile) {
       return NextResponse.json({ error: 'No photo uploaded' }, { status: 400 })
     }
+
+    const { Client } = await import('@gradio/client')
 
     const personBuffer = await personFile.arrayBuffer()
     const personBlob = new Blob([personBuffer], { type: personFile.type })
@@ -28,48 +27,40 @@ export async function POST(req: NextRequest) {
       garmentBlob = await r.blob()
     }
 
-    // Upload files to Gradio space
-    const uploadPerson = await uploadToSpace(SPACE_URL, personBlob, 'person.jpg')
-    const uploadGarment = await uploadToSpace(SPACE_URL, garmentBlob, 'garment.jpg')
+    const client = await Client.connect('Kwai-Kolors/Kolors-Virtual-Try-On')
 
-    // Call predict with fn_index 0 (first function in the space)
-    const predictRes = await fetch(`${SPACE_URL}/run/predict`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fn_index: 0,
-        data: [
-          { path: uploadPerson, meta: { _type: 'gradio.FileData' } },
-          { path: uploadGarment, meta: { _type: 'gradio.FileData' } },
-        ],
-        event_data: null,
-      }),
-    })
-
-    if (!predictRes.ok) {
-      const txt = await predictRes.text()
-      console.error('[tryon] predict failed', predictRes.status, txt.slice(0, 300))
-      throw new Error(`Space error ${predictRes.status}: ${txt.slice(0, 120)}`)
+    // Discover available API endpoints — will appear in Vercel logs
+    let endpoint: string | number = 0
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const api = await (client as any).view_api()
+      const named = Object.keys(api?.named_endpoints ?? {})
+      const unnamed = api?.unnamed_endpoints?.length ?? 0
+      console.log('[tryon] named_endpoints:', named)
+      console.log('[tryon] unnamed_endpoints count:', unnamed)
+      if (named.length > 0) endpoint = named[0]
+    } catch (e) {
+      console.log('[tryon] view_api failed:', e)
     }
 
-    const prediction = await predictRes.json()
-    console.log('[tryon] raw prediction:', JSON.stringify(prediction).slice(0, 400))
+    console.log('[tryon] using endpoint:', endpoint)
 
-    // Extract result URL from prediction data
-    const outData = prediction?.data?.[0]
+    const result = await client.predict(endpoint, [personBlob, garmentBlob])
+
+    console.log('[tryon] result keys:', Object.keys(result ?? {}))
+    console.log('[tryon] data[0]:', JSON.stringify(result?.data?.[0]).slice(0, 200))
+
+    const outData = result?.data?.[0]
     const tryonUrl: string | null =
       typeof outData === 'string'
         ? outData
-        : outData?.url ?? outData?.path
-          ? `${SPACE_URL}/file=${outData.path}`
-          : null
+        : outData?.url ?? (outData?.path ? `https://kwai-kolors-kolors-virtual-try-on.hf.space/file=${outData.path}` : null)
 
     if (!tryonUrl) {
-      return NextResponse.json({ error: 'AI returned no result — try again' }, { status: 500 })
+      return NextResponse.json({ error: 'No output from AI — check Vercel logs' }, { status: 500 })
     }
 
-    // Proxy image back
-    const imgRes = await fetch(tryonUrl.startsWith('http') ? tryonUrl : `${SPACE_URL}/file=${tryonUrl}`)
+    const imgRes = await fetch(tryonUrl.startsWith('http') ? tryonUrl : `https://kwai-kolors-kolors-virtual-try-on.hf.space/file=${tryonUrl}`)
     const imgBuf = await imgRes.arrayBuffer()
     const b64 = Buffer.from(imgBuf).toString('base64')
     const mime = imgRes.headers.get('content-type') ?? 'image/jpeg'
@@ -77,23 +68,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ image: `data:${mime};base64,${b64}` })
 
   } catch (err: unknown) {
-    console.error('[tryon]', err)
+    console.error('[tryon] FATAL:', err)
     const msg = err instanceof Error ? err.message : String(err)
     if (msg.includes('503') || msg.includes('loading')) {
-      return NextResponse.json({ error: 'Model warming up — wait 60 sec and try again' }, { status: 503 })
+      return NextResponse.json({ error: 'Model warming up — wait 60 sec and retry' }, { status: 503 })
     }
     return NextResponse.json({ error: msg.slice(0, 200) }, { status: 500 })
   }
-}
-
-async function uploadToSpace(spaceUrl: string, blob: Blob, filename: string): Promise<string> {
-  const fd = new FormData()
-  fd.append('files', blob, filename)
-  const res = await fetch(`${spaceUrl}/upload`, { method: 'POST', body: fd })
-  if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
-  const json = await res.json()
-  // Returns array of file paths
-  const path = Array.isArray(json) ? json[0] : json
-  console.log('[tryon] uploaded', filename, '->', path)
-  return typeof path === 'string' ? path : path?.path ?? path?.name ?? ''
 }
