@@ -234,25 +234,7 @@ export default function ProductClient({ slug }: { slug: string }) {
                     </div>
                   </div>
 
-                  {/* TRY ON button */}
-                  <button
-                    onClick={() => setShowTryOn(true)}
-                    style={{
-                      marginTop: 10, width: "100%",
-                      padding: "0.7rem",
-                      background: "#0d0d0d", color: "#fff",
-                      border: "none", borderRadius: 10,
-                      fontFamily: "Inter, sans-serif", fontWeight: 700,
-                      fontSize: "0.72rem", letterSpacing: "0.08em",
-                      cursor: "pointer",
-                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                    </svg>
-                    ✨ TRY ON — See How It Looks On You
-                  </button>
+                  {/* TRY ON button — hidden until feature is ready */}
                 </div>
               );
             })()}
