@@ -10,6 +10,7 @@ import { useSiteAssets } from "@/lib/useSiteAssets";
 import { ProductMockup } from "@/components/ProductMockup";
 import { useCart } from "@/components/CartProvider";
 import { useWishlist } from "@/components/WishlistProvider";
+import { TryOnModal } from "@/components/TryOnModal";
 
 const SIZES: ProductSize[] = ["XS", "S", "M", "L", "XL", "XXL"];
 
@@ -121,6 +122,7 @@ export default function ProductClient({ slug }: { slug: string }) {
   const { misc } = useSiteAssets();
   const sizeChartImg = misc["sizechart"];
   const [showSizeChart, setShowSizeChart] = useState(false);
+  const [showTryOn, setShowTryOn] = useState(false);
   const sold = parseInt(product.id.replace("custom-", "")) % 500 + 124;
   const otherProducts = allProducts.filter(p => p.id !== product.id);
   const related = otherProducts.slice(0, 6);
@@ -231,6 +233,26 @@ export default function ProductClient({ slug }: { slug: string }) {
                       <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa" }}>4.4K</span>
                     </div>
                   </div>
+
+                  {/* TRY ON button */}
+                  <button
+                    onClick={() => setShowTryOn(true)}
+                    style={{
+                      marginTop: 10, width: "100%",
+                      padding: "0.7rem",
+                      background: "#0d0d0d", color: "#fff",
+                      border: "none", borderRadius: 10,
+                      fontFamily: "Inter, sans-serif", fontWeight: 700,
+                      fontSize: "0.72rem", letterSpacing: "0.08em",
+                      cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                    </svg>
+                    ✨ TRY ON — See How It Looks On You
+                  </button>
                 </div>
               );
             })()}
@@ -809,6 +831,17 @@ export default function ProductClient({ slug }: { slug: string }) {
             <img src={sizeChartImg} alt="Size chart" style={{ width: "100%", display: "block" }} />
           </div>
         </div>
+      )}
+
+      {/* TRY ON modal */}
+      {showTryOn && (
+        <TryOnModal
+          productName={product.name}
+          garmentImageUrl={
+            product.customImages?.[0] ?? product.customImage ?? null
+          }
+          onClose={() => setShowTryOn(false)}
+        />
       )}
 
       <style>{`
