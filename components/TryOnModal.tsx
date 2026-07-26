@@ -172,7 +172,6 @@ export function TryOnModal({ productName, garmentImageUrl, onClose }: Props) {
               ref={fileRef}
               type="file"
               accept="image/*"
-              capture="user"
               style={{ display: "none" }}
               onChange={(e) => {
                 const f = e.target.files?.[0];
