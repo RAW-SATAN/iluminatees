@@ -18,39 +18,36 @@ export async function POST(req: NextRequest) {
     const personBuffer = await personFile.arrayBuffer()
     const personBlob = new Blob([personBuffer], { type: personFile.type })
 
-    // Fetch garment image if provided
     let garmentBlob: Blob
     if (garmentUrl) {
       const res = await fetch(garmentUrl)
       garmentBlob = await res.blob()
     } else {
-      // Use a plain white placeholder if no garment image uploaded yet
-      garmentBlob = personBlob // fallback, IDM-VTON will handle it
+      garmentBlob = personBlob
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const opts: any = {}
-    if (process.env.HF_TOKEN) opts.hf_token = process.env.HF_TOKEN
-    const client = await Client.connect('yisol/IDM-VTON', opts)
+    // Try Nymbo/Virtual-Try-On (CatVTON based, more reliable)
+    const client = await Client.connect('Nymbo/Virtual-Try-On')
 
-    const result = await client.predict('/tryon', {
-      dict: { background: personBlob, layers: [], composite: null },
-      garm_img: garmentBlob,
-      garment_des: 'stylish oversized graphic t-shirt, streetwear',
-      is_checked: true,
-      is_checked_crop: false,
-      denoise_steps: 30,
-      seed: 42,
-    })
+    const result = await client.predict('/tryon_fn', [
+      personBlob,                  // person image
+      garmentBlob,                 // garment image
+      'stylish oversized graphic streetwear t-shirt', // description
+      true,                        // is_checked
+      true,                        // is_checked_crop
+      30,                          // denoise steps
+      42,                          // seed
+    ])
 
-    const data = result.data as [{ url: string }, unknown]
-    const tryonUrl = data[0]?.url
+    const data = result.data as [{ url: string } | string, unknown]
+    const raw = data[0]
+    const tryonUrl = typeof raw === 'string' ? raw : raw?.url
 
     if (!tryonUrl) {
-      return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
+      return NextResponse.json({ error: 'AI model returned no result — try again in 30 seconds' }, { status: 500 })
     }
 
-    // Proxy the image through our server to avoid CORS issues on canvas
+    // Proxy image to avoid CORS on canvas
     const imgRes = await fetch(tryonUrl)
     const imgBuffer = await imgRes.arrayBuffer()
     const base64 = Buffer.from(imgBuffer).toString('base64')
@@ -61,10 +58,14 @@ export async function POST(req: NextRequest) {
   } catch (err: unknown) {
     console.error('[tryon]', err)
     const msg = err instanceof Error ? err.message : String(err)
-    // Space may be sleeping — give a helpful hint
-    if (msg.includes('503') || msg.includes('loading')) {
-      return NextResponse.json({ error: 'AI model is warming up, try again in 60 seconds' }, { status: 503 })
+
+    if (msg.includes('503') || msg.includes('loading') || msg.includes('waking')) {
+      return NextResponse.json({ error: 'AI model is warming up (free tier). Wait 60 seconds and try again.' }, { status: 503 })
     }
-    return NextResponse.json({ error: 'Processing failed, please try again' }, { status: 500 })
+    if (msg.includes('timeout') || msg.includes('ETIMEDOUT')) {
+      return NextResponse.json({ error: 'Request timed out — AI is busy. Try again in a moment.' }, { status: 504 })
+    }
+
+    return NextResponse.json({ error: `Processing failed: ${msg.slice(0, 120)}` }, { status: 500 })
   }
 }
