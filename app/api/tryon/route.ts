@@ -49,18 +49,26 @@ export async function POST(req: NextRequest) {
     let personBlob: Blob
 
     if (mode === 'model') {
-      // Generate AI fashion model photo via pollinations.ai (free, no API key)
-      const prompt = encodeURIComponent(
-        'full body young person standing straight facing camera, plain white background, basic white t-shirt, professional fashion photography, studio lighting, 512x768'
-      )
-      const seed = Math.floor(Math.random() * 99999)
-      const polUrl = `https://image.pollinations.ai/prompt/${prompt}?width=512&height=768&nologo=true&seed=${seed}`
-      console.log('[tryon] generating model photo from pollinations.ai...')
-      const polRes = await fetch(polUrl)
-      if (!polRes.ok) throw new Error(`Pollinations failed: ${polRes.status}`)
-      const polBuf = await polRes.arrayBuffer()
-      personBlob = new Blob([polBuf], { type: 'image/jpeg' })
-      console.log('[tryon] model photo generated, size:', personBlob.size)
+      // Generate AI fashion model photo via Gemini (free tier, requires GEMINI_API_KEY)
+      const apiKey = process.env.GEMINI_API_KEY
+      if (!apiKey) throw new Error('GEMINI_API_KEY not set in environment')
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`
+      console.log('[tryon] generating model photo from Gemini...')
+      const geminiRes = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: 'Full body young person, standing straight, facing camera, plain white background, wearing a basic plain white t-shirt, professional fashion photography, studio lighting, clean minimal look, full head to toe visible' }] }],
+          generationConfig: { responseModalities: ['IMAGE'] },
+        }),
+      })
+      if (!geminiRes.ok) throw new Error(`Gemini failed: ${geminiRes.status} ${await geminiRes.text()}`)
+      const geminiJson = await geminiRes.json()
+      const imgData = geminiJson?.candidates?.[0]?.content?.parts?.find((p: { inlineData?: unknown }) => p.inlineData)?.inlineData
+      if (!imgData?.data) throw new Error('Gemini returned no image')
+      const imgBufModel = Buffer.from(imgData.data, 'base64')
+      personBlob = new Blob([imgBufModel], { type: imgData.mimeType ?? 'image/png' })
+      console.log('[tryon] Gemini model photo generated, size:', personBlob.size)
     } else {
       if (!personFile) {
         return NextResponse.json({ error: 'No photo uploaded' }, { status: 400 })
