@@ -70,11 +70,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ image: `data:${mime};base64,${b64}` })
 
   } catch (err: unknown) {
-    console.error('[tryon] FATAL:', err)
-    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[tryon] FATAL:', JSON.stringify(err, null, 2))
+    const msg =
+      err instanceof Error
+        ? err.message
+        : typeof err === 'object' && err !== null
+          ? JSON.stringify(err).slice(0, 300)
+          : String(err)
     if (msg.includes('503') || msg.includes('loading')) {
       return NextResponse.json({ error: 'Model warming up — wait 60 sec and retry' }, { status: 503 })
     }
-    return NextResponse.json({ error: msg.slice(0, 200) }, { status: 500 })
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }
