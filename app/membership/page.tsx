@@ -84,25 +84,24 @@ export default function MembershipPage() {
         </div>
 
         {/* Savings calc */}
-        <div style={{ background: "#0d0d0d", borderRadius: 16, padding: "1.4rem", marginBottom: 24, color: "#fff" }}>
-          <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", letterSpacing: "0.2em", color: "#d4a840", textTransform: "uppercase", marginBottom: 14 }}>
+        <div style={{ background: "#0d0d0d", borderRadius: 16, overflow: "hidden", marginBottom: 24, color: "#fff" }}>
+          <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.6rem", letterSpacing: "0.2em", color: "#d4a840", textTransform: "uppercase", padding: "1.2rem 1.4rem 0.8rem" }}>
             Break-Even Calculator
           </div>
           {[
-            { label: "Buy 1 drop (avg ₹699)", saving: 105 },
-            { label: "Buy 2 drops", saving: 210 },
-            { label: "Buy 3 drops", saving: 315 },
-            { label: "Buy 7 drops → membership pays for itself", saving: 999, highlight: true },
+            { label: "Buy 1 drop (avg ₹699)", saving: 105, highlight: false },
+            { label: "Buy 2 drops", saving: 210, highlight: false },
+            { label: "Buy 3 drops", saving: 315, highlight: false },
+            { label: "Buy 7 drops — membership pays for itself", saving: 999, highlight: true },
           ].map(({ label, saving, highlight }) => (
             <div key={label} style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
-              padding: "8px 0",
-              borderBottom: "1px solid #1e1e1e",
-              background: highlight ? "rgba(212,168,64,0.08)" : "transparent",
-              margin: highlight ? "4px -1.4rem" : 0,
+              padding: "10px 1.4rem",
+              borderTop: "1px solid #1e1e1e",
+              background: highlight ? "rgba(212,168,64,0.1)" : "transparent",
             }}>
-              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: highlight ? "#d4a840" : "rgba(255,255,255,0.6)" }}>{label}</span>
-              <span style={{ fontFamily: "Space Mono, monospace", fontSize: "0.6rem", color: highlight ? "#d4a840" : "#fff", fontWeight: 700 }}>Save ₹{saving}</span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: highlight ? "#d4a840" : "rgba(255,255,255,0.6)", fontWeight: highlight ? 700 : 400 }}>{label}</span>
+              <span style={{ fontFamily: "Space Mono, monospace", fontSize: "0.6rem", color: highlight ? "#d4a840" : "#fff", fontWeight: 700, flexShrink: 0, marginLeft: 12 }}>Save ₹{saving}</span>
             </div>
           ))}
         </div>
