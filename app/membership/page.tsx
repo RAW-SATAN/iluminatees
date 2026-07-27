@@ -6,12 +6,12 @@ export const metadata = {
 };
 
 const PERKS = [
+  { icon: "🎽", title: "Buy 1 Get 1 Free", desc: "Buy any tee, get another one free. Once per membership year. Mix sizes, mix designs.", highlight: true },
   { icon: "💸", title: "15% Off Every Order", desc: "Member price on every product, every drop. Stacks on top of sale prices." },
   { icon: "⚡", title: "Early Drop Access", desc: "Get notified 24 hours before public launch. Never miss a limited drop again." },
   { icon: "🚚", title: "Priority Dispatch", desc: "Your orders jump the queue. Dispatched within 12 hours, guaranteed." },
   { icon: "🔁", title: "Free Exchanges", desc: "Wrong size? We swap it free of charge, no questions asked." },
   { icon: "🎁", title: "Birthday Drop", desc: "Exclusive discount on your birthday month. Because you deserve it." },
-  { icon: "👁", title: "Cult Archives Access", desc: "Shop sold-out pieces brought back exclusively for members." },
 ];
 
 export default function MembershipPage() {
@@ -71,13 +71,21 @@ export default function MembershipPage() {
 
         {/* Perks grid */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 32 }}>
-          {PERKS.map(({ icon, title, desc }) => (
+          {PERKS.map(({ icon, title, desc, highlight }) => (
             <div key={title} style={{
-              border: "1px solid #eee", borderRadius: 14,
-              padding: "1.1rem", background: "#fafafa",
+              border: highlight ? "1.5px solid #d4a840" : "1px solid #eee",
+              borderRadius: 14,
+              padding: "1.1rem",
+              background: highlight ? "#fffbf0" : "#fafafa",
+              gridColumn: highlight ? "span 2" : undefined,
             }}>
+              {highlight && (
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.48rem", fontWeight: 700, letterSpacing: "0.2em", color: "#a07020", textTransform: "uppercase", marginBottom: 6 }}>
+                  ⭐ STAR BENEFIT
+                </div>
+              )}
               <div style={{ fontSize: "1.4rem", marginBottom: 8 }}>{icon}</div>
-              <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.65rem", color: "#111", marginBottom: 4 }}>{title}</div>
+              <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: highlight ? "0.78rem" : "0.65rem", color: "#111", marginBottom: 4 }}>{title}</div>
               <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.56rem", color: "#888", lineHeight: 1.6 }}>{desc}</div>
             </div>
           ))}

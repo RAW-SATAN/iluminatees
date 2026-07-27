@@ -368,16 +368,21 @@ export default function ProductClient({ slug }: { slug: string }) {
           </div>
 
           {/* Member price row */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, background: "#fdf8f0", border: "1px solid #f0e0c0", borderRadius: 8, padding: "6px 12px" }}>
-            <span style={{ fontSize: "0.75rem" }}>👑</span>
-            <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#a07020", fontWeight: 700, letterSpacing: "0.06em" }}>MEMBER PRICE</span>
-            <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#7a5000" }}>
-              ₹{Math.round(product.price * 0.85).toLocaleString("en-IN")}
-            </span>
-            <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#b08030" }}>Save 15%</span>
-            <Link href="/membership" style={{ marginLeft: "auto", fontFamily: "Inter, sans-serif", fontSize: "0.52rem", fontWeight: 700, color: "#a07020", textDecoration: "none", whiteSpace: "nowrap", border: "1px solid #d4a840", borderRadius: 20, padding: "2px 10px" }}>
-              Join →
-            </Link>
+          <div style={{ marginBottom: 10, background: "#fffbf0", border: "1.5px solid #d4a840", borderRadius: 10, padding: "8px 12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: "0.75rem" }}>👑</span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#a07020", fontWeight: 700, letterSpacing: "0.06em" }}>MEMBER PRICE</span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#7a5000" }}>
+                ₹{Math.round(product.price * 0.85).toLocaleString("en-IN")}
+              </span>
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5rem", color: "#b08030" }}>15% off</span>
+              <Link href="/membership" style={{ marginLeft: "auto", fontFamily: "Inter, sans-serif", fontSize: "0.5rem", fontWeight: 700, color: "#a07020", textDecoration: "none", whiteSpace: "nowrap", border: "1px solid #d4a840", borderRadius: 20, padding: "2px 10px" }}>
+                Join →
+              </Link>
+            </div>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#a07020" }}>
+              🎽 + Buy 1 Get 1 Free (once/year) · Early access · Free exchanges
+            </div>
           </div>
 
           {/* Delivery line */}
