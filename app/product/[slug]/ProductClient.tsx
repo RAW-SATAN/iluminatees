@@ -857,6 +857,7 @@ export default function ProductClient({ slug }: { slug: string }) {
       )}
 
       <style>{`
+        .product-grid > * { min-width: 0; }
         @media (max-width: 768px) {
           .product-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
           .product-sticky-col { position: static !important; }
