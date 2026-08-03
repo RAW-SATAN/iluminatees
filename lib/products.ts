@@ -222,6 +222,23 @@ export const products: Product[] = [
     limited: false,
     tags: [],
   },
+  {
+    id: "the-katana",
+    slug: "test",
+    name: "test",
+    codename: "DOSSIER-THE-KATANA",
+    category: "APEX",
+    price: 0,
+    description: "",
+    lore: "",
+    symbol: "eye",
+    shirtColor: "#111111",
+    accentColor: "#c9a84c",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: [],
+  },
 ];
 
 export function getProductBySlug(slug: string): Product | undefined {
