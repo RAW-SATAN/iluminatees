@@ -132,6 +132,24 @@ export const products: Product[] = [
     limited: false,
     tags: [],
   },
+  {
+    id: "custom-1785720298589",
+    slug: "the-capybara",
+    name: "The Capybara",
+    codename: "DOSSIER-1785720298589",
+    category: "APEX",
+    price: 999,
+    originalPrice: 1499,
+    description: "",
+    lore: "",
+    symbol: "eye",
+    shirtColor: "#111111",
+    accentColor: "#c9a84c",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: [],
+  },
 ];
 
 export function getProductBySlug(slug: string): Product | undefined {
