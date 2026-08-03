@@ -96,6 +96,24 @@ export const products: Product[] = [
     limited: false,
     tags: [],
   },
+  {
+    id: "custom-1785720114346",
+    slug: "the-crime-scene",
+    name: "The Crime Scene",
+    codename: "DOSSIER-1785720114346",
+    category: "APEX",
+    price: 1999,
+    originalPrice: 2499,
+    description: "",
+    lore: "",
+    symbol: "eye",
+    shirtColor: "#111111",
+    accentColor: "#c9a84c",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: [],
+  },
 ];
 
 export function getProductBySlug(slug: string): Product | undefined {
