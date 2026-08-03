@@ -16,10 +16,17 @@ interface CustomProduct {
   price: number; originalPrice?: number; sizes: string; inStock: boolean; limited: boolean;
 }
 
-export function useProducts(): Product[] {
+export interface ProductsState {
+  products: Product[];
+  loaded: boolean;
+}
+
+export function useProductsState(): ProductsState {
   const [all, setAll] = useState<Product[]>(staticProducts);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    let alive = true;
     async function load() {
       try {
         /* ── Permanent images from server (overrides localStorage) ── */
@@ -102,11 +109,18 @@ export function useProducts(): Product[] {
           });
 
         /* Static products are never deleted via localStorage */
-        setAll([...staticMapped, ...customMapped.filter(p => !deleted.includes(p.id))]);
-      } catch {}
+        if (alive) setAll([...staticMapped, ...customMapped.filter(p => !deleted.includes(p.id))]);
+      } catch {} finally {
+        if (alive) setLoaded(true);
+      }
     }
     load();
+    return () => { alive = false; };
   }, []);
 
-  return all;
+  return { products: all, loaded };
+}
+
+export function useProducts(): Product[] {
+  return useProductsState().products;
 }

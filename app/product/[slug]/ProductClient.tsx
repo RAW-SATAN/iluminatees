@@ -4,8 +4,8 @@ import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check, Share2 } from "lucide-react";
-import { getProductBySlug, products as staticProducts, type ProductSize } from "@/lib/products";
-import { useProducts } from "@/lib/useProducts";
+import { getProductBySlug, type ProductSize } from "@/lib/products";
+import { useProductsState } from "@/lib/useProducts";
 import { useSiteAssets } from "@/lib/useSiteAssets";
 import { ProductMockup } from "@/components/ProductMockup";
 import { useCart } from "@/components/CartProvider";
@@ -95,11 +95,23 @@ function StarRow({ rating }: { rating: number }) {
 }
 
 export default function ProductClient({ slug }: { slug: string }) {
-  const allProducts = useProducts();
+  const { products: allProducts, loaded } = useProductsState();
 
   // Use merged product (with localStorage edits/images) if available, else static
   const productData = allProducts.find(p => p.slug === slug) ?? getProductBySlug(slug);
-  if (!productData) notFound();
+
+  // Newly-added products (admin) live in localStorage/DB and are only known to the
+  // client after load. Don't 404 during SSR/first paint — show a loading state instead.
+  if (!productData) {
+    if (!loaded) {
+      return (
+        <div style={{ minHeight: "100vh", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif", fontSize: "0.7rem", color: "#aaa" }}>
+          Loading…
+        </div>
+      );
+    }
+    notFound();
+  }
   const product = productData!;
 
   const router = useRouter();
