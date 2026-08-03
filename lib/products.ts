@@ -114,6 +114,24 @@ export const products: Product[] = [
     limited: false,
     tags: [],
   },
+  {
+    id: "custom-1785720180160",
+    slug: "the-pink-panther",
+    name: "The Pink Panther",
+    codename: "DOSSIER-1785720180160",
+    category: "APEX",
+    price: 999,
+    originalPrice: 1599,
+    description: "",
+    lore: "",
+    symbol: "eye",
+    shirtColor: "#111111",
+    accentColor: "#c9a84c",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: [],
+  },
 ];
 
 export function getProductBySlug(slug: string): Product | undefined {
