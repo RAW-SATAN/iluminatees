@@ -186,6 +186,24 @@ export const products: Product[] = [
     limited: false,
     tags: [],
   },
+  {
+    id: "custom-1785720952213",
+    slug: "-iluminatees-basics-navy-blue",
+    name: "ILUMINATEES BASICS NAVY BLUE",
+    codename: "DOSSIER-1785720952213",
+    category: "APEX",
+    price: 499,
+    originalPrice: 999,
+    description: "",
+    lore: "",
+    symbol: "eye",
+    shirtColor: "#111111",
+    accentColor: "#c9a84c",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
+    limited: false,
+    tags: [],
+  },
 ];
 
 export function getProductBySlug(slug: string): Product | undefined {
