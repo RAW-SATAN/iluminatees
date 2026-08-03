@@ -215,9 +215,9 @@ export default function ProductClient({ slug }: { slug: string }) {
                     </button>
                   </div>
 
-                  <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 500, padding: activeImg ? 0 : "3rem 2rem", position: "relative", overflow: "hidden" }}>
+                  <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", width: "100%", aspectRatio: "1 / 1", maxHeight: "70vh", padding: 0 }}>
                     {activeImg ? (
-                      <img src={activeImg} alt={product.name} style={{ width: "100%", height: "100%", minHeight: 500, objectFit: "cover", borderRadius: 12 }} />
+                      <img src={activeImg} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block", borderRadius: 12 }} />
                     ) : (
                       <>
                         <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
