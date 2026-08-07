@@ -232,6 +232,9 @@ export function Footer() {
         letterSpacing: "0.05em",
       }}>
         © 2026 ILUMINATEES — All Rights Reserved · All Truths Encrypted
+        <div style={{ marginTop: 4, color: "rgba(255,255,255,0.14)", letterSpacing: "0.05em" }}>
+          Owned by getsalenow
+        </div>
       </div>
 
       <style>{`
