@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { cashfreeEnabled, cashfreeMode, createCashfreeOrder } from '@/lib/cashfree'
+import { payuEnabled, payuMode } from '@/lib/payu'
 
 export const dynamic = 'force-dynamic'
 
-/* Checkout asks this to decide between the Cashfree flow and the manual QR fallback */
+/* Checkout asks this to decide which payment gateway is active */
 export async function GET() {
-  return NextResponse.json({ enabled: cashfreeEnabled(), mode: cashfreeMode() })
+  return NextResponse.json({
+    enabled: cashfreeEnabled(),
+    mode: cashfreeMode(),
+    payuEnabled: payuEnabled(),
+    payuMode: payuMode(),
+  })
 }
 
 /* Create a Cashfree payment session for an existing unpaid order */

@@ -74,7 +74,7 @@ function ReturnInner() {
           Hum jaldi hi dispatch details WhatsApp par bhejenge.
         </p>
         <a
-          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Payment ho gaya.\n\nOrder: ${order.id}\nItems: ${summary}\nAmount: ₹${order.total} (PAID via Cashfree)\n\nPlease confirm.`)}`}
+          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Payment ho gaya.\n\nOrder: ${order.id}\nItems: ${summary}\nAmount: ₹${order.total} (PAID Online)\n\nPlease confirm.`)}`}
           style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#25D366", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.06em", padding: "0.9rem 1.8rem", borderRadius: 24, textDecoration: "none" }}
         >
           💬 WhatsApp par order confirm karo
