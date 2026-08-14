@@ -88,7 +88,10 @@ export default function CartPage() {
                 >
                   {/* Thumbnail */}
                   <div className="cart-thumb" style={{ width: 68, height: 84, flexShrink: 0, background: "#f5f5f5", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                    {product && <ProductMockup product={product} size={54} />}
+                    {product && (product.customImage
+                      ? <img src={product.customImage} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : <ProductMockup product={product} size={54} />
+                    )}
                   </div>
 
                   {/* Info */}

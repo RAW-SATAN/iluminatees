@@ -506,8 +506,11 @@ export default function ProductClient({ slug }: { slug: string }) {
                         style={{ position: "relative", width: 64, height: 80, borderRadius: 8, border: `2px solid ${picked ? "#111" : "#e8e8e8"}`, background: picked ? "#111" : "#f5f5f5", cursor: "pointer", padding: 0, overflow: "hidden", flexShrink: 0 }}
                         title={p.name}
                       >
-                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <ProductMockup product={p} size={50} />
+                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                          {p.customImage
+                            ? <img src={p.customImage} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <ProductMockup product={p} size={50} />
+                          }
                         </div>
                         {picked && (
                           <div style={{ position: "absolute", top: 3, right: 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", border: "1.5px solid #111", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -562,8 +565,11 @@ export default function ProductClient({ slug }: { slug: string }) {
                   <div key={p.slug} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     {idx > 0 && <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "1rem", color: "#ccc" }}>+</span>}
                     <div style={{ position: "relative" }}>
-                      <div style={{ width: 70, height: 84, background: "#f5f5f5", borderRadius: 8, border: `1.5px solid ${!fixed && !fbtSelected.includes(p.slug) ? "#e0e0e0" : "#ddd"}`, display: "flex", alignItems: "center", justifyContent: "center", opacity: !fixed && !fbtSelected.includes(p.slug) ? 0.4 : 1, transition: "opacity 0.15s" }}>
-                        <ProductMockup product={p} size={54} />
+                      <div style={{ width: 70, height: 84, background: "#f5f5f5", borderRadius: 8, border: `1.5px solid ${!fixed && !fbtSelected.includes(p.slug) ? "#e0e0e0" : "#ddd"}`, display: "flex", alignItems: "center", justifyContent: "center", opacity: !fixed && !fbtSelected.includes(p.slug) ? 0.4 : 1, transition: "opacity 0.15s", overflow: "hidden" }}>
+                        {p.customImage
+                          ? <img src={p.customImage} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          : <ProductMockup product={p} size={54} />
+                        }
                       </div>
                       {!fixed && (
                         <button
@@ -788,8 +794,11 @@ export default function ProductClient({ slug }: { slug: string }) {
                     UPTO {pDisc}% OFF
                   </div>
                 )}
-                <div style={{ background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.6rem 1rem", minHeight: 165 }}>
-                  <ProductMockup product={p} size={115} />
+                <div style={{ background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 165, overflow: "hidden" }}>
+                  {p.customImage
+                    ? <img src={p.customImage} alt={p.name} style={{ width: "100%", height: 165, objectFit: "cover" }} />
+                    : <ProductMockup product={p} size={115} />
+                  }
                 </div>
                 <div style={{ padding: "0.65rem 0.75rem 0.8rem" }}>
                   <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.6rem", color: "#111", marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
@@ -817,8 +826,11 @@ export default function ProductClient({ slug }: { slug: string }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: 14 }}>
           {byTheCult.map(p => (
             <Link key={p.id} href={`/product/${p.slug}`} style={{ textDecoration: "none", border: "1px solid #eee", borderRadius: 12, overflow: "hidden", background: "#fff", display: "flex", flexDirection: "column" }}>
-              <div style={{ background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem 1rem", minHeight: 155 }}>
-                <ProductMockup product={p} size={105} />
+              <div style={{ background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 155, overflow: "hidden" }}>
+                {p.customImage
+                  ? <img src={p.customImage} alt={p.name} style={{ width: "100%", height: 155, objectFit: "cover" }} />
+                  : <ProductMockup product={p} size={105} />
+                }
               </div>
               <div style={{ padding: "0.65rem 0.7rem 0.8rem" }}>
                 <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "0.58rem", color: "#111", marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
