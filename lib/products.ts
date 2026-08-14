@@ -41,6 +41,20 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["apex", "heavyweight", "oversized"],
+    customImage: "/products/the-katana/0.jpg",
+    customImages: [
+      "/products/the-katana/0.jpg",
+      "/products/the-katana/1.jpg",
+      "/products/the-katana/2.jpg",
+      "/products/the-katana/3.jpg",
+      "/products/the-katana/4.jpg",
+      "/products/the-katana/5.jpg",
+      "/products/the-katana/6.jpg",
+      "/products/the-katana/7.jpg",
+      "/products/the-katana/8.jpg",
+      "/products/the-katana/9.jpg",
+      "/products/the-katana/10.jpg",
+    ],
   },
   {
     id: "14",
@@ -59,6 +73,12 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["apex", "heavyweight", "oversized"],
+    customImage: "/products/the-black-samurai/0.jpg",
+    customImages: [
+      "/products/the-black-samurai/0.jpg",
+      "/products/the-black-samurai/1.jpg",
+      "/products/the-black-samurai/2.jpg",
+    ],
   },
   {
     id: "15",
@@ -77,6 +97,13 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: ["apex", "heavyweight", "oversized"],
+    customImage: "/products/the-bankai/0.jpg",
+    customImages: [
+      "/products/the-bankai/0.jpg",
+      "/products/the-bankai/1.jpg",
+      "/products/the-bankai/2.jpg",
+      "/products/the-bankai/3.jpg",
+    ],
   },
   {
     id: "custom-1784201245342",
@@ -95,6 +122,11 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/the-sakura/0.jpg",
+    customImages: [
+      "/products/the-sakura/0.jpg",
+      "/products/the-sakura/1.jpg",
+    ],
   },
   {
     id: "custom-1785720114346",
@@ -113,6 +145,16 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/the-crime-scene/0.jpg",
+    customImages: [
+      "/products/the-crime-scene/0.jpg",
+      "/products/the-crime-scene/1.jpg",
+      "/products/the-crime-scene/2.jpg",
+      "/products/the-crime-scene/3.jpg",
+      "/products/the-crime-scene/4.jpg",
+      "/products/the-crime-scene/5.jpg",
+      "/products/the-crime-scene/6.jpg",
+    ],
   },
   {
     id: "custom-1785720180160",
@@ -131,6 +173,15 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/the-pink-panther/0.jpg",
+    customImages: [
+      "/products/the-pink-panther/0.jpg",
+      "/products/the-pink-panther/1.jpg",
+      "/products/the-pink-panther/2.jpg",
+      "/products/the-pink-panther/3.jpg",
+      "/products/the-pink-panther/4.jpg",
+      "/products/the-pink-panther/5.jpg",
+    ],
   },
   {
     id: "custom-1785720298589",
@@ -149,6 +200,20 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/the-capybara/0.jpg",
+    customImages: [
+      "/products/the-capybara/0.jpg",
+      "/products/the-capybara/1.jpg",
+      "/products/the-capybara/2.jpg",
+      "/products/the-capybara/3.jpg",
+      "/products/the-capybara/4.jpg",
+      "/products/the-capybara/5.jpg",
+      "/products/the-capybara/6.jpg",
+      "/products/the-capybara/7.jpg",
+      "/products/the-capybara/8.jpg",
+      "/products/the-capybara/9.jpg",
+      "/products/the-capybara/10.jpg",
+    ],
   },
   {
     id: "custom-1785720857482",
@@ -167,6 +232,10 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/iluminatees-basics-black/0.jpg",
+    customImages: [
+      "/products/iluminatees-basics-black/0.jpg",
+    ],
   },
   {
     id: "custom-1785720923813",
@@ -185,6 +254,10 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/iluminatees-basics-beige/0.jpg",
+    customImages: [
+      "/products/iluminatees-basics-beige/0.jpg",
+    ],
   },
   {
     id: "custom-1785720952213",
@@ -203,6 +276,10 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/-iluminatees-basics-navy-blue/0.jpg",
+    customImages: [
+      "/products/-iluminatees-basics-navy-blue/0.jpg",
+    ],
   },
   {
     id: "custom-1785720976061",
@@ -221,6 +298,10 @@ export const products: Product[] = [
     inStock: true,
     limited: false,
     tags: [],
+    customImage: "/products/iluminatees-basics-white/0.jpg",
+    customImages: [
+      "/products/iluminatees-basics-white/0.jpg",
+    ],
   },
 ];
 
