@@ -93,7 +93,7 @@ export default function AdminPage() {
   const [showAdd, setShowAdd]       = useState(false);
   const [addForm, setAddForm]       = useState({ name: "", price: "", mrp: "", category: "SAMURAI" as "SAMURAI"|"MISFITS"|"BASICS", sizes: "S,M,L,XL" });
   const [panelProduct, setPanelProduct] = useState<Product|null>(null);
-  const [panelDraft, setPanelDraft] = useState<PanelDraft>({ name: "", description: "", price: "", mrp: "", category: "APEX", sizes: ["S","M","L","XL"], inStock: true, limited: false, customImages: [] });
+  const [panelDraft, setPanelDraft] = useState<PanelDraft>({ name: "", description: "", price: "", mrp: "", category: "SAMURAI", sizes: ["S","M","L","XL"], inStock: true, limited: false, customImages: [] });
   const [imgUrlInput, setImgUrlInput] = useState("");
   const descRef = useRef<HTMLTextAreaElement>(null);
   const [addedProducts, setAddedProducts] = useLS<CustomProduct[]>(ADDED_KEY, []);
@@ -650,7 +650,7 @@ export default function AdminPage() {
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={{ padding: "0.5rem 1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Export</button>
                 <button style={{ padding: "0.5rem 1rem", background: S.card, border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.65rem", color: S.text, cursor: "pointer", fontWeight: 500 }}>Import</button>
-                <button onClick={() => { setAddForm({ name: "", price: "", mrp: "", category: "APEX", sizes: "S,M,L,XL" }); setShowAdd(true); }} style={{ padding: "0.5rem 1rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.65rem", color: "#fff", cursor: "pointer", fontWeight: 600 }}>+ Add product</button>
+                <button onClick={() => { setAddForm({ name: "", price: "", mrp: "", category: "SAMURAI", sizes: "S,M,L,XL" }); setShowAdd(true); }} style={{ padding: "0.5rem 1rem", background: S.green, border: "none", borderRadius: 8, fontSize: "0.65rem", color: "#fff", cursor: "pointer", fontWeight: 600 }}>+ Add product</button>
               </div>
             </div>
 
