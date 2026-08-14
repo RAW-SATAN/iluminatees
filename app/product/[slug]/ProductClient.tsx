@@ -1,9 +1,9 @@
 "use client";
 
 import { notFound, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
-import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check, Share2 } from "lucide-react";
+import { Star, ChevronDown, ChevronUp, TrendingUp, Heart, Check, Share2, Bookmark } from "lucide-react";
 import { getProductBySlug, type ProductSize } from "@/lib/products";
 import { useProductsState } from "@/lib/useProducts";
 import { useSiteAssets } from "@/lib/useSiteAssets";
@@ -128,6 +128,38 @@ export default function ProductClient({ slug }: { slug: string }) {
   const [bundlePicks, setBundlePicks] = useState<string[]>([]);
 
   const wishlisted = isWishlisted(product.slug);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  function showToast(msg: string) {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(m => m === msg ? null : m), 2200);
+  }
+
+  async function handleShare() {
+    const shareData = {
+      title: `${product.name} — ILUMINATEES`,
+      text: `Check out ${product.name} on ILUMINATEES!`,
+      url: typeof window !== "undefined" ? window.location.href : "",
+    };
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {}
+    } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast("📋 Link copied to clipboard!");
+      } catch {
+        showToast("Link: " + window.location.href);
+      }
+    }
+  }
+
+  function handleBookmark() {
+    toggleItem(product.slug);
+    showToast(wishlisted ? "Removed from saved" : "🔖 Saved to collection!");
+  }
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null;
@@ -199,25 +231,95 @@ export default function ProductClient({ slug }: { slug: string }) {
             {(() => {
               const imgs = product.customImages ?? (product.customImage ? [product.customImage] : []);
               const activeImg = imgs[activeImgIdx] ?? imgs[0] ?? null;
+              const totalImgs = imgs.length;
+
+              const goToPrev = () => {
+                if (totalImgs <= 1) return;
+                setActiveImgIdx(prev => (prev - 1 + totalImgs) % totalImgs);
+              };
+
+              const goToNext = () => {
+                if (totalImgs <= 1) return;
+                setActiveImgIdx(prev => (prev + 1) % totalImgs);
+              };
+
+              const handleTouchStart = (e: React.TouchEvent) => {
+                touchStartRef.current = {
+                  x: e.touches[0].clientX,
+                  y: e.touches[0].clientY,
+                };
+              };
+
+              const handleTouchEnd = (e: React.TouchEvent) => {
+                if (!touchStartRef.current || totalImgs <= 1) return;
+                const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+                const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+                touchStartRef.current = null;
+
+                if (Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) {
+                  if (dx < 0) goToNext();
+                  else goToPrev();
+                }
+              };
+
               return (
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, position: "relative" }}>
                   {/* Icons row */}
                   <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                    <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+                    <button
+                      onClick={handleShare}
+                      title="Share product"
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 6, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    >
                       <Share2 size={16} color="#555" />
                     </button>
-                    <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8"><path d="M18 21l-6-3-6 3V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z" /></svg>
+                    <button
+                      onClick={handleBookmark}
+                      title="Save product"
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 6, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    >
+                      <Bookmark size={16} color={wishlisted ? "#111" : "#555"} fill={wishlisted ? "#111" : "none"} />
                     </button>
-                    <button onClick={() => toggleItem(product.slug)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                    <button
+                      onClick={() => {
+                        toggleItem(product.slug);
+                        showToast(wishlisted ? "Removed from wishlist" : "❤️ Added to wishlist!");
+                      }}
+                      title="Wishlist"
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 8px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}
+                    >
                       <Heart size={16} color={wishlisted ? "#e8000d" : "#555"} fill={wishlisted ? "#e8000d" : "none"} />
                       <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.58rem", color: "#555" }}>53.0k</span>
                     </button>
                   </div>
 
-                  <div className="product-main-img" style={{ background: "#f5f5f5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", width: "100%", aspectRatio: "1 / 1", maxHeight: "70vh", padding: 0 }}>
+                  <div
+                    className="product-main-img"
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                    style={{
+                      background: "#f5f5f5",
+                      borderRadius: 12,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                      overflow: "hidden",
+                      width: "100%",
+                      aspectRatio: "1 / 1",
+                      maxHeight: "70vh",
+                      padding: 0,
+                      touchAction: "pan-y",
+                      userSelect: "none",
+                    }}
+                  >
                     {activeImg ? (
-                      <img src={activeImg} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block", borderRadius: 12 }} />
+                      <img
+                        key={activeImg}
+                        src={activeImg}
+                        alt={product.name}
+                        style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block", borderRadius: 12 }}
+                      />
                     ) : (
                       <>
                         <div style={{ position: "absolute", top: 14, left: 14, opacity: 0.3 }}>
@@ -228,6 +330,28 @@ export default function ProductClient({ slug }: { slug: string }) {
                         </div>
                         <ProductMockup product={product} size={340} colorOverride={selectedColor} />
                       </>
+                    )}
+
+                    {/* Image Counter Badge on Mobile */}
+                    {totalImgs > 1 && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 12,
+                          right: 12,
+                          background: "rgba(0,0,0,0.6)",
+                          backdropFilter: "blur(4px)",
+                          color: "#fff",
+                          fontFamily: "Space Mono, monospace",
+                          fontSize: "0.52rem",
+                          fontWeight: 700,
+                          padding: "0.22rem 0.6rem",
+                          borderRadius: 20,
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {activeImgIdx + 1} / {totalImgs}
+                      </div>
                     )}
                   </div>
 
@@ -866,6 +990,32 @@ export default function ProductClient({ slug }: { slug: string }) {
           }
           onClose={() => setShowTryOn(false)}
         />
+      )}
+
+      {/* Floating feedback toast */}
+      {toastMsg && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 99999,
+            background: "#111",
+            color: "#fff",
+            fontFamily: "Inter, sans-serif",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            padding: "0.75rem 1.4rem",
+            borderRadius: 30,
+            boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            pointerEvents: "none",
+            animation: "fade-up 0.25s ease-out",
+          }}
+        >
+          {toastMsg}
+        </div>
       )}
 
       <style>{`
