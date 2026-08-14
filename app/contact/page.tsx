@@ -13,7 +13,7 @@ export default function ContactPage() {
           Contact <span style={{ color: "#e8000d" }}>Us</span>
         </h1>
         <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#888", marginBottom: 36 }}>
-          Order help, size exchange, ya kuch bhi — we reply fast.
+          Order assistance, size exchanges, or questions — we reply promptly.
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

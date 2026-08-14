@@ -34,16 +34,16 @@ export default function TrackPage() {
     e.preventDefault();
     setErr(null); setOrder(null);
     if (!orderId.trim() || !/^\d{10}$/.test(phone.trim())) {
-      setErr("Order ID aur 10-digit phone number dono chahiye.");
+      setErr("Please enter both Order ID and your 10-digit phone number.");
       return;
     }
     setBusy(true);
     try {
       const res = await fetch(`/api/orders/track?id=${encodeURIComponent(orderId.trim())}&phone=${encodeURIComponent(phone.trim())}`);
-      if (!res.ok) { setErr("Order nahi mila — ID aur phone number check karo."); return; }
+      if (!res.ok) { setErr("Order not found — please verify your Order ID and phone number."); return; }
       setOrder(await res.json());
     } catch {
-      setErr("Server se connect nahi ho paya. Dobara try karo.");
+      setErr("Could not connect to server. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -61,7 +61,7 @@ export default function TrackPage() {
             Track Your Order
           </h1>
           <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.66rem", color: "#888", marginTop: 6 }}>
-            Order ID aur wahi phone number daalo jo order par diya tha.
+            Enter your Order ID and the phone number used during checkout.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function TrackPage() {
 
             {order.status === "cancelled" ? (
               <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, padding: "0.8rem 1rem", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.66rem", color: "#b91c1c" }}>
-                Ye order cancel ho chuka hai. Koi sawaal ho to WhatsApp karo.
+                This order has been cancelled. For any queries, please reach out to us on WhatsApp.
               </div>
             ) : (
               <div style={{ display: "flex", alignItems: "flex-start" }}>
@@ -112,9 +112,9 @@ export default function TrackPage() {
               </div>
             )}
 
-            <a href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Order ${order.id} ka update chahiye.`)}`}
+            <a href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! I'd like an update on order ${order.id}.`)}`}
               style={{ display: "block", textAlign: "center", marginTop: 20, fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#16a34a", fontWeight: 700, textDecoration: "none" }}>
-              💬 WhatsApp par live update lo →
+              💬 Get Live Updates on WhatsApp →
             </a>
           </div>
         )}

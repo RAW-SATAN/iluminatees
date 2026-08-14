@@ -53,7 +53,7 @@ function ReturnInner() {
     return (
       <div style={{ minHeight: "70vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, textAlign: "center", padding: "2rem" }}>
         <div style={{ width: 44, height: 44, border: "4px solid #eee", borderTopColor: "#111", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.74rem", color: "#666" }}>Payment verify ho raha hai…</p>
+        <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.74rem", color: "#666" }}>Verifying your payment…</p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -70,14 +70,14 @@ function ReturnInner() {
           Payment Successful!
         </h1>
         <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#666", lineHeight: 1.8, maxWidth: 380 }}>
-          Order <strong>{order.id}</strong> confirm ho gaya — ₹{order.total.toLocaleString("en-IN")} paid.
-          Hum jaldi hi dispatch details WhatsApp par bhejenge.
+          Order <strong>{order.id}</strong> has been confirmed — ₹{order.total.toLocaleString("en-IN")} paid.
+          We will send your dispatch details on WhatsApp shortly.
         </p>
         <a
-          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Payment ho gaya.\n\nOrder: ${order.id}\nItems: ${summary}\nAmount: ₹${order.total} (PAID Online)\n\nPlease confirm.`)}`}
+          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Payment completed.\n\nOrder: ${order.id}\nItems: ${summary}\nAmount: ₹${order.total} (PAID Online)\n\nPlease confirm.`)}`}
           style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#25D366", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.06em", padding: "0.9rem 1.8rem", borderRadius: 24, textDecoration: "none" }}
         >
-          💬 WhatsApp par order confirm karo
+          💬 Confirm Order on WhatsApp
         </a>
         <div style={{ display: "flex", gap: 16 }}>
           <Link href="/track" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#888", textDecoration: "underline" }}>
@@ -97,16 +97,16 @@ function ReturnInner() {
         <X size={30} color="#fff" strokeWidth={3} />
       </div>
       <h1 style={{ fontFamily: "Anton, sans-serif", fontSize: "clamp(1.5rem, 4vw, 2.2rem)", letterSpacing: "0.06em", color: "#111", textTransform: "uppercase" }}>
-        Payment Complete Nahi Hua
+        Payment Incomplete
       </h1>
       <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#666", lineHeight: 1.8, maxWidth: 380 }}>
-        {order ? <>Order <strong>{order.id}</strong> abhi unpaid hai.</> : "Payment verify nahi ho paya."} Tumhara bag safe hai — dobara try kar sakte ho.
-        Agar paisa kat gaya hai to WhatsApp karo, hum turant check karenge.
+        {order ? <>Order <strong>{order.id}</strong> is currently unpaid.</> : "Payment could not be verified."} Your bag items are saved — please try again.
+        If the amount was deducted from your account, please reach out to us on WhatsApp and we will resolve it immediately.
       </p>
       <Link href="/checkout" style={{ display: "inline-block", background: "#111", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.12em", padding: "0.85rem 2rem", borderRadius: 24, textDecoration: "none" }}>
         TRY AGAIN →
       </Link>
-      <a href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Order ${order?.id ?? orderId} ka payment issue hai, please check.`)}`}
+      <a href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! I need help with payment for order ${order?.id ?? orderId}.`)}`}
         style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#16a34a", fontWeight: 700, textDecoration: "none" }}>
         💬 WhatsApp support
       </a>

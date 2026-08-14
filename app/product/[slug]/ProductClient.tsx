@@ -27,25 +27,25 @@ const WA_CHATS = [
   {
     avatar: "R", name: "Rahul K.", color: "#128C7E",
     messages: [
-      { text: "bhai ye eye of providence wali tshirt ekdum mast h 🔥", time: "11:32 AM", out: false },
-      { text: "quality dekh ke shock ho gaya, itni thick hai", time: "11:33 AM", out: false },
+      { text: "The Eye of Providence tee is absolute fire 🔥", time: "11:32 AM", out: false },
+      { text: "Super impressed with the quality, heavyweight and premium feel.", time: "11:33 AM", out: false },
       { text: "Glad you love it! Stay initiated. 🙌", time: "11:34 AM", out: true },
     ],
   },
   {
     avatar: "A", name: "Aryan S.", color: "#25D366",
     messages: [
-      { text: "delivery bhi fast thi, 3 days mein aa gayi", time: "2:15 PM", out: false },
-      { text: "packaging bhi premium tha, unboxing experience 10/10", time: "2:16 PM", out: false },
+      { text: "Fast shipping too, arrived in just 3 days!", time: "2:15 PM", out: false },
+      { text: "Packaging and unboxing experience was 10/10.", time: "2:16 PM", out: false },
       { text: "Thanks bro! Welcome to the order 🕯️", time: "2:18 PM", out: true },
     ],
   },
   {
     avatar: "P", name: "Priya M.", color: "#34B7F1",
     messages: [
-      { text: "size guide ekdum accurate h, M fit perfectly", time: "6:44 PM", out: false },
-      { text: "logo bhi sharp h, 5 washes ke baad bhi nahi nikla 👌", time: "6:45 PM", out: false },
-      { text: "That's our promise — screen print lasts! 💪", time: "6:47 PM", out: true },
+      { text: "Size guide is spot on, Size M fits perfectly!", time: "6:44 PM", out: false },
+      { text: "The print is sharp and pristine even after 5+ washes 👌", time: "6:45 PM", out: false },
+      { text: "That's our promise — screen print made to last! 💪", time: "6:47 PM", out: true },
     ],
   },
 ];

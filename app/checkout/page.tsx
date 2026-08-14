@@ -80,7 +80,7 @@ export default function CheckoutPage() {
 
   async function placeOrder() {
     if (!form.name.trim() || !/^\d{10}$/.test(form.phone.trim()) || !form.address.trim() || !form.city.trim()) {
-      setErr("Naam, 10-digit phone, address aur city bharna zaroori hai.");
+      setErr("Please fill in your name, 10-digit phone number, address and city.");
       return;
     }
     const order = {
@@ -100,12 +100,12 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order),
       });
-      if (!res.ok) { setErr("Order place nahi ho paya. Dobara try karo."); return; }
+      if (!res.ok) { setErr("Could not place your order. Please try again."); return; }
       const saved = await res.json();
       savedId = saved.id ?? order.id;
       try { localStorage.setItem("iluminatees_orders", JSON.stringify([saved, ...JSON.parse(localStorage.getItem("iluminatees_orders") ?? "[]")])); } catch {}
     } catch {
-      setErr("Server se connect nahi ho paya. Dobara try karo.");
+      setErr("Could not connect to server. Please try again.");
       return;
     }
     /* ── Prepaid + PayU configured (PayU takes priority) → PayU redirect ── */
@@ -123,7 +123,7 @@ export default function CheckoutPage() {
         return;
       } catch (e) {
         setPaying(false);
-        setErr("Payment page load nahi hua — dobara try karo ya WhatsApp karo. Order save ho gaya hai.");
+        setErr("Payment page failed to load — please try again or contact us on WhatsApp. Your order has been saved.");
         return;
       }
     }
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
         return;
       } catch (e) {
         setPaying(false);
-        setErr("Payment page load nahi hua — dobara try karo ya WhatsApp karo. Order save ho gaya hai.");
+        setErr("Payment page failed to load — please try again or contact us on WhatsApp. Your order has been saved.");
         return;
       }
     }
@@ -169,14 +169,14 @@ export default function CheckoutPage() {
           Order Placed!
         </h1>
         <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#666", lineHeight: 1.8, maxWidth: 380 }}>
-          Order <strong>{placed}</strong> mil gaya. Hum WhatsApp par confirm karenge.
-          {payment === "prepaid" && <> Payment UPI se complete karna na bhoolein — <strong>{UPI_ID}</strong>.</>}
+          Order <strong>{placed}</strong> confirmed. We'll reach out on WhatsApp shortly.
+          {payment === "prepaid" && <>Please complete payment via UPI — <strong>{UPI_ID}</strong>.</>}
         </p>
         <a
-          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! Maine order place kiya hai.\n\nOrder: ${placed}\nItems: ${placedSummary}\nPayment: ${payment === "cod" ? "COD" : "UPI (paid)"}\n\nPlease confirm.`)}`}
+          href={`https://wa.me/919760492581?text=${encodeURIComponent(`Hi! I placed an order.\n\nOrder: ${placed}\nItems: ${placedSummary}\nPayment: ${payment === "cod" ? "COD" : "UPI (paid)"}\n\nPlease confirm.`)}`}
           style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#25D366", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.06em", padding: "0.9rem 1.8rem", borderRadius: 24, textDecoration: "none" }}
         >
-          💬 WhatsApp par order confirm karo
+          💬 Confirm Order on WhatsApp
         </a>
         <div style={{ display: "flex", gap: 16 }}>
           <Link href="/track" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "#888", textDecoration: "underline" }}>
@@ -195,7 +195,7 @@ export default function CheckoutPage() {
     return (
       <div style={{ minHeight: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, padding: "2rem", textAlign: "center" }}>
         <ShoppingBag size={52} color="#e0e0e0" strokeWidth={1.2} />
-        <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.75rem", color: "#888" }}>Bag khali hai — pehle kuch add karo.</p>
+        <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.75rem", color: "#888" }}>Your bag is empty — add some items first.</p>
         <Link href="/shop" style={{ background: "#111", color: "#fff", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.12em", padding: "0.8rem 1.8rem", borderRadius: 24, textDecoration: "none" }}>
           SHOP NOW →
         </Link>
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
                 <div style={{ marginTop: 14, border: "1px dashed #c9e5d2", background: "#f7fff9", borderRadius: 12, padding: "0.9rem 1rem", display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: "1.3rem" }}>🔒</span>
                   <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6rem", color: "#333", lineHeight: 1.7 }}>
-                    Place Order dabate hi <strong>secure payment page</strong> khulega — UPI, cards, netbanking sab chalega. Payment hote hi order automatically confirm ho jayega.
+                    Clicking Place Order opens the <strong>secure payment gateway</strong> — UPI, Cards & NetBanking accepted. Your order will be confirmed automatically once payment is complete.
                   </div>
                 </div>
               )}
@@ -277,7 +277,7 @@ export default function CheckoutPage() {
                     <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.66rem", color: "#111", marginBottom: 6 }}>Scan & Pay ₹{payable.toLocaleString("en-IN")}</div>
                     <div style={{ fontFamily: "Space Mono, monospace", fontSize: "0.62rem", color: "#333", background: "#fff", border: "1px solid #e5e5e5", borderRadius: 6, padding: "0.4rem 0.6rem", marginBottom: 8, wordBreak: "break-all" }}>{UPI_ID}</div>
                     <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.56rem", color: "#777", lineHeight: 1.6 }}>
-                      Kisi bhi UPI app se scan karo ya UPI ID par pay karo, phir Place Order dabao. Hum WhatsApp par confirm karenge.
+                    Scan the QR or pay via UPI ID, then click Place Order. We'll confirm your order on WhatsApp.
                     </div>
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export default function CheckoutPage() {
               </div>
               {payment === "cod" && (
                 <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.54rem", color: "#e8000d", marginBottom: 4 }}>
-                  Pay Now select karo aur ₹{Math.round(afterBundle * PREPAID_DISCOUNT).toLocaleString("en-IN")} bacha lo 👀
+                  Switch to Pay Now and save ₹{Math.round(afterBundle * PREPAID_DISCOUNT).toLocaleString("en-IN")} instantly 👀
                 </div>
               )}
 
@@ -326,7 +326,7 @@ export default function CheckoutPage() {
 
               <button onClick={placeOrder} disabled={paying}
                 style={{ width: "100%", marginTop: 12, padding: "1rem", borderRadius: 10, background: "#111", color: "#fff", border: "none", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.8rem", letterSpacing: "0.06em", cursor: "pointer" }}>
-                {paying ? "PAYMENT PAGE KHUL RAHA HAI…" : `PLACE ORDER — ₹${payable.toLocaleString("en-IN")}`}
+                {paying ? "PROCESSING PAYMENT…" : `PLACE ORDER — ₹${payable.toLocaleString("en-IN")}`}
               </button>
               <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.52rem", color: "#aaa", textAlign: "center", marginTop: 10 }}>
                 🔒 100% secure · Easy size exchange · Ships in 3–5 days

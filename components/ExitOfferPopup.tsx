@@ -55,14 +55,14 @@ export function ExitOfferPopup() {
 
         <div style={{ fontSize: "2rem", marginBottom: 10 }}>👁️</div>
         <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "0.5rem", letterSpacing: "0.35em", color: "#e8000d", textTransform: "uppercase", marginBottom: 8 }}>
-          RUKO — THE VAULT HAS AN OFFER
+          WAIT — EXCLUSIVE VAULT OFFER
         </div>
         <h3 style={{ fontFamily: "Anton, sans-serif", fontSize: "1.6rem", letterSpacing: "0.04em", color: "#fff", textTransform: "uppercase", lineHeight: 1.15, marginBottom: 10 }}>
           Flat 20% OFF<br />On Prepaid Orders
         </h3>
         <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.62rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 20 }}>
-          Checkout par Pay Now (UPI) select karo — discount automatically apply hota hai.
-          Limited drops kabhi restock nahi hote. 🔥
+          Select Pay Now at checkout — 20% discount is automatically applied.
+          Limited edition drops never restock. 🔥
         </p>
         <Link
           href="/shop"
@@ -75,7 +75,7 @@ export function ExitOfferPopup() {
           onClick={() => setShow(false)}
           style={{ background: "none", border: "none", fontFamily: "Inter, sans-serif", fontSize: "0.56rem", color: "rgba(255,255,255,0.35)", cursor: "pointer", textDecoration: "underline" }}
         >
-          Nahi chahiye, jaane do
+          No thanks, I'll pass
         </button>
       </div>
     </div>

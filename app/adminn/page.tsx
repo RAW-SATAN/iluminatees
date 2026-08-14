@@ -505,7 +505,7 @@ export default function AdminPage() {
                 )}
               </div>
               {subscribers.length === 0 ? (
-                <div style={{ padding: "1.25rem", fontSize: "0.64rem", color: S.muted }}>Abhi koi subscriber nahi — site ke newsletter form se emails yahan aayengi.</div>
+                <div style={{ padding: "1.25rem", fontSize: "0.64rem", color: S.muted }}>No subscribers yet — emails submitted from the newsletter form will appear here.</div>
               ) : (
                 <div style={{ maxHeight: 260, overflowY: "auto" }}>
                   {subscribers.slice().reverse().map((s, i) => (
@@ -843,9 +843,9 @@ export default function AdminPage() {
                     const res = await fetch("/api/settings", { method: "PUT", headers: authHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ key: "cod_enabled", value: next }) });
                     if (!res.ok) throw new Error();
                     setSettings({ ...settings, cod_enabled: next });
-                    showToast(next === "0" ? "✅ COD band ho gaya" : "✅ COD chalu ho gaya");
+                    showToast(next === "0" ? "✅ Cash on Delivery disabled" : "✅ Cash on Delivery enabled");
                   } catch {
-                    showToast("❌ Save nahi hua — dobara try karo");
+                    showToast("❌ Failed to save — please try again");
                   }
                 }}
                   style={{ width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", position: "relative", background: settings.cod_enabled !== "0" ? S.green : "#C9CCCF", transition: "background 0.2s" }}>
@@ -857,7 +857,7 @@ export default function AdminPage() {
           {tab === "homepage" && (<>
             <div style={{ marginBottom: 16 }}>
               <h1 style={{ fontSize: "1.05rem", fontWeight: 700, color: S.text, marginBottom: 4 }}>Homepage</h1>
-              <div style={{ fontSize: "0.62rem", color: S.muted }}>Hero banners aur carousel ke 3D mockups yahan se upload karo — save hote hi site par live ho jaate hain (~1 min).</div>
+              <div style={{ fontSize: "0.62rem", color: S.muted }}>Upload hero banners and 3D mockups — changes go live across the site automatically.</div>
             </div>
 
             {/* ── Hero Banners ── */}
@@ -883,7 +883,7 @@ export default function AdminPage() {
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: "0.66rem", fontWeight: 600, color: S.text }}>{label}</div>
-                      <div style={{ fontSize: "0.54rem", color: S.muted, marginTop: 2 }}>{banner ? "Custom banner active" : "Site ka built-in design dikh raha hai"}</div>
+                      <div style={{ fontSize: "0.54rem", color: S.muted, marginTop: 2 }}>{banner ? "Custom banner active" : "Default built-in banner"}</div>
                     </div>
                     <label style={{ padding: "0.4rem 0.9rem", background: S.green, color: "#fff", borderRadius: 6, fontSize: "0.6rem", fontWeight: 600, cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}>
                       {busy ? "Saving…" : banner ? "Replace" : "Upload"}
@@ -905,7 +905,7 @@ export default function AdminPage() {
             <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, overflow: "hidden" }}>
               <div style={{ padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
                 <div style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>Drops Carousel — 3D Mockups</div>
-                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Har product ke liye 3D mockup (transparent PNG best) upload karo — homepage ke DROPS carousel mein wahi dikhega. Nahi hoga to product photo/drawing dikhti hai.</div>
+                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Upload transparent 3D PNG mockups for each product to showcase in the DROPS carousel.</div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12, padding: "1rem" }}>
                 {products.map(p => {
@@ -945,7 +945,7 @@ export default function AdminPage() {
             <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, marginTop: 20, overflow: "hidden" }}>
               <div style={{ padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
                 <div style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>"We Illuminated The Cult" — Photos</div>
-                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Achievements, awards ya koi bhi photos — homepage ke cult slider mein cards ke saath dikhengi. 6 slots.</div>
+                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Community photos, press coverage, or customer moments — displayed in the Cult gallery slider (6 slots).</div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 12, padding: "1rem" }}>
                 {["0","1","2","3","4","5"].map(key => {
@@ -981,7 +981,7 @@ export default function AdminPage() {
             <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 12, marginTop: 20, overflow: "hidden" }}>
               <div style={{ padding: "0.85rem 1rem", borderBottom: `1px solid ${S.border}` }}>
                 <div style={{ fontSize: "0.72rem", fontWeight: 700, color: S.text }}>Size Chart</div>
-                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Size chart ki photo upload karo — product page par "Size Chart" click karne par yahi khulegi.</div>
+                <div style={{ fontSize: "0.56rem", color: S.muted, marginTop: 2 }}>Upload your size guide image — shown on product pages when users click "Size Chart".</div>
               </div>
               {(() => {
                 const img = siteAssets.misc["sizechart"];
@@ -994,7 +994,7 @@ export default function AdminPage() {
                         : <span style={{ fontSize: "0.52rem", color: S.muted }}>No size chart</span>}
                     </div>
                     <div style={{ flex: 1, fontSize: "0.56rem", color: img ? S.green : S.muted }}>
-                      {img ? "Size chart active — product page par dikh raha hai" : "Upload nahi hui — product page par Size Chart button hidden rahega"}
+                      {img ? "Size chart active — visible on product pages" : "Not uploaded — Size Chart button will remain hidden"}
                     </div>
                     <label style={{ padding: "0.4rem 0.9rem", background: S.green, color: "#fff", borderRadius: 6, fontSize: "0.6rem", fontWeight: 600, cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}>
                       {busy ? "Saving…" : img ? "Replace" : "Upload"}

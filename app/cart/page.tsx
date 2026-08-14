@@ -15,8 +15,8 @@ export default function CartPage() {
   const suggestions = allProducts.filter(p => !inCart.has(p.slug) && p.inStock).slice(0, 3);
   const totalQty = items.reduce((s, i) => s + i.quantity, 0);
   const nextTierMsg =
-    totalQty === 1 ? "1 aur tee add karo → Any 2 par 10% OFF 🔥"
-    : totalQty === 2 ? "1 aur tee add karo → Any 3 par 15% OFF 🔥"
+    totalQty === 1 ? "Add 1 more tee → Get 10% OFF on any 2 🔥"
+    : totalQty === 2 ? "Add 1 more tee → Get 15% OFF on any 3 🔥"
     : null;
 
   if (items.length === 0) {
