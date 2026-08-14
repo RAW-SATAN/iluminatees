@@ -10,10 +10,9 @@ import { Logo } from "./Logo";
 
 const PLACEHOLDERS = [
   "Search For Tees...",
-  "Search For Apex Collection...",
-  "Search For Limited Drops...",
-  "Search For Sacred Series...",
-  "Search For Cipher...",
+  "Search For Samurai Collection...",
+  "Search For Misfits Drop...",
+  "Search For Basics...",
   "Search For Oversized Fits...",
 ];
 

@@ -12,25 +12,23 @@ import { useWishlist } from "@/components/WishlistProvider";
 
 /* ── Filters ────────────────────────────────────────────── */
 const FILTERS = [
-  { key: "ALL",        label: "All"            },
-  { key: "APEX",       label: "APEX"           },
-  { key: "SACRED",     label: "Sacred Series"  },
-  { key: "CIPHER",     label: "Cipher Series"  },
-  { key: "BESTSELLER", label: "Bestsellers"    },
-  { key: "LIMITED",    label: "Limited Drops"  },
-  { key: "SALE",       label: "On Sale"        },
-  { key: "NEW",        label: "New Arrivals"   },
+  { key: "ALL",        label: "All"                  },
+  { key: "SAMURAI",    label: "⚔️ Samurai Collection" },
+  { key: "MISFITS",    label: "⚡ Misfits Drop"       },
+  { key: "BASICS",     label: "👕 Basics"             },
+  { key: "BESTSELLER", label: "Bestsellers"          },
+  { key: "LIMITED",    label: "Limited Drops"        },
+  { key: "SALE",       label: "On Sale"              },
 ];
 
 function filterProducts(key: string, products: Product[]): Product[] {
   switch (key) {
-    case "APEX":       return products.filter(p => p.category === "APEX");
-    case "SACRED":     return products.filter(p => p.category === "SACRED");
-    case "CIPHER":     return products.filter(p => p.category === "CIPHER");
+    case "SAMURAI":    return products.filter(p => p.category === "SAMURAI");
+    case "MISFITS":    return products.filter(p => p.category === "MISFITS");
+    case "BASICS":     return products.filter(p => p.category === "BASICS");
     case "BESTSELLER": return products.filter(p => p.tags.includes("bestseller"));
     case "LIMITED":    return products.filter(p => p.limited);
     case "SALE":       return products.filter(p => !!p.originalPrice);
-    case "NEW":        return products.filter(p => !p.originalPrice && !p.limited);
     default:           return products;
   }
 }
@@ -42,7 +40,9 @@ function getTag(p: Product) {
   }
   if (p.limited)                       return { label: "LIMITED EDITION", color: "#fff",  bg: "#e8000d" };
   if (p.tags.includes("bestseller"))   return { label: "BESTSELLER",      color: "#111",  bg: "#ffd700" };
-  if (p.category === "APEX")           return { label: "⚡ APEX",          color: "#fff",  bg: "#7c00cc" };
+  if (p.category === "SAMURAI")        return { label: "⚔️ SAMURAI",      color: "#fff",  bg: "#111"    };
+  if (p.category === "MISFITS")        return { label: "⚡ MISFITS",      color: "#fff",  bg: "#7c00cc" };
+  if (p.category === "BASICS")         return { label: "👕 BASICS",       color: "#fff",  bg: "#333"    };
   return                                      { label: "NEW ARRIVAL",      color: "#fff",  bg: "#111"    };
 }
 

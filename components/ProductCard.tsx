@@ -3,9 +3,9 @@ import type { Product } from "@/lib/products";
 import { ProductMockup } from "./ProductMockup";
 
 const categoryColor: Record<string, string> = {
-  APEX: "var(--color-gold)",
-  CIPHER: "var(--color-muted)",
-  SACRED: "#6a8f6a",
+  SAMURAI: "var(--color-gold)",
+  MISFITS: "#9090ff",
+  BASICS: "var(--color-muted)",
 };
 
 interface Props {

@@ -8,11 +8,11 @@ const DELETED_KEY = "iluminatees_deleted_products";
 
 interface ProductEdit {
   price?: number; originalPrice?: number | null; inStock?: boolean;
-  name?: string; description?: string; category?: "APEX"|"SACRED"|"CIPHER";
+  name?: string; description?: string; category?: "SAMURAI"|"MISFITS"|"BASICS";
   sizes?: string; limited?: boolean; customImage?: string; customImages?: string[];
 }
 interface CustomProduct {
-  id: string; slug: string; name: string; category: "APEX"|"SACRED"|"CIPHER";
+  id: string; slug: string; name: string; category: "SAMURAI"|"MISFITS"|"BASICS";
   price: number; originalPrice?: number; sizes: string; inStock: boolean; limited: boolean;
 }
 

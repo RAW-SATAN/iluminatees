@@ -19,16 +19,16 @@ interface Order {
 }
 interface ProductEdit {
   price?: number; originalPrice?: number | null; inStock?: boolean;
-  name?: string; description?: string; category?: "APEX"|"SACRED"|"CIPHER";
+  name?: string; description?: string; category?: "SAMURAI"|"MISFITS"|"BASICS";
   sizes?: string; limited?: boolean; customImage?: string; customImages?: string[];
 }
 interface PanelDraft {
   name: string; description: string; price: string; mrp: string;
-  category: "APEX"|"SACRED"|"CIPHER"; sizes: string[]; inStock: boolean;
+  category: "SAMURAI"|"MISFITS"|"BASICS"; sizes: string[]; inStock: boolean;
   limited: boolean; customImages: string[];
 }
 interface CustomProduct {
-  id: string; slug: string; name: string; category: "APEX"|"SACRED"|"CIPHER";
+  id: string; slug: string; name: string; category: "SAMURAI"|"MISFITS"|"BASICS";
   price: number; originalPrice?: number; sizes: string; inStock: boolean; limited: boolean;
 }
 
@@ -91,7 +91,7 @@ export default function AdminPage() {
   const [selProds, setSelProds]     = useState<Set<string>>(new Set());
   const [expandedOrder, setExpandedOrder] = useState<string|null>(null);
   const [showAdd, setShowAdd]       = useState(false);
-  const [addForm, setAddForm]       = useState({ name: "", price: "", mrp: "", category: "APEX" as "APEX"|"SACRED"|"CIPHER", sizes: "S,M,L,XL" });
+  const [addForm, setAddForm]       = useState({ name: "", price: "", mrp: "", category: "SAMURAI" as "SAMURAI"|"MISFITS"|"BASICS", sizes: "S,M,L,XL" });
   const [panelProduct, setPanelProduct] = useState<Product|null>(null);
   const [panelDraft, setPanelDraft] = useState<PanelDraft>({ name: "", description: "", price: "", mrp: "", category: "APEX", sizes: ["S","M","L","XL"], inStock: true, limited: false, customImages: [] });
   const [imgUrlInput, setImgUrlInput] = useState("");
@@ -1302,10 +1302,10 @@ export default function AdminPage() {
                   <div style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 10, padding: "1rem" }}>
                     <div style={{ fontSize: "0.68rem", fontWeight: 600, color: S.text, marginBottom: 10 }}>Category</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                      {(["APEX","SACRED","CIPHER"] as const).map(cat => (
+                      {(["SAMURAI","MISFITS","BASICS"] as const).map(cat => (
                         <label key={cat} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                           <input type="radio" name="cat" checked={panelDraft.category===cat} onChange={() => setPanelDraft(d=>({...d, category: cat}))} />
-                          <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "#5A2D91", background: "#E2D9F3", borderRadius: 20, padding: "0.18rem 0.6rem" }}>{cat}</span>
+                          <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "#111", background: "#f0f0f0", borderRadius: 20, padding: "0.18rem 0.6rem" }}>{cat}</span>
                         </label>
                       ))}
                     </div>
@@ -1410,12 +1410,12 @@ export default function AdminPage() {
               <label style={{ display: "block", fontSize: "0.65rem", fontWeight: 600, color: S.text, marginBottom: 5 }}>Category</label>
               <select
                 value={addForm.category}
-                onChange={e => setAddForm(f => ({ ...f, category: e.target.value as "APEX"|"SACRED"|"CIPHER" }))}
+                onChange={e => setAddForm(f => ({ ...f, category: e.target.value as "SAMURAI"|"MISFITS"|"BASICS" }))}
                 style={{ width: "100%", padding: "0.6rem 0.75rem", border: `1px solid ${S.border}`, borderRadius: 8, fontSize: "0.75rem", color: S.text, outline: "none", background: "#fff" }}
               >
-                <option value="APEX">APEX</option>
-                <option value="SACRED">SACRED</option>
-                <option value="CIPHER">CIPHER</option>
+                <option value="SAMURAI">SAMURAI</option>
+                <option value="MISFITS">MISFITS</option>
+                <option value="BASICS">BASICS</option>
               </select>
             </div>
 
