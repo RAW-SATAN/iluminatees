@@ -54,17 +54,18 @@ function ProductTile({ product }: { product: Product }) {
       className="product-card"
       style={{
         background: "#fff",
-        border: "1px solid #eee",
+        border: "1px solid #eaeaea",
         display: "flex",
         flexDirection: "column",
         position: "relative",
         overflow: "hidden",
-        borderRadius: 16,
-        transition: "transform 0.2s, box-shadow 0.2s",
+        borderRadius: 14,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
       }}
     >
       {/* Tag badge */}
-      <div style={{ position: "absolute", top: 10, left: 10, zIndex: 2 }}>
+      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 2 }}>
         <span
           style={{
             background: tag.bg,
@@ -74,8 +75,9 @@ function ProductTile({ product }: { product: Product }) {
             fontSize: "0.42rem",
             letterSpacing: "0.18em",
             textTransform: "uppercase",
-            padding: "0.24rem 0.6rem",
-            borderRadius: 5,
+            padding: "0.26rem 0.6rem",
+            borderRadius: 4,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
           }}
         >
           {tag.label}
@@ -87,11 +89,11 @@ function ProductTile({ product }: { product: Product }) {
         onClick={handleAddToCart}
         style={{
           position: "absolute",
-          top: 8,
-          right: 8,
+          top: 10,
+          right: 10,
           zIndex: 2,
-          width: 32,
-          height: 32,
+          width: 34,
+          height: 34,
           borderRadius: "50%",
           background: added ? "#111" : "#fff",
           border: "1px solid #e0e0e0",
@@ -99,50 +101,70 @@ function ProductTile({ product }: { product: Product }) {
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-          transition: "background 0.2s, border-color 0.2s",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          transition: "all 0.2s",
         }}
         aria-label="Add to cart"
       >
         {added ? (
           <Check size={14} color="#fff" strokeWidth={3} />
         ) : (
-          <Plus size={14} color="#333" strokeWidth={2.5} />
+          <Plus size={15} color="#222" strokeWidth={2.5} />
         )}
       </button>
 
-      {/* Product image */}
+      {/* Product image link */}
       <Link href={`/product/${product.slug}`} style={{ textDecoration: "none", flex: 1, display: "flex", flexDirection: "column" }}>
         <div
           className="card-img"
           style={{
-            background: "#f8f8f8",
+            background: "#f7f7f7",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            minHeight: 230,
+            aspectRatio: "1 / 1.15",
+            width: "100%",
             overflow: "hidden",
+            position: "relative",
           }}
         >
           {product.customImage ? (
             <img
               src={product.customImage}
               alt={product.name}
-              style={{ width: "100%", height: 230, objectFit: "cover" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center",
+                display: "block",
+                transition: "transform 0.35s ease",
+              }}
             />
           ) : (
-            <ProductMockup product={product} size={140} />
+            <ProductMockup product={product} size={150} />
           )}
         </div>
 
-        {/* Info */}
-        <div className="card-info" style={{ padding: "0.95rem 1.1rem 1.1rem", borderTop: "1px solid #f2f2f2", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        {/* Product Details */}
+        <div
+          className="card-info"
+          style={{
+            padding: "1rem 1.1rem 1.1rem",
+            borderTop: "1px solid #f0f0f0",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            background: "#fff",
+          }}
+        >
           <div>
             <div
               style={{
                 fontFamily: "Inter, sans-serif",
-                fontSize: "0.68rem",
-                fontWeight: 600,
+                fontSize: "0.72rem",
+                fontWeight: 700,
                 color: "#111",
                 lineHeight: 1.35,
                 marginBottom: 8,
@@ -150,18 +172,19 @@ function ProductTile({ product }: { product: Product }) {
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
+                minHeight: "1.9em",
               }}
             >
               {product.name}
             </div>
 
             {/* Price row */}
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
               <span
                 style={{
                   fontFamily: "Space Mono, monospace",
                   fontWeight: 700,
-                  fontSize: "0.88rem",
+                  fontSize: "0.92rem",
                   color: "#111",
                 }}
               >
@@ -171,8 +194,8 @@ function ProductTile({ product }: { product: Product }) {
                 <span
                   style={{
                     fontFamily: "Space Mono, monospace",
-                    fontSize: "0.62rem",
-                    color: "#bbb",
+                    fontSize: "0.64rem",
+                    color: "#aaa",
                     textDecoration: "line-through",
                   }}
                 >
@@ -182,33 +205,34 @@ function ProductTile({ product }: { product: Product }) {
             </div>
           </div>
 
-          {/* Wishlist row */}
+          {/* Wishlist button */}
           <button
             onClick={(e) => {
               e.preventDefault();
               toggleItem(product.slug);
             }}
             style={{
-              marginTop: 8,
-              display: "flex",
+              marginTop: 12,
+              display: "inline-flex",
               alignItems: "center",
               gap: 5,
               background: "none",
               border: "none",
               cursor: "pointer",
               padding: 0,
+              alignSelf: "flex-start",
             }}
           >
             <Heart
               size={12}
-              color={wishlisted ? "#e8000d" : "#ccc"}
+              color={wishlisted ? "#e8000d" : "#bbb"}
               fill={wishlisted ? "#e8000d" : "none"}
             />
             <span
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontSize: "0.48rem",
-                color: wishlisted ? "#e8000d" : "#bbb",
+                color: wishlisted ? "#e8000d" : "#888",
                 fontWeight: 600,
                 letterSpacing: "0.08em",
               }}
@@ -222,7 +246,7 @@ function ProductTile({ product }: { product: Product }) {
   );
 }
 
-/* ── Single Drop Section Component ──────────────────────── */
+/* ── Drop Section Component ─────────────────────────────── */
 interface DropSectionProps {
   badge: string;
   title: string;
@@ -236,13 +260,22 @@ function DropSection({ badge, title, subtitle, products, categoryKey, bg = "#fff
   if (products.length === 0) return null;
 
   return (
-    <section style={{ background: bg, padding: "3.5rem 0", borderBottom: "1px solid #eee" }}>
-      <div style={{ maxWidth: 1440, margin: "0 auto", padding: "0 1.5rem" }}>
+    <section style={{ background: bg, padding: "4rem 0", borderBottom: "1px solid #ebebeb" }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto", padding: "0 1.5rem" }}>
 
         {/* Section Header */}
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: "2.2rem",
+            flexWrap: "wrap",
+            gap: 16,
+          }}
+        >
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <span
                 style={{
                   fontFamily: "Inter, sans-serif",
@@ -252,7 +285,7 @@ function DropSection({ badge, title, subtitle, products, categoryKey, bg = "#fff
                   textTransform: "uppercase",
                   background: "#111",
                   color: "#fff",
-                  padding: "0.2rem 0.55rem",
+                  padding: "0.22rem 0.6rem",
                   borderRadius: 4,
                 }}
               >
@@ -262,7 +295,7 @@ function DropSection({ badge, title, subtitle, products, categoryKey, bg = "#fff
             <h2
               style={{
                 fontFamily: "Anton, sans-serif",
-                fontSize: "clamp(1.8rem, 4vw, 2.6rem)",
+                fontSize: "clamp(1.9rem, 4.5vw, 2.8rem)",
                 letterSpacing: "0.04em",
                 color: "#111",
                 textTransform: "uppercase",
@@ -275,10 +308,10 @@ function DropSection({ badge, title, subtitle, products, categoryKey, bg = "#fff
             <p
               style={{
                 fontFamily: "Inter, sans-serif",
-                fontSize: "0.68rem",
-                color: "#777",
-                maxWidth: 540,
-                lineHeight: 1.5,
+                fontSize: "0.72rem",
+                color: "#666",
+                maxWidth: 580,
+                lineHeight: 1.55,
               }}
             >
               {subtitle}
@@ -294,16 +327,17 @@ function DropSection({ badge, title, subtitle, products, categoryKey, bg = "#fff
               gap: 6,
               fontFamily: "Inter, sans-serif",
               fontWeight: 700,
-              fontSize: "0.62rem",
+              fontSize: "0.64rem",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               textDecoration: "none",
               color: "#111",
-              background: "#fafafa",
+              background: "#fff",
               border: "1.5px solid #111",
               borderRadius: 24,
-              padding: "0.55rem 1.1rem",
+              padding: "0.6rem 1.25rem",
               transition: "all 0.2s",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
             }}
           >
             Explore Drop ({products.length}) <ArrowRight size={13} />
@@ -312,11 +346,11 @@ function DropSection({ badge, title, subtitle, products, categoryKey, bg = "#fff
 
         {/* Products Grid */}
         <div
-          className="grid-products"
+          className="drop-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))",
-            gap: "18px",
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+            gap: "22px",
           }}
         >
           {products.map((p) => (
@@ -368,6 +402,20 @@ export function TrendingSection() {
         categoryKey="BASICS"
         bg="#fff"
       />
+
+      <style>{`
+        @media (min-width: 1100px) {
+          .drop-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .drop-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

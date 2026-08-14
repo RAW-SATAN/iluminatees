@@ -51,13 +51,32 @@ export function useProductsState(): ProductsState {
         const added: CustomProduct[]             = JSON.parse(localStorage.getItem(ADDED_KEY)   ?? "[]");
         const deleted: string[]                  = JSON.parse(localStorage.getItem(DELETED_KEY) ?? "[]");
 
+const CANONICAL_CATEGORY_BY_SLUG: Record<string, "SAMURAI" | "MISFITS" | "BASICS"> = {
+  "the-katana": "SAMURAI",
+  "the-black-samurai": "SAMURAI",
+  "the-bankai": "SAMURAI",
+  "the-sakura": "SAMURAI",
+  "the-crime-scene": "MISFITS",
+  "the-pink-panther": "MISFITS",
+  "the-capybara": "MISFITS",
+  "iluminatees-basics-black": "BASICS",
+  "iluminatees-basics-beige": "BASICS",
+  "-iluminatees-basics-navy-blue": "BASICS",
+  "iluminatees-basics-white": "BASICS",
+};
+
         const applyEdit = (base: Product, e: ProductEdit, slug: string): Product => {
           const imgs = permanentImages[slug] || e.customImages || (e.customImage ? [e.customImage] : undefined);
+          const rawCat = e.category;
+          const validCat = (rawCat === "SAMURAI" || rawCat === "MISFITS" || rawCat === "BASICS")
+            ? rawCat
+            : (CANONICAL_CATEGORY_BY_SLUG[slug] ?? base.category ?? "SAMURAI");
+
           return {
             ...base,
             name:          e.name          ?? base.name,
             description:   e.description   ?? base.description,
-            category:      e.category      ?? base.category,
+            category:      validCat,
             sizes:         e.sizes ? (e.sizes.split(",").map(s => s.trim()) as Product["sizes"]) : base.sizes,
             limited:       e.limited       ?? base.limited,
             price:         e.price         ?? base.price,
