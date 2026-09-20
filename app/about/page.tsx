@@ -49,16 +49,16 @@ export default function AboutPage() {
 
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 32 }}>
 
-          {/* Adv. Sneha Mishra */}
+          {/* Aman Mudgal */}
           <div style={{ width: 280, textAlign: 'center' }}>
             <div style={{ width: 160, height: 160, borderRadius: '50%', background: 'linear-gradient(135deg,#1a0000,#330000)', border: '1px solid rgba(204,0,0,.3)', margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 52, color: '#cc0000', letterSpacing: '.04em' }}>SM</span>
+              <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 52, color: '#cc0000', letterSpacing: '.04em' }}>AM</span>
               <div style={{ position: 'absolute', bottom: 8, right: 8, width: 16, height: 16, borderRadius: '50%', background: '#cc0000' }} />
             </div>
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: '.06em', color: '#f0ece8', marginBottom: 4 }}>Adv. Sneha Mishra</div>
-            <div style={{ fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase', color: '#cc0000', marginBottom: 16 }}>Legal Advisor & Co-Founder</div>
+            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: '.06em', color: '#f0ece8', marginBottom: 4 }}>Aman Mudgal</div>
+            <div style={{ fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase', color: '#cc0000', marginBottom: 16 }}>Founder</div>
             <p style={{ fontSize: 13, lineHeight: 1.8, color: 'rgba(240,236,232,.45)' }}>
-              The legal backbone of ILUMINATEES. Sneha ensures every drop, collab, and contract stands on solid ground — so the brand can push every other boundary freely.
+              Building ILUMINATEES from India — one limited drop at a time. Every piece is designed, quality-checked and shipped under his watch.
             </p>
           </div>
 

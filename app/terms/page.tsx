@@ -6,7 +6,7 @@ export default function TermsPage() {
   return (
     <PolicyPage title="Terms & Conditions" updated="July 17, 2026">
       {[
-        ["About Us", "ILUMINATEES is an India-based streetwear brand selling limited-run graphic t-shirts through this website (iluminatees.com). By placing an order you agree to these terms."],
+        ["About Us", "ILUMINATEES is a brand owned and operated by Aman Mudgal (sole proprietor), an India-based streetwear label selling limited-run graphic t-shirts through this website (iluminatees.com). Registered legal name: Aman Mudgal. By placing an order you agree to these terms."],
         ["Orders & Pricing", "All prices are in Indian Rupees (INR) and include applicable taxes. An order is confirmed once we verify it with you on WhatsApp or call. We reserve the right to cancel orders in case of pricing errors, stock unavailability or suspected fraud — any amount paid will be fully refunded."],
         ["Payments", "We accept UPI payments (prepaid, with the displayed discount). Prepaid orders are processed after the payment is verified. Payment is made directly to our UPI ID — we never ask for your PIN, OTP or card details."],
         ["Shipping & Delivery", "Orders ship Pan-India within 3–5 business days. Delivery timelines are estimates and may vary with courier delays. See our Shipping Policy for details."],
